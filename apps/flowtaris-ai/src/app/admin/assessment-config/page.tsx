@@ -195,11 +195,33 @@ export interface AssessmentConfigData {
   }
   tourAndResults: {
     tourSteps: Array<{ target: string; text: string }>
+    assessmentCompleteLabel: string
     resultsHeading: string
     resultsSubtitle: string
+    scoreLabel: string
+    estSavingsLabel: string
+    perYearLabel: string
+    kpiOpportunitiesLabel: string
+    kpiOpportunitiesUnit: string
+    kpiQuickWinsLabel: string
+    kpiQuickWinsUnit: string
+    kpiFastestPaybackLabel: string
+    kpiFastestPaybackUnit: string
+    kpiProfileLabel: string
+    kpiProfileUnit: string
+    catQuickWinLabel: string
+    catQuickWinSub: string
+    catStrategicLabel: string
+    catStrategicSub: string
+    catInnovationLabel: string
+    catInnovationSub: string
     emailCaptureHeadline: string
     emailCaptureDescription: string
     emailCaptureButtonText: string
+    ctaRoiTitle: string
+    ctaRoiSubtitle: string
+    ctaContactTitle: string
+    ctaContactSubtitle: string
   }
 }
 

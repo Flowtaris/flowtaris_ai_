@@ -3,116 +3,24 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Clock, Users, TrendingUp, DollarSign, CheckCircle, ChevronRight, BarChart2, Zap, ShieldCheck, Search, Filter } from 'lucide-react'
 
-const CASE_STUDIES = [
-  {
-    slug: 'global-saas-decacorn',
-    client: 'Global SaaS Decacorn',
-    sector: 'SaaS / Technology',
-    label: 'CONFIDENTIAL — ANONYMIZED',
-    headline: '$4.5M saved. 50,000 invoices/month. Automated in 90 days.',
-    subheadline: 'How a $10B SaaS company with 12 subsidiaries eliminated 95% of manual AP labor using GenAI — without replacing NetSuite or Coupa.',
-    heroImage: '/case-studies/cs_saas_decacorn.png',
-    platforms: ['NetSuite', 'Coupa'],
-    capabilityTags: ['GenAI Document Intelligence', 'Autonomous Workflow Engine'],
-    timeline: '90 days',
-    teamSize: 8,
-    keyNumbers: [
-      { metric: '$4.5M', label: 'Annual Savings', color: '#c084fc' },
-      { metric: '99%', label: 'Faster Processing', color: '#38bdf8' },
-      { metric: '95%', label: 'Labor Reduction', color: '#34d399' },
-      { metric: '18 FTE', label: 'Redeployed', color: '#fb923c' },
-    ],
-    tags: ['NetSuite', 'Coupa', 'SaaS', 'AP Automation'],
-  },
-  {
-    slug: 'fintech-unicorn',
-    client: 'FinTech Unicorn',
-    sector: 'Financial Services / FinTech',
-    label: 'CONFIDENTIAL — ANONYMIZED',
-    headline: 'Zero liquidity events. 92% forecast accuracy. In 4 months.',
-    subheadline: 'A $3B FinTech eliminated 12 annual liquidity crises by replacing spreadsheet forecasting with AI-driven predictive models across SAP and Workday.',
-    heroImage: '/case-studies/cs_fintech_forecast.png',
-    platforms: ['SAP', 'Workday'],
-    capabilityTags: ['Predictive Analytics', 'Integration Health Monitoring'],
-    timeline: '4 months',
-    teamSize: 6,
-    keyNumbers: [
-      { metric: '$12M', label: 'Risk Eliminated', color: '#c084fc' },
-      { metric: '92%', label: 'Forecast Accuracy', color: '#38bdf8' },
-      { metric: '0', label: 'Liquidity Events', color: '#34d399' },
-      { metric: '95%', label: 'Analyst Hours Saved', color: '#fb923c' },
-    ],
-    tags: ['SAP', 'Workday', 'FinTech', 'Cash Forecasting'],
-  },
-  {
-    slug: 'healthcare-manufacturing',
-    client: 'Healthcare Manufacturing Co.',
-    sector: 'Healthcare / Manufacturing',
-    label: 'CONFIDENTIAL — ANONYMIZED',
-    headline: '99.5% PO match rate. Vendor disputes down 95%. SOC2 achieved.',
-    subheadline: 'A $800M healthcare manufacturer eliminated 15% payment delays and vendor disputes across NetSuite and SAP by deploying AI-driven 3-way matching and governance controls.',
-    heroImage: '/case-studies/cs_manufacturing_compliance.png',
-    platforms: ['NetSuite', 'SAP'],
-    capabilityTags: ['GenAI Document Intelligence', 'AI Governance & Compliance'],
-    timeline: '5 months',
-    teamSize: 10,
-    keyNumbers: [
-      { metric: '99.5%', label: 'PO Match Rate', color: '#c084fc' },
-      { metric: '95%', label: 'Fewer Disputes', color: '#38bdf8' },
-      { metric: '0.5%', label: 'Payment Delay Rate', color: '#34d399' },
-      { metric: 'SOC2', label: 'Audit Pass', color: '#fb923c' },
-    ],
-    tags: ['NetSuite', 'SAP', 'Manufacturing', 'Compliance'],
-  },
-  {
-    slug: 'global-retail-erp-transformation',
-    client: 'Global Retail & E-Commerce Group',
-    sector: 'Retail / E-Commerce',
-    label: 'CONFIDENTIAL — ANONYMIZED',
-    headline: '84% faster month-end close. $3.2M in recaptured vendor rebates. 8 weeks.',
-    subheadline: 'A 450-outlet global retailer compressed its 14-day close cycle to under 3 days and unlocked $3.2M in previously missed vendor rebates using real-time GenAI finance automation.',
-    heroImage: '/case-studies/cs_saas_decacorn.png',
-    platforms: ['NetSuite', 'Workday'],
-    capabilityTags: ['GenAI Document Intelligence', 'Predictive Analytics', 'Conversational ERP Interface'],
-    timeline: '8 weeks',
-    teamSize: 9,
-    keyNumbers: [
-      { metric: '$3.2M', label: 'Rebates Recaptured', color: '#c084fc' },
-      { metric: '84%', label: 'Faster Close', color: '#38bdf8' },
-      { metric: '99%', label: 'Rebate Capture Rate', color: '#34d399' },
-      { metric: '28', label: 'Entities Consolidated', color: '#fb923c' },
-    ],
-    tags: ['NetSuite', 'Workday', 'Retail', 'Month-End Close', 'Vendor Rebates'],
-  },
-  {
-    slug: 'professional-services-erp-ai',
-    client: 'Global Management Consulting Firm',
-    sector: 'Professional Services / Consulting',
-    label: 'CONFIDENTIAL — ANONYMIZED',
-    headline: '$1.8M recovered in unbilled time. 97% T&E compliance. 60 days.',
-    subheadline: 'A top-20 consulting firm used AI time intelligence and T&E compliance automation to recover $1.8M in unbilled revenue and achieve 97% expense policy compliance across 820 consultants in 14 countries.',
-    heroImage: '/case-studies/cs_fintech_forecast.png',
-    platforms: ['SAP', 'Workday'],
-    capabilityTags: ['Autonomous Workflow Engine', 'Conversational ERP Interface', 'AI Governance & Compliance'],
-    timeline: '60 days',
-    teamSize: 7,
-    keyNumbers: [
-      { metric: '$1.8M', label: 'Revenue Recovered', color: '#c084fc' },
-      { metric: '97%', label: 'T&E Compliance', color: '#38bdf8' },
-      { metric: '92%', label: 'Faster Invoicing', color: '#34d399' },
-      { metric: '820', label: 'Consultants Impacted', color: '#fb923c' },
-    ],
-    tags: ['SAP', 'Workday', 'Professional Services', 'T&E', 'Revenue Recovery'],
-  },
-]
-
-const ALL_TAGS = ['All', 'NetSuite', 'Coupa', 'SAP', 'Workday', 'SaaS', 'FinTech', 'Manufacturing', 'Retail', 'Professional Services', 'AP Automation', 'Cash Forecasting', 'Compliance', 'T&E', 'Month-End Close']
-
-export default function CaseStudiesClient() {
+export default function CaseStudiesClient({
+  caseStudies,
+  heroConfig
+}: {
+  caseStudies: any[]
+  heroConfig?: any
+}) {
   const [activeTag, setActiveTag] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
 
-  const filtered = CASE_STUDIES.filter(cs => {
+  const formattedCaseStudies = caseStudies.map(cs => ({
+    slug: cs.slug,
+    ...(cs.content_data || {})
+  }))
+
+  const ALL_TAGS = ['All', ...Array.from(new Set(formattedCaseStudies.flatMap(cs => cs.tags || []))).sort()]
+
+  const filtered = formattedCaseStudies.filter(cs => {
     const matchTag = activeTag === 'All' || cs.tags.includes(activeTag)
     const matchSearch = !searchQuery ||
       cs.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -135,27 +43,27 @@ export default function CaseStudiesClient() {
         <div className="max-w-5xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.3em] text-[#c084fc] bg-[#c084fc]/10 border border-[#c084fc]/30 px-5 py-2 rounded-full mb-10">
             <span className="w-1.5 h-1.5 rounded-full bg-[#c084fc] animate-pulse" />
-            Verified Customer Results
+            {heroConfig?.badgeText || 'Verified Customer Results'}
           </div>
 
           <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black leading-[1.02] tracking-tight mb-8">
-            Real Transformations.
+            {heroConfig?.titleLine1 || 'Real Transformations.'}
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#c084fc] via-[#a855f7] to-[#38bdf8]">Measured Results.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#c084fc] via-[#a855f7] to-[#38bdf8]">{heroConfig?.titleLine2 || 'Measured Results.'}</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-400 font-light leading-relaxed max-w-3xl mb-12">
-            Three enterprise deployments across NetSuite, SAP, Coupa, and Workday — with real before/after data, full technical architectures, and team testimonials. Client names anonymized per confidentiality agreements.
+            {heroConfig?.subtitle || 'Three enterprise deployments across NetSuite, SAP, Coupa, and Workday — with real before/after data, full technical architectures, and team testimonials. Client names anonymized per confidentiality agreements.'}
           </p>
 
           {/* Aggregate numbers */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-14">
             {[
-            { number: '$27M+', label: 'Combined Value Delivered', accent: '#c084fc' },
-            { number: '5', label: 'Enterprise Deployments', accent: '#38bdf8' },
-            { number: '<8 wks', label: 'Average Time to Value', accent: '#34d399' },
-            { number: '99%', label: 'Avg Automation Rate Achieved', accent: '#fb923c' },
-          ].map(stat => (
+              { number: heroConfig?.metric1Value || '$27M+', label: heroConfig?.metric1Label || 'Combined Value Delivered', accent: '#c084fc' },
+              { number: heroConfig?.metric2Value || '5', label: heroConfig?.metric2Label || 'Enterprise Deployments', accent: '#38bdf8' },
+              { number: heroConfig?.metric3Value || '<8 wks', label: heroConfig?.metric3Label || 'Average Time to Value', accent: '#34d399' },
+              { number: heroConfig?.metric4Value || '99%', label: heroConfig?.metric4Label || 'Avg Automation Rate Achieved', accent: '#fb923c' },
+            ].map(stat => (
               <div key={stat.label} className="rounded-2xl border border-white/[0.07] bg-white/[0.03] p-5 backdrop-blur-sm">
                 <div className="text-3xl font-black mb-1" style={{ color: stat.accent }}>{stat.number}</div>
                 <div className="text-xs text-gray-500 font-medium leading-snug">{stat.label}</div>
@@ -196,11 +104,10 @@ export default function CaseStudiesClient() {
               <button
                 key={tag}
                 onClick={() => setActiveTag(tag)}
-                className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-full transition-all duration-200 ${
-                  activeTag === tag
+                className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-full transition-all duration-200 ${activeTag === tag
                     ? 'bg-[#c084fc] text-white shadow-lg'
                     : 'bg-white/[0.05] text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
-                }`}
+                  }`}
               >
                 {tag}
               </button>
@@ -271,21 +178,28 @@ export default function CaseStudiesClient() {
                       </p>
 
                       {/* Key Numbers */}
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                        {cs.keyNumbers.map(kn => (
-                          <div key={kn.label} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 text-center">
-                            <div className="text-xl font-black mb-0.5" style={{ color: kn.color }}>{kn.metric}</div>
-                            <div className="text-[10px] text-gray-500 font-medium leading-tight">{kn.label}</div>
-                          </div>
-                        ))}
-                      </div>
+                      {(cs.keyMetrics || cs.keyNumbers || []).length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                          {(cs.keyMetrics || cs.keyNumbers).slice(0, 4).map((kn: any) => {
+                            // Support both old and new data structures
+                            const displayMetric = kn.direction === 'value' ? kn.value : (kn.improvement ? `${kn.improvement}%` : kn.metric)
+                            
+                            return (
+                              <div key={kn.label} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 text-center">
+                                <div className="text-xl font-black mb-0.5" style={{ color: kn.color || '#38bdf8' }}>{displayMetric}</div>
+                                <div className="text-[10px] text-gray-500 font-medium leading-tight">{kn.label}</div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
 
                       {/* Platform & Capability Tags */}
                       <div className="flex flex-wrap gap-2 mb-6">
-                        {cs.platforms.map(p => (
+                        {(cs.platforms || []).map((p: string) => (
                           <span key={p} className="text-xs font-bold px-3 py-1 rounded-full bg-[#38bdf8]/10 text-[#38bdf8] border border-[#38bdf8]/20">{p}</span>
                         ))}
-                        {cs.capabilityTags.map(c => (
+                        {(cs.capabilityTags || []).map((c: string) => (
                           <span key={c} className="text-xs font-medium px-3 py-1 rounded-full bg-white/[0.05] text-gray-400 border border-white/10">{c}</span>
                         ))}
                       </div>

@@ -113,9 +113,12 @@ type SiteConfigFormData = {
   analytics: string
   seo: string
   trust_signals: any[]
+  newsletter_title: string
+  newsletter_description: string
+  newsletter_button_text: string
 }
 
-const DEFAULT_LOGO = 'https://www.flowtaris.com/logo.svg'
+const DEFAULT_LOGO = '/images/flowtaris.avif'
 const DEFAULTS: SiteConfigFormData = {
   site_name: 'Flowtaris AI',
   site_url: 'https://flowtaris.ai',
@@ -144,6 +147,9 @@ const DEFAULTS: SiteConfigFormData = {
     { id: '5', label: 'API Calls/Day', value: '50M+' },
     { id: '6', label: 'Trusted By', value: 'Fortune 500' },
   ],
+  newsletter_title: 'Stay ahead in Enterprise AI',
+  newsletter_description: 'Join 10,000+ finance leaders receiving our weekly insights on autonomous workflows, GenAI document intelligence, and predictive analytics.',
+  newsletter_button_text: 'Subscribe',
 }
 
 // ── Logo Upload Component ─────────────────────────────────────────────────────
@@ -398,6 +404,114 @@ function LogoManager({
   )
 }
 
+// ── Favicon Upload Component ──────────────────────────────────────────────────
+
+function FaviconUpload({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (url: string) => void
+}) {
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+  const [previewError, setPreviewError] = useState(false)
+  const [isDragOver, setIsDragOver] = useState(false)
+
+  const handleFileUpload = async (file: File) => {
+    if (!file) return
+    setUploading(true)
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `favicon-${Date.now()}.${fileExt}`
+      const { error } = await supabase.storage.from('assets').upload(fileName, file)
+      if (error) throw error
+      const { data: { publicUrl } } = supabase.storage.from('assets').getPublicUrl(fileName)
+      onChange(publicUrl)
+      setPreviewError(false)
+    } catch (err) {
+      console.error(err)
+      alert('Failed to upload favicon. Make sure it is a valid image file.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const onDragOver = (e: React.DragEvent) => { e.preventDefault(); setIsDragOver(true) }
+  const onDragLeave = () => setIsDragOver(false)
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(false)
+    if (e.dataTransfer.files?.[0]) handleFileUpload(e.dataTransfer.files[0])
+  }
+
+  return (
+    <div className="mb-5">
+      <Label>Favicon</Label>
+      <div className="flex items-start gap-4">
+        {/* Preview / Upload Box */}
+        <div
+          className={`relative w-16 h-16 flex-shrink-0 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden cursor-pointer transition-colors group
+            ${isDragOver ? 'border-blue-500 bg-blue-50/50' : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 hover:border-blue-400'}`}
+          onClick={() => fileRef.current?.click()}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={onDrop}
+          title="Click or drag to upload favicon"
+        >
+          <input
+            type="file"
+            ref={fileRef}
+            className="hidden"
+            accept="image/*,.ico"
+            onChange={e => { if (e.target.files?.[0]) handleFileUpload(e.target.files[0]) }}
+          />
+          {uploading ? (
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+              <span className="text-[9px] text-gray-500 font-medium">Uploading</span>
+            </div>
+          ) : value && !previewError ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={value}
+                alt="Favicon preview"
+                className="w-10 h-10 object-contain group-hover:opacity-40 transition-opacity"
+                onError={() => setPreviewError(true)}
+              />
+              <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <Upload className="w-5 h-5 text-blue-500 mb-0.5" />
+                <span className="text-[9px] font-bold text-blue-600">Change</span>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center gap-1 text-gray-400">
+              <ImageIcon className="w-6 h-6" />
+              <span className="text-[9px] font-semibold uppercase tracking-wider">Upload</span>
+            </div>
+          )}
+        </div>
+
+        {/* URL Input */}
+        <div className="flex-1">
+          <input
+            type="text"
+            value={value}
+            onChange={e => { onChange(e.target.value); setPreviewError(false) }}
+            placeholder="/favicon.ico or https://..."
+            className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3.5 py-2.5 text-sm
+              bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+              placeholder-gray-400 dark:placeholder-gray-500
+              focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all"
+          />
+          <p className="text-xs text-gray-400 mt-1">Path or URL to the site favicon (ICO, PNG, or SVG). Click the box or drag a file to upload.</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Header Live Preview ───────────────────────────────────────────────────────
 
 function HeaderPreview({ brandName, badgeText, showLogo, logoUrl }: {
@@ -648,6 +762,9 @@ export default function SiteConfigPage() {
             analytics: JSON.stringify(data.analytics ?? {}, null, 2),
             seo: JSON.stringify(data.seo ?? {}, null, 2),
             trust_signals: (data as any).trust_signals ?? DEFAULTS.trust_signals,
+            newsletter_title: (data as any).newsletter_config?.title || DEFAULTS.newsletter_title,
+            newsletter_description: (data as any).newsletter_config?.description || DEFAULTS.newsletter_description,
+            newsletter_button_text: (data as any).newsletter_config?.buttonText || DEFAULTS.newsletter_button_text,
           }
           
           if ((data as any).trust_signals) {
@@ -711,6 +828,11 @@ export default function SiteConfigPage() {
           analytics: analytics,
           seo: seo,
           trust_signals: config.trust_signals,
+          newsletter_config: {
+            title: config.newsletter_title,
+            description: config.newsletter_description,
+            buttonText: config.newsletter_button_text,
+          },
         }),
       })
       const json = await res.json()
@@ -837,13 +959,9 @@ export default function SiteConfigPage() {
             placeholder="Enterprise AI Automation for Finance"
             hint="Short value proposition — used in meta descriptions and hero text"
           />
-          <Input
-            id="favicon_url"
-            label="Favicon URL"
+          <FaviconUpload
             value={config.favicon_url}
             onChange={v => update('favicon_url', v)}
-            placeholder="/favicon.ico"
-            hint="Path or URL to the site favicon (ICO, PNG, or SVG)"
           />
         </Section>
 
@@ -880,6 +998,24 @@ export default function SiteConfigPage() {
           </div>
         </Section>
 
+        {/* ── SECTION: NEWSLETTER CTA ── */}
+        <Section title="Footer Newsletter CTA" icon={Tag} accent="amber">
+          <Input id="newsletter_title" label="Newsletter Title"
+            value={config.newsletter_title}
+            onChange={v => update('newsletter_title', v)}
+            placeholder="Stay ahead in Enterprise AI"
+            hint="The headline of the newsletter CTA section in the footer" />
+          <Textarea id="newsletter_description" label="Newsletter Description"
+            value={config.newsletter_description}
+            onChange={v => update('newsletter_description', v)} rows={3}
+            hint="Supporting text below the newsletter title" />
+          <Input id="newsletter_button_text" label="Subscribe Button Text"
+            value={config.newsletter_button_text}
+            onChange={v => update('newsletter_button_text', v)}
+            placeholder="Subscribe"
+            hint="Text for the newsletter subscribe button" />
+        </Section>
+
         <Section title="Advanced Configuration (JSON)" icon={Tag} accent="blue">
           <Textarea id="social_links" label="Social links (JSON)" value={config.social_links}
             onChange={v => update('social_links', v)} rows={5}
@@ -896,12 +1032,12 @@ export default function SiteConfigPage() {
         </Section>
 
         {/* ── SUBMIT ── */}
-        <div className="flex items-center justify-between pt-2 pb-8">
+        <div className="sticky bottom-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 -mx-6 px-6 py-4 mt-6 flex items-center justify-between">
           <p className="text-xs text-gray-400">Changes take effect on next page load after saving.</p>
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl
               bg-gradient-to-r from-blue-600 to-blue-700
               hover:from-blue-500 hover:to-blue-600
               text-white text-sm font-bold shadow-lg shadow-blue-500/20

@@ -3,20 +3,47 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowUpRight, Github, Linkedin, Twitter, ArrowRight } from 'lucide-react'
+import { ArrowUpRight, Github, Linkedin, Twitter, ArrowRight, Youtube, Instagram, Facebook, Mail, MapPin } from 'lucide-react'
 
 export default function SiteFooter({ config }: { config?: any } = {}) {
   const logoUrl = config?.logoUrl || "/images/logo.png"
   const tagline = config?.tagline || "The intelligence layer enterprise finance was missing. Built by the best, deployed in weeks."
+
+  // Newsletter CTA — dynamic from admin
+  const newsletter = config?.newsletterConfig ?? {}
+  const newsletterTitle = newsletter.title || 'Stay ahead in Enterprise AI'
+  const newsletterDescription = newsletter.description || 'Join 10,000+ finance leaders receiving our weekly insights on autonomous workflows, GenAI document intelligence, and predictive analytics.'
+  const newsletterButtonText = newsletter.buttonText || 'Subscribe'
+
+  // Social links — dynamic from admin (JSON object: {linkedin, twitter, github})
+  const socialLinks = config?.socialLinks ?? {}
+  const phone = socialLinks.phone || '+91 9391274394'
+  const emailUrl = socialLinks.email || 'mailto:hello@flowtaris.com'
+  const linkedinUrl = socialLinks.linkedin || 'https://www.linkedin.com/company/flowtaris-private-limited/'
+  const twitterUrl = socialLinks.twitter || 'https://x.com/flowtaris'
+  const facebookUrl = socialLinks.facebook || 'https://www.facebook.com/people/Flowtaris/61588772333370/#'
+  const youtubeUrl = socialLinks.youtube || 'https://www.youtube.com/@Flowtaris'
+  const mapUrl = socialLinks.map || 'https://www.google.com/search?sca_esv=96d5796968b1433c&rlz=1CDGOYI_enIN1181IN1181&hl=en-US&sxsrf=APpeQns0i6Wv56arcLK29N7ke_P-BipzBA:1782895358308&kgmid=/g/11d_z6tqlf&q=Swarna+Residency+Apartment&shem=epsd1,ltae,rimspwouoe&shndl=30&source=sh/x/loc/tile/m1/3&kgs=6e6b2f36f5c65751&utm_source=epsd1,ltae,rimspwouoe,sh/x/loc/tile/m1/3'
+  const whatsappUrl = socialLinks.whatsapp || 'https://api.whatsapp.com/send/?phone=919391274394&text=Hi+Flowtaris%2C+I+would+like+to+inquire+about+your+services.&type=phone_number&app_absent=0'
+  const instagramUrl = socialLinks.instagram || 'https://www.instagram.com/flowtaris_official?igsh=d2N5a2FzZDlqZ2F5&utm_source=qr'
+
+  // Legal links — dynamic from admin
+  const privacyUrl = config?.privacyPolicyUrl || '/privacy'
+  const termsUrl = config?.termsOfServiceUrl || '/terms'
   
   // Use navigation json if provided, otherwise fallback to defaults
-  const resources = config?.navigation?.footer?.resources || [
+  const resources = (config?.navigation?.footer?.resources || [
     { label: 'Insights', href: '/insights' },
     { label: 'Case Studies', href: '/case-studies' },
     { label: 'ROI Calculator', href: '/roi-calculator' },
     { label: 'Assessment', href: '/assessment' },
     { label: 'Cost of Inaction', href: '/cost-of-inaction' },
-  ]
+  ]).filter((link: any) => {
+    if (link.href === '/roi-calculator' && config?.roiCalculatorConfig?.shutdown) return false
+    if (link.href === '/cost-of-inaction' && config?.coiCalculatorConfig?.shutdown) return false
+    return true
+  })
+  
   const company = config?.navigation?.footer?.company || [
     { label: 'About Us', href: '/about-flowtaris-ai' },
     { label: 'Contact', href: '/contact' },
@@ -38,9 +65,9 @@ export default function SiteFooter({ config }: { config?: any } = {}) {
           <div className="absolute inset-0 bg-[#D4A847]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
           <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div className="max-w-xl">
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight">Stay ahead in Enterprise AI</h3>
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight">{newsletterTitle}</h3>
               <p className="text-neutral-400 text-sm md:text-base leading-relaxed">
-                Join 10,000+ finance leaders receiving our weekly insights on autonomous workflows, GenAI document intelligence, and predictive analytics.
+                {newsletterDescription}
               </p>
             </div>
             <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3">
@@ -50,7 +77,7 @@ export default function SiteFooter({ config }: { config?: any } = {}) {
                 className="w-full sm:w-72 bg-black/50 border border-white/10 rounded-full px-6 py-3.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#D4A847]/50 focus:ring-1 focus:ring-[#D4A847]/50 transition-all"
               />
               <button className="whitespace-nowrap bg-white text-black font-semibold rounded-full px-8 py-3.5 text-sm hover:bg-[#f0c97a] hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                Subscribe
+                {newsletterButtonText}
               </button>
             </div>
           </div>
@@ -60,18 +87,38 @@ export default function SiteFooter({ config }: { config?: any } = {}) {
         <div className="grid grid-cols-2 md:grid-cols-4 md:grid-cols-12 gap-12 lg:gap-8 mb-20">
           <div className="col-span-2 md:col-span-4 lg:col-span-5 flex flex-col justify-between">
             <div>
-              <Link href="/" className="inline-block mb-8 relative w-[320px] h-[80px]">
+              <Link href="/" className="inline-block mb-6 relative w-[200px] h-[200px]">
                 <Image src={logoUrl} alt="Flowtaris AI" fill className="object-contain object-left" />
               </Link>
               <p className="text-neutral-500 font-light text-sm max-w-xs leading-relaxed mb-8">
                 {tagline}
               </p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-wrap">
+              {phone && (
+                <div className="flex items-center gap-3 mr-2">
+                  <span className="text-white/80 font-bold tracking-widest">{phone}</span>
+                  <div className="w-1.5 h-1.5 bg-white/20 rounded-full" />
+                </div>
+              )}
               {[
-                { icon: <Linkedin className="w-4 h-4" />, href: 'https://flowtaris.com' },
-                { icon: <Twitter className="w-4 h-4" />, href: 'https://flowtaris.com' },
-                { icon: <Github className="w-4 h-4" />, href: 'https://flowtaris.com' },
+                { icon: <Mail className="w-5 h-5" />, href: emailUrl },
+                { icon: <Linkedin className="w-5 h-5" />, href: linkedinUrl },
+                { icon: (
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
+                    <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+                  </svg>
+                ), href: twitterUrl },
+                { icon: <Facebook className="w-5 h-5" />, href: facebookUrl },
+                { icon: <Youtube className="w-5 h-5" />, href: youtubeUrl },
+                { icon: <MapPin className="w-5 h-5" />, href: mapUrl },
+                { icon: (
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.127 1.532 5.862L0 24l6.272-1.506A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.805 9.805 0 01-5.032-1.388l-.36-.214-3.726.895.928-3.625-.235-.372A9.808 9.808 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
+                  </svg>
+                ), href: whatsappUrl },
+                { icon: <Instagram className="w-5 h-5" />, href: instagramUrl },
               ].map((social, i) => (
                 <a 
                   key={i} 
@@ -132,8 +179,8 @@ export default function SiteFooter({ config }: { config?: any } = {}) {
             © {new Date().getFullYear()} Flowtaris AI. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-xs text-neutral-500 font-light">
-            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link href={privacyUrl} className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href={termsUrl} className="hover:text-white transition-colors">Terms of Service</Link>
           </div>
         </div>
 

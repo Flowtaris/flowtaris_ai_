@@ -11,6 +11,9 @@ interface HeaderConfig {
   brandName?: string
   badgeText?: string
   showLogo?: boolean
+  heroConfig?: any
+  roiCalculatorConfig?: any
+  coiCalculatorConfig?: any
 }
 
 interface SiteHeaderProps {
@@ -21,10 +24,22 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  if (pathname?.startsWith('/admin')) {
+    return null
+  }
+
   const logoUrl   = config?.logoUrl   ?? '/images/flowtaris-logo.png'
   const brandName = config?.brandName ?? 'Flowtaris'
   const badgeText = config?.badgeText ?? '.ai'
   const showLogo  = config?.showLogo  !== false
+
+  // Fallback default CTA configuration in case the database is missing it
+  const ctas = config?.heroConfig?.header_ctas || {
+    assessment: { label: 'Assessment', href: '/assessment' },
+    roi: { label: 'ROI', href: '/roi-calculator' },
+    coi: { label: 'Cost of Inaction', href: '/cost-of-inaction', mobileLabel: 'COI' },
+    corporate: { label: 'Corporate', href: 'https://www.flowtaris.com/' }
+  }
 
   const isActive = (path: string) =>
     pathname === path || (pathname?.startsWith(path + '/') && path !== '/')
@@ -129,35 +144,39 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
           aria-label="Main navigation links"
         >
           {/* Assessment */}
-          <Link href="/assessment" className={navItem('/assessment', isActive('/assessment'))}>
+          <Link href={ctas.assessment.href} className={navItem(ctas.assessment.href, isActive(ctas.assessment.href))}>
             <CheckCircle2
-              strokeWidth={isActive('/assessment') ? 2.5 : 2}
+              strokeWidth={isActive(ctas.assessment.href) ? 2.5 : 2}
               className={`w-4 h-4 flex-shrink-0 transition-colors duration-300
-                ${isActive('/assessment') ? 'text-white' : 'text-white/70 group-hover:text-white'}`}
+                ${isActive(ctas.assessment.href) ? 'text-white' : 'text-white/70 group-hover:text-white'}`}
             />
-            <span className="hidden sm:inline">Assessment</span>
+            <span className="hidden sm:inline">{ctas.assessment.label}</span>
           </Link>
 
           {/* ROI Calculator */}
-          <Link href="/roi-calculator" className={navItem('/roi-calculator', isActive('/roi-calculator'))}>
-            <TrendingUp
-              strokeWidth={isActive('/roi-calculator') ? 2.5 : 2}
-              className={`w-4 h-4 flex-shrink-0 transition-colors duration-300
-                ${isActive('/roi-calculator') ? 'text-white' : 'text-white/70 group-hover:text-white'}`}
-            />
-            <span className="hidden sm:inline">ROI</span>
-          </Link>
+          {(!config?.roiCalculatorConfig?.shutdown) && (
+            <Link href={ctas.roi.href} className={navItem(ctas.roi.href, isActive(ctas.roi.href))}>
+              <TrendingUp
+                strokeWidth={isActive(ctas.roi.href) ? 2.5 : 2}
+                className={`w-4 h-4 flex-shrink-0 transition-colors duration-300
+                  ${isActive(ctas.roi.href) ? 'text-white' : 'text-white/70 group-hover:text-white'}`}
+              />
+              <span className="hidden sm:inline">{ctas.roi.label}</span>
+            </Link>
+          )}
 
           {/* Cost of Inaction */}
-          <Link href="/cost-of-inaction" className={navItem('/cost-of-inaction', isActive('/cost-of-inaction'))}>
-            <AlertTriangle
-              strokeWidth={isActive('/cost-of-inaction') ? 2.5 : 2}
-              className={`w-4 h-4 flex-shrink-0 transition-colors duration-300
-                ${isActive('/cost-of-inaction') ? 'text-amber-400' : 'text-amber-400/60 group-hover:text-amber-400'}`}
-            />
-            <span className="hidden md:inline">Cost of Inaction</span>
-            <span className="hidden sm:inline md:hidden">COI</span>
-          </Link>
+          {(!config?.coiCalculatorConfig?.shutdown) && (
+            <Link href={ctas.coi.href} className={navItem(ctas.coi.href, isActive(ctas.coi.href))}>
+              <AlertTriangle
+                strokeWidth={isActive(ctas.coi.href) ? 2.5 : 2}
+                className={`w-4 h-4 flex-shrink-0 transition-colors duration-300
+                  ${isActive(ctas.coi.href) ? 'text-amber-400' : 'text-amber-400/60 group-hover:text-amber-400'}`}
+              />
+              <span className="hidden md:inline">{ctas.coi.label}</span>
+              <span className="hidden sm:inline md:hidden">{ctas.coi.mobileLabel || ctas.coi.label}</span>
+            </Link>
+          )}
         </nav>
 
         {/* ── Separator ── */}
@@ -165,7 +184,7 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
 
         {/* ── CORPORATE LINK ── */}
         <a
-          href="https://www.flowtaris.com/"
+          href={ctas.corporate.href}
           target="_blank"
           rel="noopener noreferrer"
           className="
@@ -178,7 +197,7 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
         >
           {/* Subtle gold gradient text */}
           <span className="bg-gradient-to-br from-[#f0c97a] via-[#D4A847] to-[#b3852b] bg-clip-text text-transparent group-hover:brightness-110 transition-all duration-300 whitespace-nowrap">
-            Corporate
+            {ctas.corporate.label}
           </span>
           <ArrowUpRight
             strokeWidth={2.5}
@@ -224,39 +243,43 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
 
             <div className="space-y-1">
               {[
-                { href: '/assessment', label: 'Assessment' },
-                { href: '/roi-calculator', label: 'ROI Calculator' },
-                { href: '/cost-of-inaction', label: 'Cost of Inaction' },
+                { href: ctas.assessment.href, label: ctas.assessment.label },
+                (!config?.roiCalculatorConfig?.shutdown) ? { href: ctas.roi.href, label: ctas.roi.label } : null,
+                (!config?.coiCalculatorConfig?.shutdown) ? { href: ctas.coi.href, label: ctas.coi.label } : null,
                 { href: '/capabilities', label: 'Capabilities' },
                 { href: '/case-studies', label: 'Case Studies' },
                 { href: '/insights', label: 'Insights' },
                 { href: '/about-flowtaris-ai', label: 'About' },
                 { href: '/contact', label: 'Contact' },
-              ].map(({ href, label }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                    pathname === href || pathname?.startsWith(href + '/')
-                      ? 'bg-white/[0.10] text-white font-semibold'
-                      : 'text-white/70 hover:text-white hover:bg-white/[0.05]'
-                  }`}
-                >
-                  {label}
-                </Link>
-              ))}
+              ].filter(Boolean).map((item) => {
+                const href = item!.href
+                const label = item!.label
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      pathname === href || pathname?.startsWith(href + '/')
+                        ? 'bg-white/[0.10] text-white font-semibold'
+                        : 'text-white/70 hover:text-white hover:bg-white/[0.05]'
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                )
+              })}
             </div>
 
             <div className="mt-auto pt-8 border-t border-white/[0.08]">
               <a
-                href="https://www.flowtaris.com/"
+                href={ctas.corporate.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm text-[#D4A847] font-medium hover:bg-white/[0.04] transition-all"
                 onClick={() => setMobileOpen(false)}
               >
-                Corporate Site
+                {ctas.corporate.label}
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </a>
             </div>

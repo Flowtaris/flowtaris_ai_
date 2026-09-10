@@ -11,6 +11,21 @@ export const metadata: Metadata = {
   },
 }
 
+import { getSiteConfig } from '@/lib/supabase'
+import { notFound } from 'next/navigation'
+
 export default async function CostOfInactionPage() {
-  return <CostOfInactionClient initialConfig={null} />
+  let coiConfig = null;
+  try {
+    const siteConfig = await getSiteConfig();
+    coiConfig = siteConfig?.coi_calculator_config ?? siteConfig?.seo?.coi_calculator_config ?? null;
+  } catch (e) {
+    console.error("Failed to load COI config:", e);
+  }
+
+  if (coiConfig?.shutdown) {
+    notFound();
+  }
+
+  return <CostOfInactionClient initialConfig={coiConfig} />
 }

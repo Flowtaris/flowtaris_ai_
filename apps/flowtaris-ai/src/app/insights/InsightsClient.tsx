@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Container, Badge, Button, Input } from '@repo/ui'
 import { ArrowRight, BookOpen, Clock, Activity, Zap, ShieldAlert, Cpu } from 'lucide-react'
 
-export default function InsightsClient({ insights, categories }: { insights: any[], categories: string[] }) {
+export default function InsightsClient({ insights, categories, heroConfig }: { insights: any[], categories: string[], heroConfig?: any }) {
   const [activeCategory, setActiveCategory] = useState(categories[1] || 'Research')
 
   // Filter out empty categories
@@ -66,26 +66,28 @@ export default function InsightsClient({ insights, categories }: { insights: any
             {/* Left Column */}
             <div className="lg:col-span-6 lg:pr-8">
               <div className="mb-6 inline-flex items-center rounded-none border border-[#c084fc] bg-[#c084fc]/10 px-4 py-1.5 text-sm font-bold text-[#c084fc] shadow-[4px_4px_0px_#c084fc] transition-transform hover:-translate-y-0.5 uppercase tracking-widest">
-                Strategic Insights for Finance Leaders
+                {heroConfig?.badgeText || 'Strategic Insights for Finance Leaders'}
               </div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] mb-6 tracking-tight">
-                Empower Your <br />
-                <span className="text-[#38bdf8] drop-shadow-[0_0_20px_rgba(56,189,248,0.5)]">Financial Strategy</span>
+                {heroConfig?.titleLine1 || 'Empower Your'} <br />
+                <span className="text-[#38bdf8] drop-shadow-[0_0_20px_rgba(56,189,248,0.5)]">
+                  {heroConfig?.titleLine2 || 'Financial Strategy'}
+                </span>
               </h1>
-              <p className="text-lg md:text-xl text-neutral-400 font-medium mb-8 max-w-lg leading-relaxed">
-                Explore original research, benchmark data, and proven methodologies to navigate AI adoption and automation in enterprise finance.
+              <p className="text-lg md:text-xl text-neutral-400 font-medium mb-8 max-w-lg leading-relaxed whitespace-pre-wrap">
+                {heroConfig?.subtitle || 'Explore original research, benchmark data, and proven methodologies to navigate AI adoption and automation in enterprise finance.'}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" className="bg-[#c084fc] hover:bg-[#a855f7] text-white border-2 border-white rounded-none px-8 shadow-[4px_4px_0px_#fff] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:shadow-none" asChild>
-                  <a href="/assessment">
-                    Take the Diagnostic
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                  <a href={heroConfig?.primaryBtnLink || '/assessment'} className="inline-flex items-center whitespace-nowrap">
+                    {heroConfig?.primaryBtnText || 'Take the Diagnostic'}
+                    <ArrowRight className="ml-2 h-5 w-5 shrink-0" />
                   </a>
                 </Button>
-                <Button size="lg" variant="outline" className="bg-transparent border-2 border-[#38bdf8] text-[#38bdf8] hover:bg-[#38bdf8]/10 rounded-none px-8 shadow-[4px_4px_0px_#38bdf8] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:shadow-none" onClick={scrollToResearch} asChild>
-                  <a href="#research">
-                    Explore Research
+                <Button size="lg" variant="outline" className="bg-transparent border-2 border-[#38bdf8] text-[#38bdf8] hover:bg-[#38bdf8]/10 rounded-none px-8 shadow-[4px_4px_0px_#38bdf8] transition-transform hover:-translate-y-0.5 active:translate-y-0 active:shadow-none" onClick={heroConfig?.secondaryBtnLink?.startsWith('#') ? scrollToResearch : undefined} asChild>
+                  <a href={heroConfig?.secondaryBtnLink || '#research'} className="inline-flex items-center whitespace-nowrap">
+                    {heroConfig?.secondaryBtnText || 'Explore Research'}
                   </a>
                 </Button>
               </div>
@@ -189,6 +191,17 @@ export default function InsightsClient({ insights, categories }: { insights: any
                     <div className="flex flex-col gap-8">
                       {items.map((insight: any) => (
                         <article key={insight.slug} className="group relative bg-[#111827] border-2 border-white/10 rounded-2xl shadow-xl transition-all duration-300 hover:border-[#c084fc] hover:shadow-[8px_8px_0px_#c084fc] hover:-translate-y-1 overflow-hidden">
+                          {/* Hero image thumbnail */}
+                          {insight.image && (
+                            <div className="w-full h-48 overflow-hidden border-b-2 border-white/10">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={insight.image}
+                                alt={insight.title}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              />
+                            </div>
+                          )}
                           <a href={`/insights/${insight.slug}`} className="flex flex-col p-8 h-full w-full outline-none">
                             <div className="flex items-start justify-between mb-4">
                               <div className="inline-flex items-center bg-[#c084fc]/10 px-3 py-1 text-xs font-bold text-[#c084fc] uppercase tracking-wider rounded-sm">

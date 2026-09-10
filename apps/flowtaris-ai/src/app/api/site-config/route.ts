@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { getSiteConfig, createAdminClient } from '@/lib/supabase'
 
 /**
@@ -14,7 +15,7 @@ export async function GET() {
   try {
     const data = await getSiteConfig()
 
-    // Only expose the fields needed for public header rendering
+    // Only expose the fields needed for public rendering
     const publicConfig = {
       logoUrl:    data?.logo_url    ?? '/images/flowtaris-logo.png',
       brandName:  (data as any)?.header_brand_name ?? 'Flowtaris',
@@ -32,6 +33,21 @@ export async function GET() {
         { id: '6', label: 'Trusted By', value: 'Fortune 500' },
       ],
       dualVision: (data as any)?.dual_vision ?? null,
+      heroConfig: (data as any)?.hero_config ?? null,
+      intelligenceSuiteConfig: (data as any)?.intelligence_suite_config ?? null,
+      capabilitiesSectionConfig: (data as any)?.capabilities_section_config ?? null,
+      costSectionConfig: (data as any)?.cost_section_config ?? null,
+      newsletterConfig: (data as any)?.newsletter_config ?? null,
+      socialLinks: (data as any)?.social_links ?? null,
+      privacyPolicyUrl: (data as any)?.privacy_policy_url ?? null,
+      termsOfServiceUrl: (data as any)?.terms_of_service_url ?? null,
+      insightsHeroConfig: (data as any)?.insights_hero_config ?? null,
+      caseStudiesHeroConfig: (data as any)?.case_studies_hero_config ?? null,
+      aboutConfig: (data as any)?.about_config ?? (data as any)?.seo?.about_config ?? null,
+      contactConfig: (data as any)?.contact_config ?? (data as any)?.seo?.contact_config ?? null,
+      assessmentConfig: (data as any)?.assessment_config ?? (data as any)?.seo?.assessment_config ?? null,
+      roiCalculatorConfig: (data as any)?.roi_calculator_config ?? (data as any)?.seo?.roi_calculator_config ?? null,
+      coiCalculatorConfig: (data as any)?.coi_calculator_config ?? (data as any)?.seo?.coi_calculator_config ?? null,
     }
 
     return NextResponse.json(publicConfig, {
@@ -54,6 +70,21 @@ export async function GET() {
         tagline:   'Enterprise AI Automation for Finance',
         navigation: {},
         trustSignals: [],
+        heroConfig: null,
+        intelligenceSuiteConfig: null,
+        capabilitiesSectionConfig: null,
+        costSectionConfig: null,
+        newsletterConfig: null,
+        socialLinks: null,
+        privacyPolicyUrl: null,
+        termsOfServiceUrl: null,
+        insightsHeroConfig: null,
+        caseStudiesHeroConfig: null,
+        aboutConfig: null,
+        contactConfig: null,
+        assessmentConfig: null,
+        roiCalculatorConfig: null,
+        coiCalculatorConfig: null,
       },
       {
         status: 200,
@@ -72,44 +103,82 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
 
-    const {
-      site_name, site_url, tagline, logo_url, favicon_url,
-      header_brand_name, header_badge_text, header_show_logo,
-      navigation, social_links, contact_email, support_email,
-      privacy_policy_url, terms_of_service_url, cookie_policy_url,
-      analytics, seo, trust_signals
-    } = body
+    const allowedFields = [
+      'site_name', 'site_url', 'tagline', 'logo_url', 'favicon_url',
+      'header_brand_name', 'header_badge_text', 'header_show_logo',
+      'navigation', 'social_links', 'contact_email', 'support_email',
+      'privacy_policy_url', 'terms_of_service_url', 'cookie_policy_url',
+      'analytics', 'seo', 'trust_signals', 'hero_config',
+      'dual_vision', 'intelligence_suite_config', 'capabilities_section_config',
+      'cost_section_config', 'newsletter_config', 'insights_hero_config',
+      'case_studies_hero_config', 'about_config', 'contact_config', 'assessment_config',
+      'roi_calculator_config', 'coi_calculator_config'
+    ]
 
-    const updatePayload: Record<string, unknown> = {}
-    if (site_name !== undefined)            updatePayload.site_name = site_name
-    if (site_url !== undefined)             updatePayload.site_url = site_url
-    if (tagline !== undefined)              updatePayload.tagline = tagline
-    if (logo_url !== undefined)             updatePayload.logo_url = logo_url
-    if (favicon_url !== undefined)          updatePayload.favicon_url = favicon_url
-    if (header_brand_name !== undefined)    updatePayload.header_brand_name = header_brand_name
-    if (header_badge_text !== undefined)    updatePayload.header_badge_text = header_badge_text
-    if (header_show_logo !== undefined)     updatePayload.header_show_logo = header_show_logo
-    if (navigation !== undefined)           updatePayload.navigation = navigation
-    if (social_links !== undefined)         updatePayload.social_links = social_links
-    if (contact_email !== undefined)        updatePayload.contact_email = contact_email
-    if (support_email !== undefined)        updatePayload.support_email = support_email
-    if (privacy_policy_url !== undefined)   updatePayload.privacy_policy_url = privacy_policy_url
-    if (terms_of_service_url !== undefined) updatePayload.terms_of_service_url = terms_of_service_url
-    if (cookie_policy_url !== undefined)    updatePayload.cookie_policy_url = cookie_policy_url
-    if (analytics !== undefined)            updatePayload.analytics = analytics
-    if (seo !== undefined)                  updatePayload.seo = seo
-    if (trust_signals !== undefined)        updatePayload.trust_signals = trust_signals
-    if (body.dual_vision !== undefined)      updatePayload.dual_vision = body.dual_vision
+    const updatePayload: Record<string, any> = {}
+
+    for (const field of allowedFields) {
+      if (body[field] !== undefined) {
+        updatePayload[field] = body[field]
+      }
+    }
 
     const adminClient = createAdminClient()
+
+    // Get the current row ID and existing seo
+    const { data: currentConfig } = await adminClient
+      .from('site_config')
+      .select('id, seo')
+      .limit(1)
+      .single()
+
+    const configId = currentConfig?.id || '00000000-0000-0000-0000-000000000001'
+    const existingSeo = (currentConfig?.seo && typeof currentConfig.seo === 'object') ? { ...currentConfig.seo } : {}
+
+    if (body.about_config !== undefined) {
+      existingSeo.about_config = body.about_config
+      delete updatePayload.about_config
+      updatePayload.seo = existingSeo
+    }
+
+    if (body.contact_config !== undefined) {
+      existingSeo.contact_config = body.contact_config
+      delete updatePayload.contact_config
+      updatePayload.seo = existingSeo
+    }
+
+    if (body.assessment_config !== undefined) {
+      existingSeo.assessment_config = body.assessment_config
+      delete updatePayload.assessment_config
+      updatePayload.seo = existingSeo
+    }
+
+    if (body.roi_calculator_config !== undefined) {
+      existingSeo.roi_calculator_config = body.roi_calculator_config
+      delete updatePayload.roi_calculator_config
+      updatePayload.seo = existingSeo
+    }
+
+    if (body.coi_calculator_config !== undefined) {
+      existingSeo.coi_calculator_config = body.coi_calculator_config
+      delete updatePayload.coi_calculator_config
+      updatePayload.seo = existingSeo
+    }
+
     const { error } = await adminClient
       .from('site_config')
       .update(updatePayload)
-      .eq('id', '00000000-0000-0000-0000-000000000001')
+      .eq('id', configId)
 
     if (error) {
       console.error('[POST /api/site-config] Supabase error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    try {
+      (revalidateTag as any)('site-config')
+    } catch {
+      // ignore
     }
 
     return NextResponse.json({ success: true }, { status: 200 })

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
@@ -12,12 +12,36 @@ function formatMoney(n: number) {
   return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
 
+const DEFAULT_COST_CONFIG = {
+  eyebrow: 'Cost of Manual Finance Operations Since You Opened This Page',
+  ratePerSecond: 8.87,
+  industryAverageLabel: 'based on industry average of $280K/year',
+  headline: 'Every quarter you delay costs more than our annual contract.',
+  subheadline: 'Flowtaris customers stop the bleed in under 60 days.',
+  primaryCtaLabel: 'Calculate my actual loss',
+  primaryCtaUrl: '/roi-calculator',
+  secondaryCtaLabel: 'Start eliminating it',
+  secondaryCtaUrl: '/assessment',
+}
+
 export default function CtaCostSection() {
   const [seconds, setSeconds] = useState(0)
   const [hasStarted, setHasStarted] = useState(false)
   const [visible, setVisible] = useState(false)
+  const [config, setConfig] = useState(DEFAULT_COST_CONFIG)
   const sectionRef = useRef<HTMLElement>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    fetch('/api/site-config')
+      .then(res => res.json())
+      .then(data => {
+        if (data.costSectionConfig) {
+          setConfig(prev => ({ ...prev, ...data.costSectionConfig }))
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -43,7 +67,8 @@ export default function CtaCostSection() {
     }
   }, [hasStarted])
 
-  const totalLost = RANDOM_START_OFFSET + Math.floor(seconds * RATE_PER_SECOND)
+  const rateToUse = Number(config.ratePerSecond) || 8.87
+  const totalLost = RANDOM_START_OFFSET + Math.floor(seconds * rateToUse)
 
   return (
     <section
@@ -81,7 +106,7 @@ export default function CtaCostSection() {
           fontFamily: "'Inter', sans-serif",
           marginBottom: 40,
         }}>
-          Cost of Manual Finance Operations Since You Opened This Page
+          {config.eyebrow}
         </p>
 
         {/* The Counter — the hero of this section */}
@@ -110,7 +135,7 @@ export default function CtaCostSection() {
           marginBottom: 56,
           letterSpacing: '0.02em'
         }}>
-          +${RATE_PER_SECOND.toFixed(2)} every second · based on industry average of $280K/year
+          +${rateToUse.toFixed(2)} every second · {config.industryAverageLabel}
         </p>
 
         {/* Main statement */}
@@ -125,7 +150,7 @@ export default function CtaCostSection() {
           maxWidth: 680,
           margin: '0 auto 16px',
         }}>
-          Every quarter you delay costs more than our annual contract.
+          {config.headline}
         </h2>
 
         <p style={{
@@ -135,13 +160,13 @@ export default function CtaCostSection() {
           marginBottom: 56,
           lineHeight: 1.6,
         }}>
-          Flowtaris customers stop the bleed in under 60 days.
+          {config.subheadline}
         </p>
 
         {/* CTAs */}
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link
-            href="/roi-calculator"
+            href={config.primaryCtaUrl}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -167,14 +192,14 @@ export default function CtaCostSection() {
               e.currentTarget.style.boxShadow = '0 8px 32px rgba(245, 158, 11, 0.35)'
             }}
           >
-            Calculate my actual loss
+            {config.primaryCtaLabel}
             <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
               <path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </Link>
 
           <Link
-            href="/assessment"
+            href={config.secondaryCtaUrl}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -199,7 +224,7 @@ export default function CtaCostSection() {
               e.currentTarget.style.color = 'rgba(255,255,255,0.75)'
             }}
           >
-            Start eliminating it
+            {config.secondaryCtaLabel}
           </Link>
         </div>
       </div>

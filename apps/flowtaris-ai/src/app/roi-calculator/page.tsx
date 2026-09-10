@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import ROICalculatorClient from './ROICalculatorClient'
 import Script from 'next/script'
+import { notFound } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: 'Enterprise AI Automation ROI Calculator | Flowtaris',
@@ -18,14 +19,19 @@ export const metadata: Metadata = {
   }
 }
 
-import { getROICConfig } from '@flowtaris/supabase-client'
+import { getSiteConfig } from '@/lib/supabase'
 
 export default async function ROICalculatorPage() {
   let roiConfig = null;
   try {
-    roiConfig = await getROICConfig();
+    const siteConfig = await getSiteConfig();
+    roiConfig = siteConfig?.roi_calculator_config ?? siteConfig?.seo?.roi_calculator_config ?? null;
   } catch (e) {
     console.error("Failed to load ROI config:", e);
+  }
+
+  if (roiConfig?.shutdown) {
+    notFound();
   }
 
   // SoftwareApplication Schema for the Calculator

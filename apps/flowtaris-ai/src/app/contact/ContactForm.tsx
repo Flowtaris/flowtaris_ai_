@@ -3,41 +3,74 @@
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, CheckCircle2, ChevronDown, Send, Loader2, Globe, MessageSquare, BarChart3, Clock, Shield, Zap, Building2 } from 'lucide-react'
+import { ArrowRight, CheckCircle2, ChevronDown, Send, Loader2, Globe, BarChart3, Clock, Shield, Zap, Building2 } from 'lucide-react'
 
-// ─── DATA ─────────────────────────────────────────────────────────────────────
+// ── Default Contact Configuration ─────────────────────────────────────────────
 
-const INTENT_OPTIONS = [
-  { value: 'calendly', label: 'Auto-Schedule a Meeting', sub: 'Instantly book a time with our enterprise architects via Calendly.', icon: '▶' },
-  { value: 'message', label: 'Send a Message', sub: 'Fill out our secure inquiry form and our team will get back to you within 4 hours.', icon: '◈' }
-]
+export const DEFAULT_CONTACT_DATA = {
+  hero: {
+    badge: 'Response within 4 hours',
+    headline_part1: "Let's start",
+    headline_highlight: 'something',
+    headline_part2: 'real.',
+    description: "Every enterprise transformation begins with one conversation. Tell us where your finance ops hurt most — we'll show you exactly how AI removes it.",
+    stats: [
+      { value: '< 4 hrs', label: 'Avg Response' },
+      { value: '3', label: 'Global Offices' },
+      { value: '98%', label: 'CSAT Score' },
+      { value: '50+', label: 'Team Members' },
+    ],
+    imageSrc: '/images/contact-hero.png',
+    imageAlt: 'Flowtaris global AI finance reach — connecting Palo Alto, London, Singapore',
+    floating_card_1: { label: 'Avg Time to Value', value: '21 Days' },
+    floating_card_2: { label: 'ROI Achieved By', value: 'Day 47' },
+  },
+  meeting: {
+    calendly_url: 'https://calendly.com/flowtaris-info',
+    intent_options: [
+      { value: 'calendly', label: 'Auto-Schedule a Meeting', sub: 'Instantly book a time with our enterprise architects via Calendly.', icon: '▶' },
+      { value: 'message', label: 'Send a Message', sub: 'Fill out our secure inquiry form and our team will get back to you within 4 hours.', icon: '◈' }
+    ]
+  },
+  form_options: {
+    erp_platforms: 'NetSuite, Coupa, SAP S/4HANA, Workday, Oracle Fusion, Microsoft Dynamics, Multi-Platform, Not Sure',
+    invoice_volumes: 'Under 10,000 / year, 10,000 – 50,000 / year, 50,000 – 100,000 / year, 100,000 – 500,000 / year, 500,000+ / year, Not Sure'
+  },
+  global_presence: {
+    eyebrow: 'Global Presence',
+    headline: 'We work all over the world.\nOne standard of service.',
+    offices: [
+      { region: 'North America', scope: 'HQ & AMER Operations', timezone: 'PT / ET', email: 'amer@flowtaris.com', hours: 'Follow-the-sun Support' },
+      { region: 'Europe & UK', scope: 'EMEA Operations', timezone: 'GMT / CET', email: 'emea@flowtaris.com', hours: 'Follow-the-sun Support' },
+      { region: 'Asia Pacific', scope: 'APAC Operations', timezone: 'SGT / AEST', email: 'apac@flowtaris.com', hours: 'Follow-the-sun Support' },
+    ]
+  },
+  trust_signals: [
+    { title: 'Data Never Leaves Your Control', body: 'SOC 2 Type II in progress. AES-256 at rest, TLS 1.3 in transit. Your data is never used to train models.' },
+    { title: 'Live Production in 21 Days', body: 'Our fastest deployment was 11 days. The median is 21. No 12-month IT projects.' },
+    { title: 'Built for Enterprise Scale', body: 'From 10,000 to 2M+ invoices per year. Multi-entity, multi-currency, 28 languages.' },
+  ],
+  faq: {
+    eyebrow: 'Quick Answers',
+    headline: 'Questions we get before the first call.',
+    items: [
+      { q: 'How quickly can I get a live demo?', a: 'Within 1–2 business days. We customise every demo to your ERP and use case — no generic slide decks.' },
+      { q: 'What does implementation look like?', a: 'GenAI Document Intelligence: 3–4 weeks. Full platform: 8–12 weeks. We provide a dedicated engineer from day one.' },
+      { q: 'Do you offer a proof of concept?', a: 'Yes. Qualified enterprises can run a 4-week POC on their own live data with full platform access — no synthetic demos.' },
+      { q: 'How is pricing structured?', a: 'Platform subscription + usage-based processing fees. Volume discounts at 50K, 100K, and 500K+ invoices/year.' },
+      { q: 'What is your security posture?', a: 'SOC 2 Type II (in progress), ISO 27001 (in progress), GDPR & CCPA compliant. AES-256 at rest, TLS 1.3 in transit. Your data is never used for model training.' },
+    ]
+  },
+  bottom_cta: {
+    headline: 'Prefer to start self-serve?',
+    description: 'Take our 3-minute AI Readiness Assessment and get a personalised automation roadmap — no sales call required.',
+    primary_cta: { label: 'Start Free Assessment', href: '/assessment' },
+    secondary_cta: { label: 'Calculate ROI', href: '/roi-calculator' }
+  }
+}
 
-const ERP_PLATFORMS = ['NetSuite', 'Coupa', 'SAP S/4HANA', 'Workday', 'Oracle Fusion', 'Microsoft Dynamics', 'Multi-Platform', 'Not Sure']
+// ── Animated Counter ──────────────────────────────────────────────────────────
 
-const INVOICE_VOLUMES = [
-  'Under 10,000 / year',
-  '10,000 – 50,000 / year',
-  '50,000 – 100,000 / year',
-  '100,000 – 500,000 / year',
-  '500,000+ / year',
-  'Not Sure',
-]
-
-const REGIONS = [
-  { region: 'North America', scope: 'HQ & AMER Operations', timezone: 'PT / ET', email: 'amer@flowtaris.com', hours: 'Follow-the-sun Support' },
-  { region: 'Europe & UK', scope: 'EMEA Operations', timezone: 'GMT / CET', email: 'emea@flowtaris.com', hours: 'Follow-the-sun Support' },
-  { region: 'Asia Pacific', scope: 'APAC Operations', timezone: 'SGT / AEST', email: 'apac@flowtaris.com', hours: 'Follow-the-sun Support' },
-]
-
-const FAQS = [
-  { q: 'How quickly can I get a live demo?', a: 'Within 1–2 business days. We customise every demo to your ERP and use case — no generic slide decks.' },
-  { q: 'What does implementation look like?', a: 'GenAI Document Intelligence: 3–4 weeks. Full platform: 8–12 weeks. We provide a dedicated engineer from day one.' },
-  { q: 'Do you offer a proof of concept?', a: 'Yes. Qualified enterprises can run a 4-week POC on their own live data with full platform access — no synthetic demos.' },
-  { q: 'How is pricing structured?', a: 'Platform subscription + usage-based processing fees. Volume discounts at 50K, 100K, and 500K+ invoices/year.' },
-  { q: 'What is your security posture?', a: 'SOC 2 Type II (in progress), ISO 27001 (in progress), GDPR & CCPA compliant. AES-256 at rest, TLS 1.3 in transit. Your data is never used for model training.' },
-]
-
-// ─── ANIMATED COUNTER ─────────────────────────────────────────────────────────
 function AnimatedStat({ value, label }: { value: string; label: string }) {
   return (
     <div className="text-center">
@@ -47,7 +80,8 @@ function AnimatedStat({ value, label }: { value: string; label: string }) {
   )
 }
 
-// ─── CUSTOM SELECT ────────────────────────────────────────────────────────────
+// ── Custom Select ─────────────────────────────────────────────────────────────
+
 function CustomSelect({ options, value, onChange, placeholder }: {
   options: string[]
   value: string
@@ -106,7 +140,8 @@ function CustomSelect({ options, value, onChange, placeholder }: {
   )
 }
 
-// ─── FAQ ITEM ─────────────────────────────────────────────────────────────────
+// ── FAQ Item ──────────────────────────────────────────────────────────────────
+
 function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
   const [open, setOpen] = useState(false)
   return (
@@ -145,8 +180,10 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
   )
 }
 
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
+// ── Main Contact Form Component ───────────────────────────────────────────────
+
 export default function ContactForm() {
+  const [data, setData] = useState(DEFAULT_CONTACT_DATA)
   const [step, setStep] = useState<'intent' | 'details' | 'success'>('intent')
   const [selectedIntent, setSelectedIntent] = useState('')
   const [erp, setErp] = useState('')
@@ -156,10 +193,68 @@ export default function ContactForm() {
   const [fields, setFields] = useState({ firstName: '', lastName: '', email: '', company: '', message: '' })
   const formRef = useRef<HTMLDivElement>(null)
 
+  useEffect(() => {
+    fetch('/api/site-config')
+      .then(r => r.json())
+      .then(cfg => {
+        if (cfg?.contactConfig) {
+          const cc = cfg.contactConfig
+          setData({
+            hero: {
+              ...DEFAULT_CONTACT_DATA.hero,
+              ...(cc.hero || {}),
+              stats: cc.hero?.stats || DEFAULT_CONTACT_DATA.hero.stats,
+              floating_card_1: { ...DEFAULT_CONTACT_DATA.hero.floating_card_1, ...(cc.hero?.floating_card_1 || {}) },
+              floating_card_2: { ...DEFAULT_CONTACT_DATA.hero.floating_card_2, ...(cc.hero?.floating_card_2 || {}) },
+            },
+            meeting: {
+              ...DEFAULT_CONTACT_DATA.meeting,
+              ...(cc.meeting || {}),
+              intent_options: cc.meeting?.intent_options || DEFAULT_CONTACT_DATA.meeting.intent_options
+            },
+            form_options: {
+              ...DEFAULT_CONTACT_DATA.form_options,
+              ...(cc.form_options || {})
+            },
+            global_presence: {
+              ...DEFAULT_CONTACT_DATA.global_presence,
+              ...(cc.global_presence || {}),
+              offices: cc.global_presence?.offices || DEFAULT_CONTACT_DATA.global_presence.offices
+            },
+            trust_signals: cc.trust_signals || DEFAULT_CONTACT_DATA.trust_signals,
+            faq: {
+              ...DEFAULT_CONTACT_DATA.faq,
+              ...(cc.faq || {}),
+              items: cc.faq?.items || DEFAULT_CONTACT_DATA.faq.items
+            },
+            bottom_cta: {
+              ...DEFAULT_CONTACT_DATA.bottom_cta,
+              ...(cc.bottom_cta || {}),
+              primary_cta: { ...DEFAULT_CONTACT_DATA.bottom_cta.primary_cta, ...(cc.bottom_cta?.primary_cta || {}) },
+              secondary_cta: { ...DEFAULT_CONTACT_DATA.bottom_cta.secondary_cta, ...(cc.bottom_cta?.secondary_cta || {}) }
+            }
+          })
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const erpOptions = Array.isArray(data.form_options.erp_platforms)
+    ? data.form_options.erp_platforms
+    : (typeof data.form_options.erp_platforms === 'string'
+        ? data.form_options.erp_platforms.split(',').map(s => s.trim()).filter(Boolean)
+        : ['NetSuite', 'Coupa', 'SAP S/4HANA', 'Workday', 'Multi-Platform', 'Not Sure'])
+
+  const volumeOptions = Array.isArray(data.form_options.invoice_volumes)
+    ? data.form_options.invoice_volumes
+    : (typeof data.form_options.invoice_volumes === 'string'
+        ? data.form_options.invoice_volumes.split(',').map(s => s.trim()).filter(Boolean)
+        : ['Under 10,000 / year', '10,000 – 50,000 / year', '50,000 – 100,000 / year', '100,000 – 500,000 / year', '500,000+ / year', 'Not Sure'])
+
   const handleIntentSelect = (value: string) => {
     setSelectedIntent(value)
     if (value === 'calendly') {
-      window.open('https://calendly.com/flowtaris-info', '_blank')
+      window.open(data.meeting.calendly_url || 'https://calendly.com/flowtaris-info', '_blank')
     } else {
       setTimeout(() => {
         setStep('details')
@@ -217,30 +312,28 @@ export default function ContactForm() {
             <div className="inline-flex items-center gap-2 mb-10 px-4 py-2 rounded-full border text-xs font-bold uppercase tracking-[0.2em]"
               style={{ borderColor: 'rgba(232,160,32,0.25)', backgroundColor: 'rgba(232,160,32,0.06)', color: '#E8A020' }}>
               <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-              Response within 4 hours
+              {data.hero.badge}
             </div>
 
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-white leading-[1.04] tracking-tight mb-8"
               style={{ fontFamily: 'Sora, sans-serif' }}>
-              Let&apos;s start<br />
-              <span style={{ color: '#E8A020' }}>something</span><br />
-              real.
+              {data.hero.headline_part1}<br />
+              <span style={{ color: '#E8A020' }}>{data.hero.headline_highlight}</span><br />
+              {data.hero.headline_part2}
             </h1>
 
             <p className="text-lg text-gray-400 font-light leading-relaxed mb-14 max-w-lg">
-              Every enterprise transformation begins with one conversation.
-              Tell us where your finance ops hurt most — we&apos;ll show you exactly how AI removes it.
+              {data.hero.description}
             </p>
 
             {/* Stats row */}
             <div className="flex items-center gap-10 pt-8 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-              <AnimatedStat value="< 4 hrs" label="Avg Response" />
-              <div className="w-px h-10 bg-white/10" />
-              <AnimatedStat value="3" label="Global Offices" />
-              <div className="w-px h-10 bg-white/10" />
-              <AnimatedStat value="98%" label="CSAT Score" />
-              <div className="w-px h-10 bg-white/10" />
-              <AnimatedStat value="50+" label="Team Members" />
+              {data.hero.stats.map((st, idx) => (
+                <div key={idx} className="flex items-center gap-10">
+                  <AnimatedStat value={st.value} label={st.label} />
+                  {idx < data.hero.stats.length - 1 && <div className="w-px h-10 bg-white/10" />}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -249,26 +342,33 @@ export default function ContactForm() {
             <div className="relative w-full max-w-[540px] aspect-square rounded-3xl overflow-hidden"
               style={{ border: '1px solid rgba(232,160,32,0.12)', boxShadow: '0 0 80px rgba(232,160,32,0.06), inset 0 0 40px rgba(10,22,40,0.4)' }}>
               <Image
-                src="/images/contact-hero.png"
-                alt="Flowtaris global AI finance reach — connecting Palo Alto, London, Singapore"
+                src={data.hero.imageSrc || '/images/contact-hero.png'}
+                alt={data.hero.imageAlt || 'Flowtaris global AI finance reach'}
                 fill
                 className="object-cover"
                 priority
               />
-              {/* Overlay gradient to blend with page */}
               <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(8,15,28,0.1) 0%, transparent 60%, rgba(8,15,28,0.3) 100%)' }} />
             </div>
 
             {/* Floating accent cards */}
             <div className="absolute -left-6 top-[20%] px-4 py-3 rounded-xl border backdrop-blur-sm"
               style={{ backgroundColor: 'rgba(8,15,28,0.9)', borderColor: 'rgba(232,160,32,0.2)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
-              <div className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#E8A020' }}>Avg Time to Value</div>
-              <div className="text-white font-semibold text-lg" style={{ fontFamily: 'Sora, sans-serif' }}>21 Days</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#E8A020' }}>
+                {data.hero.floating_card_1.label}
+              </div>
+              <div className="text-white font-semibold text-lg" style={{ fontFamily: 'Sora, sans-serif' }}>
+                {data.hero.floating_card_1.value}
+              </div>
             </div>
             <div className="absolute -right-4 bottom-[25%] px-4 py-3 rounded-xl border backdrop-blur-sm"
               style={{ backgroundColor: 'rgba(8,15,28,0.9)', borderColor: 'rgba(75,159,225,0.2)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
-              <div className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#4B9FE1' }}>ROI Achieved By</div>
-              <div className="text-white font-semibold text-lg" style={{ fontFamily: 'Sora, sans-serif' }}>Day 47</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#4B9FE1' }}>
+                {data.hero.floating_card_2.label}
+              </div>
+              <div className="text-white font-semibold text-lg" style={{ fontFamily: 'Sora, sans-serif' }}>
+                {data.hero.floating_card_2.value}
+              </div>
             </div>
           </div>
         </div>
@@ -325,7 +425,7 @@ export default function ContactForm() {
               </p>
 
               <div className="grid md:grid-cols-2 gap-8">
-                {INTENT_OPTIONS.map(opt => (
+                {data.meeting.intent_options.map(opt => (
                   <button
                     key={opt.value}
                     onClick={() => handleIntentSelect(opt.value)}
@@ -368,7 +468,7 @@ export default function ContactForm() {
                 </button>
                 <div className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest"
                   style={{ backgroundColor: 'rgba(232,160,32,0.1)', color: '#E8A020' }}>
-                  {INTENT_OPTIONS.find(o => o.value === selectedIntent)?.label}
+                  {data.meeting.intent_options.find(o => o.value === selectedIntent)?.label}
                 </div>
               </div>
 
@@ -457,7 +557,7 @@ export default function ContactForm() {
                     <label className="block text-xs font-bold uppercase tracking-widest mb-2.5"
                       style={{ color: 'rgba(255,255,255,0.4)' }}>Primary ERP Platform</label>
                     <CustomSelect
-                      options={ERP_PLATFORMS}
+                      options={erpOptions}
                       value={erp}
                       onChange={setErp}
                       placeholder="Select your ERP…"
@@ -467,7 +567,7 @@ export default function ContactForm() {
                     <label className="block text-xs font-bold uppercase tracking-widest mb-2.5"
                       style={{ color: 'rgba(255,255,255,0.4)' }}>Annual Invoice Volume</label>
                     <CustomSelect
-                      options={INVOICE_VOLUMES}
+                      options={volumeOptions}
                       value={volume}
                       onChange={setVolume}
                       placeholder="Select volume…"
@@ -559,7 +659,7 @@ export default function ContactForm() {
                 Message received.
               </h2>
               <p className="text-gray-400 text-lg font-light mb-3 max-w-md mx-auto">
-                Our team typically responds within <span className="text-white font-medium">4 business hours</span>.
+                Our team typically responds within <span className="text-white font-medium">{data.hero.badge || '4 business hours'}</span>.
                 {fields.email && (
                   <> Expect a reply at <span className="text-white font-medium">{fields.email}</span>.</>
                 )}
@@ -593,14 +693,14 @@ export default function ContactForm() {
       <section className="py-28 px-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
         <div className="max-w-5xl mx-auto">
           <div className="mb-4 text-xs font-bold uppercase tracking-[0.25em]" style={{ color: '#E8A020' }}>
-            Global Presence
+            {data.global_presence.eyebrow}
           </div>
-          <h2 className="text-4xl md:text-5xl font-semibold text-white mb-16 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
-            We work all over the world.<br />One standard of service.
+          <h2 className="text-4xl md:text-5xl font-semibold text-white mb-16 leading-tight whitespace-pre-line" style={{ fontFamily: 'Sora, sans-serif' }}>
+            {data.global_presence.headline}
           </h2>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {REGIONS.map(office => (
+            {data.global_presence.offices.map(office => (
               <div
                 key={office.region}
                 className="group p-8 rounded-2xl border transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
@@ -646,21 +746,23 @@ export default function ContactForm() {
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { icon: <Shield className="w-6 h-6" />, title: 'Data Never Leaves Your Control', body: 'SOC 2 Type II in progress. AES-256 at rest, TLS 1.3 in transit. Your data is never used to train models.' },
-              { icon: <Zap className="w-6 h-6" />, title: 'Live Production in 21 Days', body: 'Our fastest deployment was 11 days. The median is 21. No 12-month IT projects.' },
-              { icon: <Building2 className="w-6 h-6" />, title: 'Built for Enterprise Scale', body: 'From 10,000 to 2M+ invoices per year. Multi-entity, multi-currency, 28 languages.' },
-            ].map(card => (
-              <div
-                key={card.title}
-                className="p-8 rounded-2xl border"
-                style={{ backgroundColor: 'rgba(13,31,56,0.3)', borderColor: 'rgba(255,255,255,0.06)' }}
-              >
-                <div className="mb-5" style={{ color: '#E8A020' }}>{card.icon}</div>
-                <div className="text-white font-semibold mb-2 text-lg leading-snug">{card.title}</div>
-                <div className="text-gray-500 text-sm leading-relaxed font-light">{card.body}</div>
-              </div>
-            ))}
+            {data.trust_signals.map((card, idx) => {
+              const icons = [Shield, Zap, Building2]
+              const IconComp = icons[idx % icons.length]
+              return (
+                <div
+                  key={card.title}
+                  className="p-8 rounded-2xl border"
+                  style={{ backgroundColor: 'rgba(13,31,56,0.3)', borderColor: 'rgba(255,255,255,0.06)' }}
+                >
+                  <div className="mb-5" style={{ color: '#E8A020' }}>
+                    <IconComp className="w-6 h-6" />
+                  </div>
+                  <div className="text-white font-semibold mb-2 text-lg leading-snug">{card.title}</div>
+                  <div className="text-gray-500 text-sm leading-relaxed font-light">{card.body}</div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -668,12 +770,14 @@ export default function ContactForm() {
       {/* ── FAQ ──────────────────────────────────────────────────────────────── */}
       <section className="py-28 px-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
         <div className="max-w-3xl mx-auto">
-          <div className="mb-4 text-xs font-bold uppercase tracking-[0.25em]" style={{ color: '#E8A020' }}>Quick Answers</div>
+          <div className="mb-4 text-xs font-bold uppercase tracking-[0.25em]" style={{ color: '#E8A020' }}>
+            {data.faq.eyebrow}
+          </div>
           <h2 className="text-4xl md:text-5xl font-semibold text-white mb-16 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
-            Questions we get<br />before the first call.
+            {data.faq.headline}
           </h2>
           <div>
-            {FAQS.map((faq, i) => (
+            {data.faq.items.map((faq, i) => (
               <FaqItem key={i} q={faq.q} a={faq.a} index={i} />
             ))}
           </div>
@@ -686,25 +790,25 @@ export default function ContactForm() {
           style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(232,160,32,0.05) 0%, transparent 70%)' }} />
         <div className="max-w-3xl mx-auto text-center relative z-10">
           <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
-            Prefer to start<br />self-serve?
+            {data.bottom_cta.headline}
           </h2>
           <p className="text-gray-400 text-lg font-light mb-14 max-w-xl mx-auto">
-            Take our 3-minute AI Readiness Assessment and get a personalised automation roadmap — no sales call required.
+            {data.bottom_cta.description}
           </p>
           <div className="flex flex-col sm:flex-row gap-5 justify-center">
             <Link
-              href="/assessment"
+              href={data.bottom_cta.primary_cta.href}
               className="inline-flex items-center justify-center gap-2 px-10 py-5 rounded-2xl font-semibold text-lg transition-all duration-300 hover:scale-[1.02]"
               style={{ backgroundColor: '#E8A020', color: '#080F1C', boxShadow: '0 0 40px rgba(232,160,32,0.25)' }}
             >
-              Start Free Assessment <ArrowRight className="w-5 h-5" />
+              {data.bottom_cta.primary_cta.label} <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              href="/roi-calculator"
+              href={data.bottom_cta.secondary_cta.href}
               className="inline-flex items-center justify-center gap-2 px-10 py-5 rounded-2xl font-semibold text-lg border transition-all duration-300 hover:bg-white/5"
               style={{ borderColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
             >
-              <BarChart3 className="w-5 h-5" /> Calculate ROI
+              <BarChart3 className="w-5 h-5" /> {data.bottom_cta.secondary_cta.label}
             </Link>
           </div>
         </div>

@@ -11,25 +11,68 @@ interface SanityInactionConfig {
   riskModels?: Array<any>
 }
 
-const defaultValues = {
-  platform: 'NetSuite',
-  useCase: 'ap-automation',
-  annualVolume: 60000,
-  avgManualHours: 15,
-  hourlyCost: 45,
-  errorRate: 3,
-  competitivePressure: 'medium' as 'low' | 'medium' | 'high',
-  complianceRequirements: 'basic' as 'none' | 'basic' | 'strict',
-  monthsDelay: 6,
+export const DEFAULT_COI_CONFIG = {
+  shutdown: false,
+  defaultValues: {
+    platform: 'NetSuite',
+    useCase: 'ap-automation',
+    annualVolume: 60000,
+    avgManualHours: 15,
+    hourlyCost: 45,
+    errorRate: 3,
+    competitivePressure: 'medium' as 'low' | 'medium' | 'high',
+    complianceRequirements: 'basic' as 'none' | 'basic' | 'strict',
+    monthsDelay: 6,
+  },
+  platforms: [
+    { value: 'NetSuite', label: 'NetSuite' },
+    { value: 'Coupa', label: 'Coupa' },
+    { value: 'SAP', label: 'SAP' },
+    { value: 'Workday', label: 'Workday' },
+    { value: 'Default', label: 'Other ERP' }
+  ],
+  rightSide: {
+    executiveSynthesis: {
+      heading: 'Executive Synthesis',
+      badge: 'Diagnostic Projection Engine',
+      template: 'Our AI diagnostic engine has processed your inputs against industry benchmarks. Based on an invoice volume of {{annualVolume}} and an average manual processing time of {{avgManualHours}} minutes, your baseline operational friction is significantly higher than top-quartile performers. \n\nWith a {{complianceRequirements}} compliance posture and {{competitivePressure}} competitive pressure, your risk profile amplifies the financial leakage. A delay of {{monthsDelay}} months translates directly to unrecoverable sunk costs. This analysis provides a structured, data-driven projection to help build your business case.'
+    },
+    mainHeader: {
+      eyebrow: 'Projected 3-Year Financial Leakage',
+      subtext: 'This figure represents the total compounded cost of manual operations, error remediation, and competitive disadvantage if automation is entirely ignored over a 36-month horizon.',
+      disclaimer: '* Projections are estimates based on industry benchmarks and your inputs. Actual results will vary. Not financial advice.'
+    },
+    breakdown: {
+      heading: 'Component Breakdown',
+      monthlyLeakage: {
+        title: 'Monthly Leakage',
+        subtitle: 'Immediate operational drain',
+        description: 'The direct capital lost every 30 days to manual data entry, invoice processing bottlenecks, and exception handling overhead.'
+      },
+      annualRisk: {
+        title: 'Annual Risk',
+        subtitle: 'Compliance & audit exposure',
+        description: 'Calculated based on your selected compliance tier, representing the financial risk of manual control failures and audit penalties.'
+      },
+      competitiveGap: {
+        title: 'Competitive Gap',
+        subtitle: '3-year market position loss',
+        description: 'The compounded opportunity cost of operating slower and with higher overhead than automated competitors.'
+      }
+    },
+    costOfDelay: {
+      heading: 'Scenario: The Cost of Delay',
+      subtext: 'Adjust the timeline below to see exactly how much capital is irrevocably lost while evaluating, deferring, or delaying implementation.',
+      sunkCostLabel: 'Sunk Cost of Delay',
+      sunkCostSubtext: 'Capital that cannot be recovered.'
+    },
+    cta: {
+      heading: 'Transition from Projection to Execution',
+      subtext: 'The numbers above are a diagnostic baseline. Book a 30-minute technical review with our solutions team to refine this model with your actual historical data and map out a precise deployment strategy.',
+      buttonText: 'Book Technical Review'
+    }
+  }
 }
-
-const defaultPlatforms = [
-  { value: 'NetSuite', label: 'NetSuite' },
-  { value: 'Coupa', label: 'Coupa' },
-  { value: 'SAP', label: 'SAP' },
-  { value: 'Workday', label: 'Workday' },
-  { value: 'Default', label: 'Other ERP' }
-]
 
 // ─── TICKING NUMBER COMPONENT ─────────────────────────────────────────────────
 function TickingNumber({ value, prefix = '', suffix = '' }: { value: number; prefix?: string; suffix?: string }) {
@@ -84,8 +127,9 @@ function DetailCard({ title, icon, value, subtitle, description }: { title: stri
 }
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-export default function CostOfInactionClient({ initialConfig }: { initialConfig: SanityInactionConfig | null }) {
-  const [state, setState] = useState(defaultValues)
+export default function CostOfInactionClient({ initialConfig }: { initialConfig: any }) {
+  const config = { ...DEFAULT_COI_CONFIG, ...(initialConfig || {}) }
+  const [state, setState] = useState(config.defaultValues)
   const [outputs, setOutputs] = useState<InactionOutputs | null>(null)
   const [narrative, setNarrative] = useState('')
   const [email, setEmail] = useState('')
@@ -93,8 +137,8 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    if (params.get('invoices')) setState(p => ({ ...p, annualVolume: parseInt(params.get('invoices')!) || p.annualVolume }))
-    if (params.get('delay')) setState(p => ({ ...p, monthsDelay: parseInt(params.get('delay')!) || p.monthsDelay }))
+    if (params.get('invoices')) setState((p: any) => ({ ...p, annualVolume: parseInt(params.get('invoices')!) || p.annualVolume }))
+    if (params.get('delay')) setState((p: any) => ({ ...p, monthsDelay: parseInt(params.get('delay')!) || p.monthsDelay }))
     analytics.inaction.open({ source: 'direct' })
   }, [])
 
@@ -107,8 +151,15 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
     const res = calculateInaction(inputs)
     setOutputs(res)
     
-    // We enhance the basic engine narrative for the UI
-    const enhancedNarrative = `Our AI diagnostic engine has processed your inputs against industry benchmarks. Based on an invoice volume of ${inputs.annualVolume.toLocaleString()} and an average manual processing time of ${state.avgManualHours} minutes, your baseline operational friction is significantly higher than top-quartile performers. \n\nWith a ${inputs.complianceRequirements} compliance posture and ${inputs.competitivePressure} competitive pressure, your risk profile amplifies the financial leakage. A delay of ${state.monthsDelay} months translates directly to unrecoverable sunk costs. This analysis provides a structured, data-driven projection to help build your business case.`
+    // We enhance the basic engine narrative for the UI using the configured template
+    let enhancedNarrative = config.rightSide?.executiveSynthesis?.template || DEFAULT_COI_CONFIG.rightSide.executiveSynthesis.template
+    enhancedNarrative = enhancedNarrative
+      .replace('{{annualVolume}}', inputs.annualVolume.toLocaleString())
+      .replace('{{avgManualHours}}', state.avgManualHours.toString())
+      .replace('{{complianceRequirements}}', inputs.complianceRequirements)
+      .replace('{{competitivePressure}}', inputs.competitivePressure)
+      .replace('{{monthsDelay}}', state.monthsDelay.toString())
+
     setNarrative(enhancedNarrative)
   }, [state])
 
@@ -153,10 +204,10 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
             <div>
               <label className="text-xs font-bold text-slate-900 uppercase tracking-widest mb-3 block">1. Core Infrastructure</label>
               <div className="grid grid-cols-2 gap-2">
-                {defaultPlatforms.map(p => (
+                {config.platforms.map((p: any) => (
                   <button
                     key={p.value}
-                    onClick={() => setState(s => ({ ...s, platform: p.value }))}
+                    onClick={() => setState((s: any) => ({ ...s, platform: p.value }))}
                     className={`px-4 py-3 text-sm font-bold rounded-lg transition-all border ${state.platform === p.value ? 'bg-slate-900 border-slate-900 text-white shadow-md' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'}`}
                   >
                     {p.label}
@@ -183,7 +234,7 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
                 <input 
                   type="range" min="1000" max="250000" step="1000" 
                   value={state.annualVolume} 
-                  onChange={e => setState(s => ({ ...s, annualVolume: parseInt(e.target.value) }))}
+                  onChange={e => setState((s: any) => ({ ...s, annualVolume: parseInt(e.target.value) }))}
                   className="w-full accent-slate-900 h-1.5 bg-slate-200 rounded-full appearance-none outline-none"
                 />
               </div>
@@ -196,7 +247,7 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
                 <input 
                   type="range" min="1" max="60" step="1" 
                   value={state.avgManualHours} 
-                  onChange={e => setState(s => ({ ...s, avgManualHours: parseInt(e.target.value) }))}
+                  onChange={e => setState((s: any) => ({ ...s, avgManualHours: parseInt(e.target.value) }))}
                   className="w-full accent-slate-900 h-1.5 bg-slate-200 rounded-full appearance-none outline-none"
                 />
               </div>
@@ -209,7 +260,7 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
                 <input 
                   type="range" min="15" max="150" step="5" 
                   value={state.hourlyCost} 
-                  onChange={e => setState(s => ({ ...s, hourlyCost: parseInt(e.target.value) }))}
+                  onChange={e => setState((s: any) => ({ ...s, hourlyCost: parseInt(e.target.value) }))}
                   className="w-full accent-slate-900 h-1.5 bg-slate-200 rounded-full appearance-none outline-none"
                 />
               </div>
@@ -222,7 +273,7 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
                 <input 
                   type="range" min="0" max="15" step="0.5" 
                   value={state.errorRate} 
-                  onChange={e => setState(s => ({ ...s, errorRate: parseFloat(e.target.value) }))}
+                  onChange={e => setState((s: any) => ({ ...s, errorRate: parseFloat(e.target.value) }))}
                   className="w-full accent-slate-900 h-1.5 bg-slate-200 rounded-full appearance-none outline-none"
                 />
               </div>
@@ -245,7 +296,7 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
                   {(['low', 'medium', 'high'] as const).map(p => (
                     <button
                       key={p}
-                      onClick={() => setState(s => ({ ...s, competitivePressure: p }))}
+                      onClick={() => setState((s: any) => ({ ...s, competitivePressure: p }))}
                       className={`flex-1 py-1.5 text-xs font-bold uppercase rounded-md transition-all ${state.competitivePressure === p ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                       {p}
@@ -260,7 +311,7 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
                   {(['none', 'basic', 'strict'] as const).map(p => (
                     <button
                       key={p}
-                      onClick={() => setState(s => ({ ...s, complianceRequirements: p }))}
+                      onClick={() => setState((s: any) => ({ ...s, complianceRequirements: p }))}
                       className={`flex-1 py-1.5 text-xs font-bold uppercase rounded-md transition-all ${state.complianceRequirements === p ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                       {p}
@@ -286,7 +337,7 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
             <div className="relative mb-16">
               <div className="hidden md:block absolute -left-6 top-0 bottom-0 w-1 bg-slate-900 rounded-full" />
               <h2 className="text-xl font-black text-slate-900 mb-4 tracking-tight">
-                Executive Synthesis
+                {config.rightSide?.executiveSynthesis?.heading || DEFAULT_COI_CONFIG.rightSide.executiveSynthesis.heading}
               </h2>
               <div className="text-slate-700 text-base leading-relaxed mb-6 max-w-3xl">
                 {narrative.split('\n\n').map((paragraph, idx) => (
@@ -295,51 +346,55 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
               </div>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-semibold rounded-md uppercase tracking-wider">
                 <Info className="w-3.5 h-3.5" />
-                Diagnostic Projection Engine
+                {config.rightSide?.executiveSynthesis?.badge || DEFAULT_COI_CONFIG.rightSide.executiveSynthesis.badge}
               </div>
             </div>
             
             {/* Main Financial Leakage Header */}
             <div className="text-center mb-16">
-              <h2 className="text-slate-500 font-bold uppercase tracking-widest text-sm mb-4">Projected 3-Year Financial Leakage</h2>
+              <h2 className="text-slate-500 font-bold uppercase tracking-widest text-sm mb-4">
+                {config.rightSide?.mainHeader?.eyebrow || DEFAULT_COI_CONFIG.rightSide.mainHeader.eyebrow}
+              </h2>
               <div className="text-6xl md:text-8xl font-black font-mono tracking-tighter text-slate-900">
                 <TickingNumber value={outputs.threeYearProjectedLoss} prefix="$" />
               </div>
               <p className="text-slate-500 mt-4 max-w-lg mx-auto text-sm leading-relaxed">
-                This figure represents the total compounded cost of manual operations, error remediation, and competitive disadvantage if automation is entirely ignored over a 36-month horizon.
+                {config.rightSide?.mainHeader?.subtext || DEFAULT_COI_CONFIG.rightSide.mainHeader.subtext}
               </p>
               <p className="text-slate-400 mt-2 max-w-lg mx-auto text-xs">
-                * Projections are estimates based on industry benchmarks and your inputs. Actual results will vary. Not financial advice.
+                {config.rightSide?.mainHeader?.disclaimer || DEFAULT_COI_CONFIG.rightSide.mainHeader.disclaimer}
               </p>
             </div>
 
             {/* Detailed Breakdown Cards */}
             <div className="mb-12">
-              <h3 className="text-xl font-black text-slate-900 mb-6">Component Breakdown</h3>
+              <h3 className="text-xl font-black text-slate-900 mb-6">
+                {config.rightSide?.breakdown?.heading || DEFAULT_COI_CONFIG.rightSide.breakdown.heading}
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
                 <DetailCard 
-                  title="Monthly Leakage" 
+                  title={config.rightSide?.breakdown?.monthlyLeakage?.title || DEFAULT_COI_CONFIG.rightSide.breakdown.monthlyLeakage.title}
                   icon={<DollarSign className="w-4 h-4" />} 
                   value={outputs.monthlyLeakage}
-                  subtitle="Immediate operational drain"
-                  description="The direct capital lost every 30 days to manual data entry, invoice processing bottlenecks, and exception handling overhead."
+                  subtitle={config.rightSide?.breakdown?.monthlyLeakage?.subtitle || DEFAULT_COI_CONFIG.rightSide.breakdown.monthlyLeakage.subtitle}
+                  description={config.rightSide?.breakdown?.monthlyLeakage?.description || DEFAULT_COI_CONFIG.rightSide.breakdown.monthlyLeakage.description}
                 />
                 
                 <DetailCard 
-                  title="Annual Risk" 
+                  title={config.rightSide?.breakdown?.annualRisk?.title || DEFAULT_COI_CONFIG.rightSide.breakdown.annualRisk.title}
                   icon={<Shield className="w-4 h-4" />} 
                   value={outputs.annualRisk}
-                  subtitle="Compliance & audit exposure"
-                  description="Calculated based on your selected compliance tier, representing the financial risk of manual control failures and audit penalties."
+                  subtitle={config.rightSide?.breakdown?.annualRisk?.subtitle || DEFAULT_COI_CONFIG.rightSide.breakdown.annualRisk.subtitle}
+                  description={config.rightSide?.breakdown?.annualRisk?.description || DEFAULT_COI_CONFIG.rightSide.breakdown.annualRisk.description}
                 />
                 
                 <DetailCard 
-                  title="Competitive Gap" 
+                  title={config.rightSide?.breakdown?.competitiveGap?.title || DEFAULT_COI_CONFIG.rightSide.breakdown.competitiveGap.title}
                   icon={<TrendingUp className="w-4 h-4" />} 
                   value={outputs.competitiveGap}
-                  subtitle="3-year market position loss"
-                  description="The compounded opportunity cost of operating slower and with higher overhead than automated competitors."
+                  subtitle={config.rightSide?.breakdown?.competitiveGap?.subtitle || DEFAULT_COI_CONFIG.rightSide.breakdown.competitiveGap.subtitle}
+                  description={config.rightSide?.breakdown?.competitiveGap?.description || DEFAULT_COI_CONFIG.rightSide.breakdown.competitiveGap.description}
                 />
               </div>
             </div>
@@ -349,10 +404,10 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
                 <div>
                   <h3 className="text-2xl font-black text-slate-900 mb-2 flex items-center gap-3">
-                    <Timer className="w-6 h-6 text-slate-400" /> Scenario: The Cost of Delay
+                    <Timer className="w-6 h-6 text-slate-400" /> {config.rightSide?.costOfDelay?.heading || DEFAULT_COI_CONFIG.rightSide.costOfDelay.heading}
                   </h3>
                   <p className="text-slate-600 text-sm max-w-md leading-relaxed">
-                    Adjust the timeline below to see exactly how much capital is irrevocably lost while evaluating, deferring, or delaying implementation.
+                    {config.rightSide?.costOfDelay?.subtext || DEFAULT_COI_CONFIG.rightSide.costOfDelay.subtext}
                   </p>
                 </div>
                 <div className="text-right">
@@ -365,7 +420,7 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
                 <input 
                   type="range" min="0" max="36" step="1" 
                   value={state.monthsDelay} 
-                  onChange={e => setState(s => ({ ...s, monthsDelay: parseInt(e.target.value) }))}
+                  onChange={e => setState((s: any) => ({ ...s, monthsDelay: parseInt(e.target.value) }))}
                   className="w-full accent-slate-900 h-2 bg-slate-300 rounded-full appearance-none outline-none focus:ring-2 focus:ring-slate-400 relative z-10"
                 />
                 <div className="w-full flex justify-between text-[10px] text-slate-400 font-mono font-bold uppercase mt-4">
@@ -378,8 +433,12 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
 
               <div className="flex flex-col md:flex-row items-center justify-between p-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
                 <div>
-                  <div className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-1">Sunk Cost of Delay</div>
-                  <div className="text-slate-500 text-sm">Capital that cannot be recovered.</div>
+                  <div className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-1">
+                    {config.rightSide?.costOfDelay?.sunkCostLabel || DEFAULT_COI_CONFIG.rightSide.costOfDelay.sunkCostLabel}
+                  </div>
+                  <div className="text-slate-500 text-sm">
+                    {config.rightSide?.costOfDelay?.sunkCostSubtext || DEFAULT_COI_CONFIG.rightSide.costOfDelay.sunkCostSubtext}
+                  </div>
                 </div>
                 <div className="text-4xl md:text-5xl font-black font-mono text-slate-900 mt-4 md:mt-0">
                   <TickingNumber value={outputs.costOfDelay} prefix="$" />
@@ -390,9 +449,11 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
             {/* Inline CTA */}
             <div className="bg-slate-900 rounded-3xl p-8 md:p-12 text-white shadow-xl">
               <div className="text-center max-w-2xl mx-auto">
-                <h3 className="text-2xl font-black mb-4">Transition from Projection to Execution</h3>
+                <h3 className="text-2xl font-black mb-4">
+                  {config.rightSide?.cta?.heading || DEFAULT_COI_CONFIG.rightSide.cta.heading}
+                </h3>
                 <p className="text-slate-400 text-sm leading-relaxed mb-8">
-                  The numbers above are a diagnostic baseline. Book a 30-minute technical review with our solutions team to refine this model with your actual historical data and map out a precise deployment strategy.
+                  {config.rightSide?.cta?.subtext || DEFAULT_COI_CONFIG.rightSide.cta.subtext}
                 </p>
                 
                 {emailSent ? (
@@ -413,7 +474,7 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
                       type="submit"
                       className="bg-white hover:bg-slate-100 text-slate-900 px-8 py-4 rounded-xl font-black text-sm transition-colors flex items-center justify-center gap-2"
                     >
-                      Book Technical Review <ArrowRight className="w-4 h-4" />
+                      {config.rightSide?.cta?.buttonText || DEFAULT_COI_CONFIG.rightSide.cta.buttonText} <ArrowRight className="w-4 h-4" />
                     </button>
                   </form>
                 )}

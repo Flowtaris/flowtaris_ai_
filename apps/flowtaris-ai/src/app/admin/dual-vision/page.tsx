@@ -135,7 +135,7 @@ function ImageUpload({
           ) : value && !previewError ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={value} alt="Preview" className="w-full h-full object-cover" onError={() => setPreviewError(true)} />
+              <img src={value.startsWith('http') || value.startsWith('/') ? value : `/${value}`} alt="Preview" className="w-full h-full object-cover" onError={() => setPreviewError(true)} />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                 <ImageIcon className="w-5 h-5 text-white" />
               </div>
@@ -232,7 +232,7 @@ function StatEditor({ stats, onChange }: { stats: any[]; onChange: (s: any[]) =>
                 type="text"
                 value={s.label}
                 onChange={e => update(i, 'label', e.target.value)}
-                className="w-16 text-sm font-bold text-center bg-transparent border-b border-gray-200 dark:border-gray-600 focus:outline-none focus:border-amber-400"
+                className="w-16 text-sm font-bold text-center bg-transparent border-b border-gray-200 dark:border-gray-600 focus:outline-none focus:border-amber-400 text-gray-900 dark:text-gray-100"
                 placeholder="40+"
               />
               <input

@@ -7,15 +7,7 @@ import IntelligenceSuiteSection from '../components/IntelligenceSuiteSection'
 import CapabilitiesSection from '../components/CapabilitiesSection'
 import CtaCostSection from '../components/CtaCostSection'
 
-export const metadata: Metadata = {
-  title: 'Flowtaris AI | Enterprise AI Automation for Finance',
-  description: 'Flowtaris AI builds enterprise-grade AI automation for finance teams. GenAI Document Intelligence, Autonomous Workflows, Predictive Analytics, and Conversational ERP for NetSuite, Coupa, SAP, and Workday.',
-  openGraph: {
-    title: 'Flowtaris AI | Enterprise AI Automation for Finance',
-    description: 'Enterprise AI automation for finance teams. GenAI Document Intelligence, Autonomous Workflows, Predictive Analytics.',
-    type: 'website',
-  },
-}
+// Metadata is now dynamically generated in layout.tsx
 
 
 

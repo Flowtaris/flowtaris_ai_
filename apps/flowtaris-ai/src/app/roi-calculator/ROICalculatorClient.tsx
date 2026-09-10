@@ -5,13 +5,52 @@ import { calculateROI } from '@flowtaris/roi-engine'
 import { analytics } from '@flowtaris/analytics'
 import { ChevronDown, BarChart3, PieChart, Zap, FileText, CheckCircle2, Activity } from 'lucide-react'
 
-// ─── Data ───────────────────────────────────────────────────────────────────
-const PLATFORMS = ['NetSuite', 'SAP', 'Coupa', 'Workday', 'Salesforce']
-const USE_CASES = [
-  { id: 'ap-automation', label: 'AP Automation & Invoicing' },
-  { id: 'po-matching', label: 'PO Reconciliation' },
-  { id: 'expense-audit', label: 'Expense & Audit' },
-]
+export const DEFAULT_ROI_CONFIG = {
+  shutdown: false,
+  tickerPrefix: 'Live Market Benchmarks',
+  tickerItems: [
+    'Avg AP Cost: $14.20/invoice',
+    'Flowtaris Target: $1.15/invoice',
+    'Industry Error Rate: 4.8%',
+    'Flowtaris Confidence Score: 99.4% (Based on 2.1M verified documents)'
+  ],
+  platforms: ['NetSuite', 'SAP', 'Coupa', 'Workday', 'Salesforce'],
+  useCases: [
+    { id: 'ap-automation', label: 'AP Automation & Invoicing' },
+    { id: 'po-matching', label: 'PO Reconciliation' },
+    { id: 'expense-audit', label: 'Expense & Audit' },
+  ],
+  dropdownLabels: {
+    platform: 'Enterprise Platform',
+    useCase: 'Primary Focus',
+    scale: 'Scale (Volume & Headcount)'
+  },
+  breakdownLabels: {
+    title: 'Cost of Inaction Breakdown',
+    subtitle: 'Your current annual bleed rate.',
+    manual: 'Manual Labor',
+    error: 'Error Rework',
+    attrition: 'Team Attrition',
+    compliance: 'Compliance Risk'
+  },
+  projectionLabels: {
+    title: '3-Year Projection',
+    subtitle: 'Status Quo vs Flowtaris Agentic AI',
+    tas: 'Total Addressable Spend',
+    y1: 'Year 1',
+    y2: 'Year 2',
+    y3: 'Year 3'
+  },
+  metricLabels: {
+    savings: 'Net Annual Savings',
+    payback: 'Payback Period',
+    capacity: 'FTE Capacity Freed',
+    ctaText: 'Export Business Case',
+    ctaLoading: 'Generating Report...',
+    success: 'Report Sent to Inbox!'
+  }
+}
+
 
 function deriveMetrics(sizeIndex: number) {
   const vol = 10000 + Math.pow(sizeIndex / 100, 2) * 490000
@@ -36,26 +75,24 @@ const fmt = (v: number) => `$${Math.round(v).toLocaleString()}`
 const fmtM = (v: number) => `$${(v / 1000000).toFixed(2)}M`
 
 // ─── Ticker Component ───────────────────────────────────────────────────────
-function MarketTicker() {
+function MarketTicker({ config }: { config: typeof DEFAULT_ROI_CONFIG }) {
   const date = new Date().toLocaleString('default', { month: 'short', year: 'numeric' })
   return (
     <div className="w-full bg-brand-emerald-500/10 border-b border-brand-emerald-500/20 text-[10px] text-brand-emerald-400 font-mono py-1.5 flex justify-start md:justify-center items-center gap-4 uppercase tracking-widest overflow-x-auto whitespace-nowrap z-40 relative px-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
       <Activity className="w-3 h-3 animate-pulse shrink-0" />
-      <span>Live Market Benchmarks ({date}):</span>
-      <span className="opacity-50">•</span>
-      <span>Avg AP Cost: $14.20/invoice</span>
-      <span className="opacity-50">•</span>
-      <span>Flowtaris Target: $1.15/invoice</span>
-      <span className="opacity-50">•</span>
-      <span>Industry Error Rate: 4.8%</span>
-      <span className="opacity-50">•</span>
-      <span>Flowtaris Confidence Score: 99.4% (Based on 2.1M verified documents)</span>
+      <span>{config.tickerPrefix} ({date}):</span>
+      {config.tickerItems.map((item, idx) => (
+        <React.Fragment key={idx}>
+          <span className="opacity-50">•</span>
+          <span>{item}</span>
+        </React.Fragment>
+      ))}
     </div>
   )
 }
 
 // ─── Custom SVG Area Chart ──────────────────────────────────────────────────
-function ProjectionChart({ baseCost, newCost }: { baseCost: number, newCost: number }) {
+function ProjectionChart({ baseCost, newCost, config }: { baseCost: number, newCost: number, config: typeof DEFAULT_ROI_CONFIG }) {
   const b1 = baseCost, b2 = baseCost * 1.1, b3 = baseCost * 1.21
   const n1 = newCost, n2 = newCost * 0.8, n3 = newCost * 0.82
   const maxVal = Math.max(b3) * 1.1
@@ -86,17 +123,21 @@ function ProjectionChart({ baseCost, newCost }: { baseCost: number, newCost: num
         </defs>
       </svg>
       <div className="absolute left-12 right-0 -bottom-6 flex justify-between text-[11px] text-white/40 font-medium">
-        <span>Year 1</span><span>Year 2</span><span>Year 3</span>
+        <span>{config.projectionLabels.y1}</span><span>{config.projectionLabels.y2}</span><span>{config.projectionLabels.y3}</span>
       </div>
     </div>
   )
 }
 
 export default function ROICalculatorClient({ initialConfig }: { initialConfig: any }) {
-  const [erp, setErp] = useState(PLATFORMS[0])
-  const [useCase, setUseCase] = useState(USE_CASES[0].id)
+  const config = { ...DEFAULT_ROI_CONFIG, ...initialConfig }
+  const [erp, setErp] = useState(config.platforms[0])
+  const [useCase, setUseCase] = useState(config.useCases[0].id)
   const [sizeIndex, setSizeIndex] = useState(50)
   const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [showPressEnter, setShowPressEnter] = useState(false)
+  const [showErrorPopup, setShowErrorPopup] = useState(false)
   const [sent, setSent] = useState(false)
   const [isSimulating, setIsSimulating] = useState(false)
 
@@ -120,7 +161,21 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
 
   const handleExport = async (e: React.FormEvent) => {
     e.preventDefault()
+
     if (!email) return
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]{2,}\.[a-zA-Z]{2,}$/
+    if (!emailRegex.test(email)) {
+      setShowPressEnter(false)
+      setShowErrorPopup(true)
+      // Auto-hide error popup after 3 seconds
+      setTimeout(() => setShowErrorPopup(false), 3000)
+      return
+    }
+
+    setShowPressEnter(false)
+    setShowErrorPopup(false)
+
     setIsSimulating(true)
     
     try {
@@ -145,7 +200,7 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
 
   return (
     <div className="min-h-screen bg-[#050508] relative overflow-hidden flex flex-col pt-[80px]">
-      <MarketTicker />
+      <MarketTicker config={config} />
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-brand-cyan-500/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-brand-emerald-500/10 blur-[150px] rounded-full pointer-events-none" />
 
@@ -153,19 +208,19 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
       <div className="w-full max-w-7xl mx-auto px-6 py-6 z-10">
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col lg:flex-row gap-6 items-center backdrop-blur-xl">
           <div className="flex-1 w-full">
-            <label className="text-[10px] uppercase tracking-widest text-white/40 font-semibold mb-2 block">Enterprise Platform</label>
+            <label className="text-[10px] uppercase tracking-widest text-white/40 font-semibold mb-2 block">{config.dropdownLabels.platform}</label>
             <div className="relative">
               <select value={erp} onChange={e => setErp(e.target.value)} className="w-full appearance-none bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white font-medium focus:border-brand-cyan-500 outline-none transition-colors">
-                {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
+                {config.platforms.map((p: string) => <option key={p} value={p}>{p}</option>)}
               </select>
               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
             </div>
           </div>
           <div className="flex-1 w-full">
-            <label className="text-[10px] uppercase tracking-widest text-white/40 font-semibold mb-2 block">Primary Focus</label>
+            <label className="text-[10px] uppercase tracking-widest text-white/40 font-semibold mb-2 block">{config.dropdownLabels.useCase}</label>
             <div className="relative">
               <select value={useCase} onChange={e => setUseCase(e.target.value)} className="w-full appearance-none bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white font-medium focus:border-brand-cyan-500 outline-none transition-colors">
-                {USE_CASES.map(u => <option key={u.id} value={u.id}>{u.label}</option>)}
+                {config.useCases.map((u: any) => <option key={u.id} value={u.id}>{u.label}</option>)}
               </select>
               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
             </div>
@@ -173,7 +228,7 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
           <div className="flex-[2] w-full px-4">
             <div className="flex justify-between items-end mb-2">
               <label className="text-[10px] uppercase tracking-widest text-white/40 font-semibold flex gap-2 items-center">
-                Scale (Volume & Headcount) 
+                {config.dropdownLabels.scale} 
                 <span className="bg-brand-emerald-500/20 text-brand-emerald-400 px-1.5 py-0.5 rounded text-[8px]">LIVE DATA SYNC</span>
               </label>
               <span className="text-brand-cyan-400 font-mono text-sm font-bold">{m.vol.toLocaleString()} docs/yr</span>
@@ -193,23 +248,23 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
         <div className="bg-black/60 border border-white/10 rounded-3xl p-8 backdrop-blur-2xl flex-1 flex flex-col shadow-2xl shadow-black/50">
           <div className="flex flex-col lg:flex-row gap-12 flex-1">
             <div className="w-full lg:w-1/3 flex flex-col">
-              <h2 className="text-xl text-white font-bold mb-1 flex items-center gap-2"><PieChart className="w-5 h-5 text-brand-amber-500" /> Cost of Inaction Breakdown</h2>
-              <p className="text-sm text-white/40 mb-8">Your current annual bleed rate.</p>
+              <h2 className="text-xl text-white font-bold mb-1 flex items-center gap-2"><PieChart className="w-5 h-5 text-brand-amber-500" /> {config.breakdownLabels.title}</h2>
+              <p className="text-sm text-white/40 mb-8">{config.breakdownLabels.subtitle}</p>
               <div className="flex-1 flex flex-col gap-4 justify-center">
                 <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5">
-                  <div className="flex items-center gap-3"><div className="w-1 h-8 bg-brand-cyan-500 rounded-full" /><div><div className="text-xs text-white/50 uppercase tracking-wider font-semibold">Manual Labor</div><div className="text-lg font-bold text-white">{fmt(manCost)}</div></div></div>
+                  <div className="flex items-center gap-3"><div className="w-1 h-8 bg-brand-cyan-500 rounded-full" /><div><div className="text-xs text-white/50 uppercase tracking-wider font-semibold">{config.breakdownLabels.manual}</div><div className="text-lg font-bold text-white">{fmt(manCost)}</div></div></div>
                   <div className="text-sm font-mono text-brand-cyan-400 bg-brand-cyan-500/10 px-2 py-1 rounded">{pMan.toFixed(1)}%</div>
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5">
-                  <div className="flex items-center gap-3"><div className="w-1 h-8 bg-brand-amber-500 rounded-full" /><div><div className="text-xs text-white/50 uppercase tracking-wider font-semibold">Error Rework</div><div className="text-lg font-bold text-white">{fmt(errCost)}</div></div></div>
+                  <div className="flex items-center gap-3"><div className="w-1 h-8 bg-brand-amber-500 rounded-full" /><div><div className="text-xs text-white/50 uppercase tracking-wider font-semibold">{config.breakdownLabels.error}</div><div className="text-lg font-bold text-white">{fmt(errCost)}</div></div></div>
                   <div className="text-sm font-mono text-brand-amber-400 bg-brand-amber-500/10 px-2 py-1 rounded">{pErr.toFixed(1)}%</div>
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5">
-                  <div className="flex items-center gap-3"><div className="w-1 h-8 bg-brand-purple-500 rounded-full" /><div><div className="text-xs text-white/50 uppercase tracking-wider font-semibold">Team Attrition</div><div className="text-lg font-bold text-white">{fmt(m.attritionCost)}</div></div></div>
+                  <div className="flex items-center gap-3"><div className="w-1 h-8 bg-brand-purple-500 rounded-full" /><div><div className="text-xs text-white/50 uppercase tracking-wider font-semibold">{config.breakdownLabels.attrition}</div><div className="text-lg font-bold text-white">{fmt(m.attritionCost)}</div></div></div>
                   <div className="text-sm font-mono text-brand-purple-400 bg-brand-purple-500/10 px-2 py-1 rounded">{pAttr.toFixed(1)}%</div>
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5">
-                  <div className="flex items-center gap-3"><div className="w-1 h-8 bg-brand-red-500 rounded-full" /><div><div className="text-xs text-white/50 uppercase tracking-wider font-semibold">Compliance Risk</div><div className="text-lg font-bold text-white">{fmt(m.complianceCost)}</div></div></div>
+                  <div className="flex items-center gap-3"><div className="w-1 h-8 bg-brand-red-500 rounded-full" /><div><div className="text-xs text-white/50 uppercase tracking-wider font-semibold">{config.breakdownLabels.compliance}</div><div className="text-lg font-bold text-white">{fmt(m.complianceCost)}</div></div></div>
                   <div className="text-sm font-mono text-brand-red-400 bg-brand-red-500/10 px-2 py-1 rounded">{pComp.toFixed(1)}%</div>
                 </div>
               </div>
@@ -217,16 +272,16 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
             <div className="w-full lg:w-2/3 flex flex-col">
               <div className="flex justify-between items-end mb-8">
                 <div>
-                  <h2 className="text-xl text-white font-bold mb-1 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-brand-emerald-500" /> 3-Year Projection</h2>
-                  <p className="text-sm text-white/40">Status Quo vs Flowtaris Agentic AI</p>
+                  <h2 className="text-xl text-white font-bold mb-1 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-brand-emerald-500" /> {config.projectionLabels.title}</h2>
+                  <p className="text-sm text-white/40">{config.projectionLabels.subtitle}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">Total Addressable Spend</div>
+                  <div className="text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">{config.projectionLabels.tas}</div>
                   <div className="text-2xl font-bold font-mono text-brand-red-400">{fmt(currentTotal)} / yr</div>
                 </div>
               </div>
               <div className="flex-1 w-full flex items-center justify-center">
-                <ProjectionChart baseCost={currentTotal} newCost={currentTotal - res.annualSavings} />
+                <ProjectionChart baseCost={currentTotal} newCost={currentTotal - res.annualSavings} config={config} />
               </div>
             </div>
           </div>
@@ -234,32 +289,64 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
           {/* ── BOTTOM METRICS PANEL ── */}
           <div className="mt-12 pt-8 border-t border-white/10 grid grid-cols-1 xl:grid-cols-4 gap-6 items-center">
             <div className="col-span-1 xl:border-r border-white/10">
-              <div className="text-[11px] text-brand-emerald-400 uppercase tracking-widest font-bold mb-2 flex items-center gap-1"><Zap className="w-3 h-3" /> Net Annual Savings</div>
+              <div className="text-[11px] text-brand-emerald-400 uppercase tracking-widest font-bold mb-2 flex items-center gap-1"><Zap className="w-3 h-3" /> {config.metricLabels.savings}</div>
               <div className="text-4xl lg:text-5xl font-black font-mono text-white tracking-tighter">{fmt(res.annualSavings)}</div>
             </div>
             <div className="col-span-1 xl:border-r border-white/10 xl:pl-6">
-              <div className="text-[11px] text-white/40 uppercase tracking-widest font-bold mb-2">Payback Period</div>
+              <div className="text-[11px] text-white/40 uppercase tracking-widest font-bold mb-2">{config.metricLabels.payback}</div>
               <div className="text-3xl font-bold text-white">{res.paybackMonths.toFixed(1)} <span className="text-lg text-white/40">mo</span></div>
             </div>
             <div className="col-span-1 xl:pl-6">
-              <div className="text-[11px] text-white/40 uppercase tracking-widest font-bold mb-2">FTE Capacity Freed</div>
+              <div className="text-[11px] text-white/40 uppercase tracking-widest font-bold mb-2">{config.metricLabels.capacity}</div>
               <div className="text-3xl font-bold text-white">{res.fteFreed.toFixed(1)} <span className="text-lg text-white/40">heads</span></div>
             </div>
             <div className="col-span-1 flex justify-end">
               {!sent ? (
                 <form onSubmit={handleExport} className="w-full max-w-sm flex flex-col gap-2">
-                  <input type="email" placeholder="CFO@company.com" required onChange={e => setEmail(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white focus:border-brand-emerald-500 outline-none transition-colors"
-                  />
-                  <button type="submit" disabled={isSimulating} className="w-full bg-brand-emerald-500 hover:bg-brand-emerald-400 text-black font-bold py-3 rounded-lg flex justify-center items-center gap-2 transition-colors disabled:opacity-50">
+                  {/* Email input with live popup feedback */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="CFO@company.com"
+                      value={email}
+                      onChange={e => {
+                        const val = e.target.value
+                        setEmail(val)
+                        setEmailError('')
+                        setShowErrorPopup(false)
+                        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]{2,}\.[a-zA-Z]{2,}$/
+                        setShowPressEnter(val.length > 0 && emailRegex.test(val))
+                      }}
+                      className={`w-full bg-white/5 border-2 rounded-lg px-4 py-3 text-sm text-white outline-none transition-all duration-200 ${
+                        email.length === 0
+                          ? 'border-white/10 focus:border-white/30'
+                          : showPressEnter
+                          ? 'border-green-500 focus:border-green-400'
+                          : 'border-red-500 focus:border-red-400'
+                      }`}
+                    />
+                    {/* Green "Press Enter" popup — below the input */}
+                    {showPressEnter && !showErrorPopup && (
+                      <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-lg shadow-green-500/30 whitespace-nowrap pointer-events-none z-10">
+                        Press Enter
+                      </div>
+                    )}
+                    {/* Red "please enter valid email" popup — below the input */}
+                    {showErrorPopup && (
+                      <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-lg shadow-red-500/30 whitespace-nowrap pointer-events-none z-10">
+                        Please enter valid email
+                      </div>
+                    )}
+                  </div>
+                  <button type="submit" disabled={isSimulating} className="w-full bg-brand-emerald-500 hover:bg-brand-emerald-400 text-black font-bold py-3 rounded-lg flex justify-center items-center gap-2 transition-colors disabled:opacity-50 mt-1">
                     {isSimulating ? <Activity className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-                    {isSimulating ? 'Generating Report...' : 'Export Business Case'}
+                    {isSimulating ? config.metricLabels.ctaLoading : config.metricLabels.ctaText}
                   </button>
                 </form>
               ) : (
                 <div className="w-full max-w-sm bg-brand-emerald-500/10 border border-brand-emerald-500/20 p-4 rounded-lg flex flex-col gap-2">
                   <div className="text-brand-emerald-400 text-sm font-bold flex items-center justify-center gap-2">
-                    <CheckCircle2 className="w-5 h-5" /> Report Sent to Inbox!
+                    <CheckCircle2 className="w-5 h-5" /> {config.metricLabels.success}
                   </div>
                 </div>
               )}

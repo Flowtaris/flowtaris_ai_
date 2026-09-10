@@ -7,9 +7,97 @@ import { analytics } from '@flowtaris/analytics'
 import { ArrowRight, ChevronLeft, Activity, Mail, CheckCircle2 } from 'lucide-react'
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
-interface SanityAssessmentConfig {
-  questions?: Array<{ id: string; step: number; title: string; description: string; type: string }>
-  uiContent?: Record<string, string>
+export interface AssessmentConfigData {
+  intro: {
+    eyebrowBadge: string
+    heading: string
+    description: string
+    walkawayTitle: string
+    walkawayDeliverables: Array<{ id: string; number: string; title: string; body: string }>
+    ctaButtonText: string
+    confidentialityNote: string
+  }
+  step1Erp: {
+    stepEyebrow: string
+    stepTitle: string
+    stepSubtitle: string
+    erpList: Array<{ value: string; abbr: string; label: string; sub: string; accent: string }>
+  }
+  step2Pain: {
+    stepEyebrow: string
+    stepTitle: string
+    stepSubtitle: string
+    maxSelections: number
+    painList: Array<{ value: string; label: string; detail: string; metric: string; unit: string; severity: number; color: string }>
+  }
+  step3Volume: {
+    stepEyebrow: string
+    stepTitle: string
+    stepSubtitle: string
+    benchmarks: {
+      invoiceCostRate: number
+      transactionCostRate: number
+      savingsMultiplier: number
+      invoicesBenchText: string
+      employeesBenchText: string
+      transactionsBenchText: string
+      poLinesBenchText: string
+    }
+  }
+  step4State: {
+    stepEyebrow: string
+    stepTitle: string
+    stepSubtitle: string
+    stateList: Array<{ value: string; label: string; tag: string; level: number }>
+  }
+  step5Maturity: {
+    stepEyebrow: string
+    stepTitle: string
+    stepSubtitle: string
+    maturityList: Array<{ value: string; label: string; tag: string; year: string }>
+  }
+  step6Urgency: {
+    stepEyebrow: string
+    stepTitle: string
+    stepSubtitle: string
+    urgencyList: Array<{ value: string; label: string; tag: string; signal: string; signalColor: string; priority: number }>
+  }
+  tourAndResults: {
+    tourSteps: Array<{ target: string; text: string }>
+    // Results page header
+    assessmentCompleteLabel: string
+    resultsHeading: string
+    resultsSubtitle: string
+    // Score card labels
+    scoreLabel: string
+    estSavingsLabel: string
+    perYearLabel: string
+    // KPI card labels
+    kpiOpportunitiesLabel: string
+    kpiOpportunitiesUnit: string
+    kpiQuickWinsLabel: string
+    kpiQuickWinsUnit: string
+    kpiFastestPaybackLabel: string
+    kpiFastestPaybackUnit: string
+    kpiProfileLabel: string
+    kpiProfileUnit: string
+    // Category labels
+    catQuickWinLabel: string
+    catQuickWinSub: string
+    catStrategicLabel: string
+    catStrategicSub: string
+    catInnovationLabel: string
+    catInnovationSub: string
+    // Email capture
+    emailCaptureHeadline: string
+    emailCaptureDescription: string
+    emailCaptureButtonText: string
+    // CTA cards
+    ctaRoiTitle: string
+    ctaRoiSubtitle: string
+    ctaContactTitle: string
+    ctaContactSubtitle: string
+  }
 }
 
 const STORAGE_KEY = 'flowtaris-assessment-v5'
@@ -19,51 +107,138 @@ const initialAnswers: AssessmentAnswers = {
   currentState: '', techMaturity: '', urgency: '',
 }
 
-// ─── DATA ─────────────────────────────────────────────────────────────────────
-const ERP_LIST = [
-  { value: 'NetSuite', abbr: 'NS', label: 'Oracle NetSuite', sub: 'Cloud ERP', accent: '#0ea5e9' },
-  { value: 'SAP', abbr: 'SAP', label: 'SAP S/4HANA', sub: 'Hybrid ERP', accent: '#6366f1' },
-  { value: 'Coupa', abbr: 'CPA', label: 'Coupa BSM', sub: 'Procurement', accent: '#f97316' },
-  { value: 'Workday', abbr: 'WD', label: 'Workday Finance', sub: 'HCM & Finance', accent: '#22c55e' },
-  { value: 'Multiple', abbr: '2+', label: 'Multiple Systems', sub: 'Multi-platform', accent: '#a855f7' },
-]
-
-const PAIN_LIST = [
-  { value: 'Manual data entry', label: 'Manual Invoice Processing', detail: 'Teams spending hours on data entry that should take seconds', metric: '$14.20', unit: '/ invoice', severity: 92, color: '#ef4444' },
-  { value: 'Invoice processing delays', label: 'Cash Flow Blind Spots', detail: 'No real-time view of cash position or receivables aging', metric: '11 days', unit: 'avg DSO gap', severity: 78, color: '#f59e0b' },
-  { value: 'Integration Failures', label: 'Integration Failures', detail: 'Systems that don\'t talk to each other, causing manual reconciliation', metric: '4.3 hrs', unit: 'downtime/mo', severity: 84, color: '#f97316' },
-  { value: 'Compliance risks', label: 'Compliance & Audit Risk', detail: 'Manual controls create gaps that auditors flag every cycle', metric: '$82K', unit: 'avg fine risk', severity: 89, color: '#ef4444' },
-  { value: 'Slow decision making', label: 'Slow Financial Close', detail: 'Month-end taking 7+ days instead of under 3', metric: '7.5 days', unit: 'avg cycle', severity: 71, color: '#eab308' },
-  { value: 'High error rates', label: 'Error Rates & Disputes', detail: 'Vendor disputes and payment errors eating into relationships', metric: '4.8%', unit: 'error rate', severity: 76, color: '#ef4444' },
-]
-
-const STATE_LIST = [
-  { value: 'Manual', label: 'Fully Manual', tag: 'Spreadsheets, email, and paper trails', level: 1 },
-  { value: 'Partial', label: 'Some Automation', tag: 'Basic OCR or RPA, still lots of exceptions', level: 2 },
-  { value: 'iPaaS', label: 'Middleware Connected', tag: 'MuleSoft, Boomi, Celigo in play', level: 3 },
-  { value: 'Custom', label: 'Custom-Built Logic', tag: 'Internal scripts and automation tooling', level: 3 },
-  { value: "Don't know", label: "Honestly not sure", tag: "Mixed bag, varies by team", level: 0 },
-]
-
-const MATURITY_LIST = [
-  { value: 'Legacy', label: 'Legacy Core', tag: 'On-premise, pre-2018 ERP landscape', year: 'Pre-2018' },
-  { value: 'Hybrid', label: 'Hybrid Mix', tag: 'Some cloud, some legacy, not fully committed', year: '2018–2022' },
-  { value: 'Modern', label: 'Cloud-First', tag: 'SaaS-first, API-driven, modern stack', year: '2022+' },
-  { value: 'AI Pilot', label: 'Already Running AI', tag: 'Active ML pilots or production AI in finance', year: 'Now' },
-]
-
-const URGENCY_LIST = [
-  { value: 'Exploring', label: 'Just researching', tag: 'No deadline, building internal awareness', signal: 'LOW', signalColor: '#64748b', priority: 1 },
-  { value: 'Budget Approved', label: 'Budget is approved', tag: 'We have funding, now need the right partner', signal: 'MED', signalColor: '#3b82f6', priority: 2 },
-  { value: 'Audit-Driven', label: 'Audit or regulatory deadline', tag: 'External compliance is forcing our hand', signal: 'HIGH', signalColor: '#f59e0b', priority: 3 },
-  { value: 'Board Mandate', label: 'Board or executive mandate', tag: 'Leadership has made this a company priority', signal: 'CRIT', signalColor: '#ef4444', priority: 4 },
-]
+// ─── DEFAULT CONFIGURATION ────────────────────────────────────────────────────
+export const DEFAULT_ASSESSMENT_DATA: AssessmentConfigData = {
+  intro: {
+    eyebrowBadge: '• FREE · TAKES ~3 MINUTES · NO CARD REQUIRED',
+    heading: 'Find out what your finance team is leaving on the table',
+    description: 'Answer 6 questions about your current setup and we will give you a specific, quantified breakdown of where you are losing money — and what it would take to fix it. No generic playbooks, no sales pitch disguised as content.',
+    walkawayTitle: 'What you walk away with',
+    walkawayDeliverables: [
+      { id: '1', number: '01', title: 'Your AI Readiness Score', body: 'A 0–100 score built from 6 dimensions of your finance operation, benchmarked against peers at your scale.' },
+      { id: '2', number: '02', title: 'A dollar figure on your inefficiency', body: 'We calculate your estimated annual bleed based on invoice volume, team size, and error rates — not ballpark guesses.' },
+      { id: '3', number: '03', title: 'A sequenced action plan', body: 'Quick wins you can start this quarter, plus the longer-term strategic moves that compound over 12–18 months.' },
+    ],
+    ctaButtonText: 'Begin Assessment',
+    confidentialityNote: 'Your answers are never sold or shared. We use them only to generate your report.',
+  },
+  step1Erp: {
+    stepEyebrow: 'Step 1 of 6 · ERP Platform',
+    stepTitle: 'Which system runs your finance operation?',
+    stepSubtitle: 'We tailor every recommendation to your specific ERP. Different platforms have different automation ceilings — this matters.',
+    erpList: [
+      { value: 'NetSuite', abbr: 'NS', label: 'Oracle NetSuite', sub: 'Cloud ERP', accent: '#0ea5e9' },
+      { value: 'SAP', abbr: 'SAP', label: 'SAP S/4HANA', sub: 'Hybrid ERP', accent: '#6366f1' },
+      { value: 'Coupa', abbr: 'CPA', label: 'Coupa BSM', sub: 'Procurement', accent: '#f97316' },
+      { value: 'Workday', abbr: 'WD', label: 'Workday Finance', sub: 'HCM & Finance', accent: '#22c55e' },
+      { value: 'Multiple', abbr: '2+', label: 'Multiple Systems', sub: 'Multi-platform', accent: '#a855f7' },
+    ]
+  },
+  step2Pain: {
+    stepEyebrow: 'Step 2 of 6 · Pain Points',
+    stepTitle: 'Where does your team feel the most friction?',
+    stepSubtitle: 'Pick up to 3. Be honest — the cost estimates next to each one are real industry benchmarks.',
+    maxSelections: 3,
+    painList: [
+      { value: 'Manual data entry', label: 'Manual Invoice Processing', detail: 'Teams spending hours on data entry that should take seconds', metric: '$14.20', unit: '/ invoice', severity: 92, color: '#ef4444' },
+      { value: 'Invoice processing delays', label: 'Cash Flow Blind Spots', detail: 'No real-time view of cash position or receivables aging', metric: '11 days', unit: 'avg DSO gap', severity: 78, color: '#f59e0b' },
+      { value: 'Integration Failures', label: 'Integration Failures', detail: 'Systems that don\'t talk to each other, causing manual reconciliation', metric: '4.3 hrs', unit: 'downtime/mo', severity: 84, color: '#f97316' },
+      { value: 'Compliance risks', label: 'Compliance & Audit Risk', detail: 'Manual controls create gaps that auditors flag every cycle', metric: '$82K', unit: 'avg fine risk', severity: 89, color: '#ef4444' },
+      { value: 'Slow decision making', label: 'Slow Financial Close', detail: 'Month-end taking 7+ days instead of under 3', metric: '7.5 days', unit: 'avg cycle', severity: 71, color: '#eab308' },
+      { value: 'High error rates', label: 'Error Rates & Disputes', detail: 'Vendor disputes and payment errors eating into relationships', metric: '4.8%', unit: 'error rate', severity: 76, color: '#ef4444' },
+    ]
+  },
+  step3Volume: {
+    stepEyebrow: 'Step 3 of 6 · Volume',
+    stepTitle: 'Give us a rough sense of scale',
+    stepSubtitle: 'Rough numbers are completely fine. We use these to calculate your actual dollar exposure, not to judge you.',
+    benchmarks: {
+      invoiceCostRate: 14.20,
+      transactionCostRate: 3.50,
+      savingsMultiplier: 0.78,
+      invoicesBenchText: 'Industry avg: $14.20 per invoice manual',
+      employeesBenchText: 'Fully-loaded ~$72K/yr per person',
+      transactionsBenchText: 'Industry avg: $3.50 per transaction',
+      poLinesBenchText: '~8 min of manual work per line',
+    }
+  },
+  step4State: {
+    stepEyebrow: 'Step 4 of 6 · Current State',
+    stepTitle: 'How does finance actually work at your company today?',
+    stepSubtitle: 'This tells us your automation ceiling — how much room there is to improve, and how fast.',
+    stateList: [
+      { value: 'Manual', label: 'Fully Manual', tag: 'Spreadsheets, email, and paper trails', level: 1 },
+      { value: 'Partial', label: 'Some Automation', tag: 'Basic OCR or RPA, still lots of exceptions', level: 2 },
+      { value: 'iPaaS', label: 'Middleware Connected', tag: 'MuleSoft, Boomi, Celigo in play', level: 3 },
+      { value: 'Custom', label: 'Custom-Built Logic', tag: 'Internal scripts and automation tooling', level: 3 },
+      { value: "Don't know", label: "Honestly not sure", tag: "Mixed bag, varies by team", level: 0 },
+    ]
+  },
+  step5Maturity: {
+    stepEyebrow: 'Step 5 of 6 · Tech Maturity',
+    stepTitle: 'How would you describe your underlying tech stack?',
+    stepSubtitle: 'Older infrastructure doesn\'t disqualify you — it just shapes how we\'d phase the work and what we\'d tackle first.',
+    maturityList: [
+      { value: 'Legacy', label: 'Legacy Core', tag: 'On-premise, pre-2018 ERP landscape', year: 'Pre-2018' },
+      { value: 'Hybrid', label: 'Hybrid Mix', tag: 'Some cloud, some legacy, not fully committed', year: '2018–2022' },
+      { value: 'Modern', label: 'Cloud-First', tag: 'SaaS-first, API-driven, modern stack', year: '2022+' },
+      { value: 'AI Pilot', label: 'Already Running AI', tag: 'Active ML pilots or production AI in finance', year: 'Now' },
+    ]
+  },
+  step6Urgency: {
+    stepEyebrow: 'Step 6 of 6 · Timeline',
+    stepTitle: 'What\'s driving the timing on this?',
+    stepSubtitle: 'This changes how we structure your roadmap — internal exploring looks very different from an audit deadline.',
+    urgencyList: [
+      { value: 'Exploring', label: 'Just researching', tag: 'No deadline, building internal awareness', signal: 'LOW', signalColor: '#64748b', priority: 1 },
+      { value: 'Budget Approved', label: 'Budget is approved', tag: 'We have funding, now need the right partner', signal: 'MED', signalColor: '#3b82f6', priority: 2 },
+      { value: 'Audit-Driven', label: 'Audit or regulatory deadline', tag: 'External compliance is forcing our hand', signal: 'HIGH', signalColor: '#f59e0b', priority: 3 },
+      { value: 'Board Mandate', label: 'Board or executive mandate', tag: 'Leadership has made this a company priority', signal: 'CRIT', signalColor: '#ef4444', priority: 4 },
+    ]
+  },
+  tourAndResults: {
+    tourSteps: [
+      { target: 'erp-section', text: 'Pick your ERP — we use this to calibrate every recommendation to your actual platform constraints.' },
+      { target: 'pain-section', text: 'Select your top pain points. We\'ll show industry cost benchmarks next to each one.' },
+      { target: 'sidebar-score', text: 'Your AI Readiness Score updates live as you answer. It\'s based on real finance benchmarks.' },
+    ],
+    assessmentCompleteLabel: 'Assessment complete',
+    resultsHeading: 'Your roadmap is ready.',
+    resultsSubtitle: 'Based on your inputs, our engine has generated this customized, sequenced action plan. Here is exactly what you should build, in what order, and the financial impact it will have.',
+    scoreLabel: 'Score',
+    estSavingsLabel: 'Est. savings',
+    perYearLabel: 'per year',
+    kpiOpportunitiesLabel: 'Opportunities',
+    kpiOpportunitiesUnit: 'found',
+    kpiQuickWinsLabel: 'Quick Wins',
+    kpiQuickWinsUnit: 'this quarter',
+    kpiFastestPaybackLabel: 'Fastest Payback',
+    kpiFastestPaybackUnit: 'to value',
+    kpiProfileLabel: 'Profile',
+    kpiProfileUnit: 'tier',
+    catQuickWinLabel: 'Quick Wins',
+    catQuickWinSub: '0–3 months',
+    catStrategicLabel: 'Strategic',
+    catStrategicSub: '3–9 months',
+    catInnovationLabel: 'Innovation',
+    catInnovationSub: '9–18 months',
+    emailCaptureHeadline: 'Get the full report in your inbox',
+    emailCaptureDescription: 'We\'ll send a PDF with implementation steps, CFO talking points, and comparable customer outcomes. No spam.',
+    emailCaptureButtonText: 'Send my complete roadmap',
+    ctaRoiTitle: 'Full ROI Calculator',
+    ctaRoiSubtitle: 'Build a 3-year financial model',
+    ctaContactTitle: 'Talk to the team',
+    ctaContactSubtitle: '30-min call with a solutions engineer',
+  }
+}
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 const fmtK = (v: number) => v >= 1e6 ? `$${(v / 1e6).toFixed(1)}M` : v >= 1000 ? `$${(v / 1000).toFixed(0)}K` : `$${Math.round(v)}`
 
-function livePainCost(vol: AssessmentAnswers['volume']) {
-  return (vol.invoicesPerMonth * 12 * 14.20) + (vol.transactions * 12 * 3.50)
+function livePainCost(vol: AssessmentAnswers['volume'], benchmarks = DEFAULT_ASSESSMENT_DATA.step3Volume.benchmarks) {
+  const invRate = benchmarks?.invoiceCostRate ?? 14.20
+  const txRate = benchmarks?.transactionCostRate ?? 3.50
+  return (vol.invoicesPerMonth * 12 * invRate) + (vol.transactions * 12 * txRate)
 }
 
 function calcScore(answers: AssessmentAnswers, _step: number) {
@@ -79,7 +254,7 @@ function calcScore(answers: AssessmentAnswers, _step: number) {
   return Math.min(s, 100)
 }
 
-// ─── SCORE GAUGE (SVG arc, no icons) ─────────────────────────────────────────
+// ─── SCORE GAUGE ─────────────────────────────────────────────────────────────
 function Gauge({ score }: { score: number }) {
   const sz = 110, r = 40, circ = 2 * Math.PI * r
   const arc = circ * 0.75
@@ -101,15 +276,10 @@ function Gauge({ score }: { score: number }) {
 }
 
 // ─── FLOATING TOUR TOOLTIP ────────────────────────────────────────────────────
-const TOUR_STEPS = [
-  { target: 'erp-section', text: 'Pick your ERP — we use this to calibrate every recommendation to your actual platform constraints.' },
-  { target: 'pain-section', text: 'Select your top pain points. We\'ll show industry cost benchmarks next to each one.' },
-  { target: 'sidebar-score', text: 'Your AI Readiness Score updates live as you answer. It\'s based on real finance benchmarks.' },
-]
-
-function FloatingTour({ onDismiss }: { onDismiss: () => void }) {
+function FloatingTour({ steps, onDismiss }: { steps: Array<{ target: string; text: string }>; onDismiss: () => void }) {
   const [idx, setIdx] = useState(0)
-  const step = TOUR_STEPS[idx]
+  const tourList = steps && steps.length > 0 ? steps : DEFAULT_ASSESSMENT_DATA.tourAndResults.tourSteps
+  const step = tourList[idx] || tourList[0]
 
   return (
     <div className="fixed bottom-28 right-6 z-50 max-w-xs animate-bounce-slow">
@@ -118,19 +288,19 @@ function FloatingTour({ onDismiss }: { onDismiss: () => void }) {
           <div className="w-6 h-6 rounded-full bg-blue-500/30 border border-blue-400/50 flex items-center justify-center text-[11px] font-black text-blue-300 flex-shrink-0 mt-0.5">
             {idx + 1}
           </div>
-          <p className="text-sm text-slate-200 leading-relaxed font-medium">{step.text}</p>
+          <p className="text-sm text-slate-200 leading-relaxed font-medium">{step?.text}</p>
         </div>
         <div className="flex items-center justify-between">
           <div className="flex gap-1.5">
-            {TOUR_STEPS.map((_, i) => (
+            {tourList.map((_, i) => (
               <div key={i} className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === idx ? '#60a5fa' : 'rgba(255,255,255,0.2)' }} />
             ))}
           </div>
           <div className="flex gap-2">
-            <button onClick={onDismiss} className="text-xs text-slate-500 hover:text-slate-300 transition-colors font-medium">Skip tour</button>
-            {idx < TOUR_STEPS.length - 1
-              ? <button onClick={() => setIdx(i => i + 1)} className="text-xs bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-3 py-1.5 rounded-lg transition-colors font-bold border border-blue-500/30">Next →</button>
-              : <button onClick={onDismiss} className="text-xs bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-3 py-1.5 rounded-lg transition-colors font-bold border border-blue-500/30">Got it</button>
+            <button onClick={onDismiss} className="text-xs text-slate-500 hover:text-slate-300 transition-colors font-medium cursor-pointer">Skip tour</button>
+            {idx < tourList.length - 1
+              ? <button onClick={() => setIdx(i => i + 1)} className="text-xs bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-3 py-1.5 rounded-lg transition-colors font-bold border border-blue-500/30 cursor-pointer">Next →</button>
+              : <button onClick={onDismiss} className="text-xs bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-3 py-1.5 rounded-lg transition-colors font-bold border border-blue-500/30 cursor-pointer">Got it</button>
             }
           </div>
         </div>
@@ -142,34 +312,35 @@ function FloatingTour({ onDismiss }: { onDismiss: () => void }) {
 }
 
 // ─── STEP 0: INTRO ────────────────────────────────────────────────────────────
-function StepIntro({ onStart }: { onStart: () => void }) {
+function StepIntro({ config, onStart }: { config: AssessmentConfigData['intro']; onStart: () => void }) {
+  const introData = config || DEFAULT_ASSESSMENT_DATA.intro
   return (
     <div className="w-full max-w-3xl mx-auto py-16 px-2">
       {/* Label */}
       <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/25 text-blue-300 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-10">
         <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-        Free · Takes ~3 minutes · No card required
+        {introData.eyebrowBadge}
       </div>
 
       <h1 className="text-4xl md:text-5xl lg:text-6xl text-white font-black leading-[1.08] tracking-tight mb-6">
-        Find out what your finance team is leaving on the table
+        {introData.heading}
       </h1>
 
       <p className="text-slate-300 text-lg md:text-xl leading-relaxed mb-14 max-w-2xl">
-        Answer 6 questions about your current setup and we will give you a specific, quantified breakdown of where you are losing money — and what it would take to fix it. No generic playbooks, no sales pitch disguised as content.
+        {introData.description}
       </p>
 
-      {/* What you get — text-only list, no icons */}
+      {/* What you get */}
       <div className="mb-14">
-        <p className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-5">What you walk away with</p>
+        <p className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-5">
+          {introData.walkawayTitle || 'What you walk away with'}
+        </p>
         <div className="space-y-4">
-          {[
-            { n: '01', title: 'Your AI Readiness Score', body: 'A 0–100 score built from 6 dimensions of your finance operation, benchmarked against peers at your scale.' },
-            { n: '02', title: 'A dollar figure on your inefficiency', body: 'We calculate your estimated annual bleed based on invoice volume, team size, and error rates — not ballpark guesses.' },
-            { n: '03', title: 'A sequenced action plan', body: 'Quick wins you can start this quarter, plus the longer-term strategic moves that compound over 12–18 months.' },
-          ].map(item => (
-            <div key={item.n} className="flex gap-5 items-start group">
-              <div className="text-xs font-black font-mono text-slate-600 group-hover:text-slate-400 transition-colors pt-0.5 flex-shrink-0 w-6">{item.n}</div>
+          {(introData.walkawayDeliverables || DEFAULT_ASSESSMENT_DATA.intro.walkawayDeliverables).map(item => (
+            <div key={item.number} className="flex gap-5 items-start group">
+              <div className="text-xs font-black font-mono text-slate-600 group-hover:text-slate-400 transition-colors pt-0.5 flex-shrink-0 w-6">
+                {item.number}
+              </div>
               <div>
                 <div className="font-bold text-white text-base mb-1">{item.title}</div>
                 <div className="text-slate-400 text-sm leading-relaxed">{item.body}</div>
@@ -183,12 +354,12 @@ function StepIntro({ onStart }: { onStart: () => void }) {
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <button
           onClick={onStart}
-          className="flex items-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-black text-lg px-10 py-4 rounded-xl transition-all hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] active:scale-95"
+          className="flex items-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-black text-lg px-10 py-4 rounded-xl transition-all hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] active:scale-95 cursor-pointer"
         >
-          Begin Assessment <ArrowRight className="w-5 h-5" />
+          {introData.ctaButtonText || 'Begin Assessment'} <ArrowRight className="w-5 h-5" />
         </button>
         <div className="text-sm text-slate-500">
-          Your answers are never sold or shared.<br className="hidden sm:block" /> We use them only to generate your report.
+          {introData.confidentialityNote}
         </div>
       </div>
     </div>
@@ -196,31 +367,32 @@ function StepIntro({ onStart }: { onStart: () => void }) {
 }
 
 // ─── STEP 1: ERP ─────────────────────────────────────────────────────────────
-function StepERP({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function StepERP({ config, value, onChange }: { config: AssessmentConfigData['step1Erp']; value: string; onChange: (v: string) => void }) {
+  const stepData = config || DEFAULT_ASSESSMENT_DATA.step1Erp
+  const erpList = stepData.erpList || DEFAULT_ASSESSMENT_DATA.step1Erp.erpList
+
   return (
     <div id="erp-section" className="w-full">
       <div className="mb-8">
         <div className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-3 flex items-center gap-3">
-          <span>Step 1 of 6</span>
-          <div className="h-px flex-1 bg-white/10" />
-          <span>ERP Platform</span>
+          <span>{stepData.stepEyebrow || 'Step 1 of 6 · ERP Platform'}</span>
         </div>
         <h2 className="text-3xl md:text-4xl text-white font-black leading-tight mb-3">
-          Which system runs your finance operation?
+          {stepData.stepTitle}
         </h2>
         <p className="text-slate-400 text-base max-w-lg">
-          We tailor every recommendation to your specific ERP. Different platforms have different automation ceilings — this matters.
+          {stepData.stepSubtitle}
         </p>
       </div>
 
       <div className="flex flex-col gap-2.5">
-        {ERP_LIST.map((erp) => {
+        {erpList.map((erp) => {
           const selected = value === erp.value
           return (
             <button
               key={erp.value}
               onClick={() => onChange(erp.value)}
-              className="group w-full flex items-center gap-5 px-5 py-4 rounded-xl border text-left transition-all duration-150"
+              className="group w-full flex items-center gap-5 px-5 py-4 rounded-xl border text-left transition-all duration-150 cursor-pointer"
               style={{
                 borderColor: selected ? erp.accent : 'rgba(255,255,255,0.1)',
                 background: selected ? erp.accent + '18' : 'rgba(255,255,255,0.03)',
@@ -228,7 +400,7 @@ function StepERP({ value, onChange }: { value: string; onChange: (v: string) => 
             >
               <div
                 className="w-12 h-10 rounded-lg flex items-center justify-center font-mono text-sm font-black flex-shrink-0"
-                style={{ background: erp.accent + '20', color: erp.accent, border: `1px solid ${erp.accent}40` }}
+                style={{ background: (erp.accent || '#3b82f6') + '20', color: erp.accent || '#3b82f6', border: `1px solid ${(erp.accent || '#3b82f6')}40` }}
               >
                 {erp.abbr}
               </div>
@@ -251,8 +423,11 @@ function StepERP({ value, onChange }: { value: string; onChange: (v: string) => 
 }
 
 // ─── STEP 2: PAIN POINTS ──────────────────────────────────────────────────────
-function StepPain({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
-  const MAX = 3
+function StepPain({ config, value, onChange }: { config: AssessmentConfigData['step2Pain']; value: string[]; onChange: (v: string[]) => void }) {
+  const stepData = config || DEFAULT_ASSESSMENT_DATA.step2Pain
+  const painList = stepData.painList || DEFAULT_ASSESSMENT_DATA.step2Pain.painList
+  const MAX = stepData.maxSelections || 3
+
   const toggle = (v: string) => {
     if (value.includes(v)) onChange(value.filter(x => x !== v))
     else if (value.length < MAX) onChange([...value, v])
@@ -262,20 +437,18 @@ function StepPain({ value, onChange }: { value: string[]; onChange: (v: string[]
     <div id="pain-section" className="w-full">
       <div className="mb-8">
         <div className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-3 flex items-center gap-3">
-          <span>Step 2 of 6</span>
-          <div className="h-px flex-1 bg-white/10" />
-          <span>Pain Points</span>
+          <span>{stepData.stepEyebrow || 'Step 2 of 6 · Pain Points'}</span>
         </div>
         <h2 className="text-3xl md:text-4xl text-white font-black leading-tight mb-3">
-          Where does your team feel the most friction?
+          {stepData.stepTitle}
         </h2>
         <p className="text-slate-400 text-base max-w-lg">
-          Pick up to <strong className="text-white">3</strong>. Be honest — the cost estimates next to each one are real industry benchmarks.
+          {stepData.stepSubtitle}
         </p>
       </div>
 
       <div className="flex flex-col gap-2.5">
-        {PAIN_LIST.map(p => {
+        {painList.map(p => {
           const selected = value.includes(p.value)
           const disabled = !selected && value.length >= MAX
           const rank = value.indexOf(p.value)
@@ -285,7 +458,7 @@ function StepPain({ value, onChange }: { value: string[]; onChange: (v: string[]
               key={p.value}
               onClick={() => !disabled && toggle(p.value)}
               disabled={disabled}
-              className="group w-full flex items-start gap-4 px-5 py-4 rounded-xl border text-left transition-all duration-150 relative"
+              className="group w-full flex items-start gap-4 px-5 py-4 rounded-xl border text-left transition-all duration-150 relative cursor-pointer"
               style={{
                 borderColor: selected ? p.color : disabled ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.1)',
                 background: selected ? p.color + '12' : 'rgba(255,255,255,0.03)',
@@ -330,30 +503,30 @@ function StepPain({ value, onChange }: { value: string[]; onChange: (v: string[]
 }
 
 // ─── STEP 3: VOLUME ───────────────────────────────────────────────────────────
-function StepVolume({ value, onChange }: { value: AssessmentAnswers['volume']; onChange: (v: AssessmentAnswers['volume']) => void }) {
-  const cost = livePainCost(value)
-  const savings = cost * 0.78
+function StepVolume({ config, value, onChange }: { config: AssessmentConfigData['step3Volume']; value: AssessmentAnswers['volume']; onChange: (v: AssessmentAnswers['volume']) => void }) {
+  const stepData = config || DEFAULT_ASSESSMENT_DATA.step3Volume
+  const benchmarks = stepData.benchmarks || DEFAULT_ASSESSMENT_DATA.step3Volume.benchmarks
+  const cost = livePainCost(value, benchmarks)
+  const savings = cost * (benchmarks.savingsMultiplier ?? 0.78)
 
   const fields: { id: keyof typeof value; label: string; bench: string; placeholder: string }[] = [
-    { id: 'invoicesPerMonth', label: 'Invoices processed per month', bench: 'Industry avg: $14.20 per invoice manual', placeholder: 'e.g. 2000' },
-    { id: 'employees', label: 'Finance & AP headcount (FTE)', bench: 'Fully-loaded ~$72K/yr per person', placeholder: 'e.g. 8' },
-    { id: 'transactions', label: 'Payment transactions per month', bench: 'Industry avg: $3.50 per transaction', placeholder: 'e.g. 5000' },
-    { id: 'poLines', label: 'Purchase order lines per month', bench: '~8 min of manual work per line', placeholder: 'e.g. 1500' },
+    { id: 'invoicesPerMonth', label: 'Invoices processed per month', bench: benchmarks.invoicesBenchText, placeholder: 'e.g. 2000' },
+    { id: 'employees', label: 'Finance & AP headcount (FTE)', bench: benchmarks.employeesBenchText, placeholder: 'e.g. 8' },
+    { id: 'transactions', label: 'Payment transactions per month', bench: benchmarks.transactionsBenchText, placeholder: 'e.g. 5000' },
+    { id: 'poLines', label: 'Purchase order lines per month', bench: benchmarks.poLinesBenchText, placeholder: 'e.g. 1500' },
   ]
 
   return (
     <div className="w-full">
       <div className="mb-8">
         <div className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-3 flex items-center gap-3">
-          <span>Step 3 of 6</span>
-          <div className="h-px flex-1 bg-white/10" />
-          <span>Volume</span>
+          <span>{stepData.stepEyebrow || 'Step 3 of 6 · Volume'}</span>
         </div>
         <h2 className="text-3xl md:text-4xl text-white font-black leading-tight mb-3">
-          Give us a rough sense of scale
+          {stepData.stepTitle}
         </h2>
         <p className="text-slate-400 text-base max-w-lg">
-          Rough numbers are completely fine. We use these to calculate your actual dollar exposure, not to judge you.
+          {stepData.stepSubtitle}
         </p>
       </div>
 
@@ -400,26 +573,26 @@ function StepVolume({ value, onChange }: { value: AssessmentAnswers['volume']; o
 }
 
 // ─── STEP 4: CURRENT STATE ────────────────────────────────────────────────────
-function StepState({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const selectedLevel = STATE_LIST.find(s => s.value === value)?.level ?? -1
+function StepState({ config, value, onChange }: { config: AssessmentConfigData['step4State']; value: string; onChange: (v: string) => void }) {
+  const stepData = config || DEFAULT_ASSESSMENT_DATA.step4State
+  const stateList = stepData.stateList || DEFAULT_ASSESSMENT_DATA.step4State.stateList
+  const selectedLevel = stateList.find(s => s.value === value)?.level ?? -1
 
   return (
     <div className="w-full">
       <div className="mb-8">
         <div className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-3 flex items-center gap-3">
-          <span>Step 4 of 6</span>
-          <div className="h-px flex-1 bg-white/10" />
-          <span>Current State</span>
+          <span>{stepData.stepEyebrow || 'Step 4 of 6 · Current State'}</span>
         </div>
         <h2 className="text-3xl md:text-4xl text-white font-black leading-tight mb-3">
-          How does finance actually work at your company today?
+          {stepData.stepTitle}
         </h2>
         <p className="text-slate-400 text-base max-w-lg">
-          This tells us your automation ceiling — how much room there is to improve, and how fast.
+          {stepData.stepSubtitle}
         </p>
       </div>
 
-      {/* Maturity ladder visual — bars only, no labels */}
+      {/* Maturity ladder visual */}
       <div className="flex items-end gap-1.5 mb-8 h-10">
         {[...Array(5)].map((_, i) => {
           const active = selectedLevel >= 0 && i <= selectedLevel
@@ -434,11 +607,11 @@ function StepState({ value, onChange }: { value: string; onChange: (v: string) =
       </div>
 
       <div className="flex flex-col gap-2.5">
-        {STATE_LIST.map(s => {
+        {stateList.map(s => {
           const selected = value === s.value
           return (
             <button key={s.value} onClick={() => onChange(s.value)}
-              className="w-full flex items-center gap-4 px-5 py-4 rounded-xl border text-left transition-all duration-150"
+              className="w-full flex items-center gap-4 px-5 py-4 rounded-xl border text-left transition-all duration-150 cursor-pointer"
               style={{
                 borderColor: selected ? '#3b82f6' : 'rgba(255,255,255,0.1)',
                 background: selected ? 'rgba(59,130,246,0.12)' : 'rgba(255,255,255,0.03)',
@@ -462,29 +635,30 @@ function StepState({ value, onChange }: { value: string; onChange: (v: string) =
 }
 
 // ─── STEP 5: TECH MATURITY ────────────────────────────────────────────────────
-function StepMaturity({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function StepMaturity({ config, value, onChange }: { config: AssessmentConfigData['step5Maturity']; value: string; onChange: (v: string) => void }) {
+  const stepData = config || DEFAULT_ASSESSMENT_DATA.step5Maturity
+  const maturityList = stepData.maturityList || DEFAULT_ASSESSMENT_DATA.step5Maturity.maturityList
+
   return (
     <div className="w-full">
       <div className="mb-8">
         <div className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-3 flex items-center gap-3">
-          <span>Step 5 of 6</span>
-          <div className="h-px flex-1 bg-white/10" />
-          <span>Tech Maturity</span>
+          <span>{stepData.stepEyebrow || 'Step 5 of 6 · Tech Maturity'}</span>
         </div>
         <h2 className="text-3xl md:text-4xl text-white font-black leading-tight mb-3">
-          How would you describe your underlying tech stack?
+          {stepData.stepTitle}
         </h2>
         <p className="text-slate-400 text-base max-w-lg">
-          Older infrastructure doesn't disqualify you — it just shapes how we'd phase the work and what we'd tackle first.
+          {stepData.stepSubtitle}
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {MATURITY_LIST.map(m => {
+        {maturityList.map(m => {
           const selected = value === m.value
           return (
             <button key={m.value} onClick={() => onChange(m.value)}
-              className="p-5 rounded-xl border text-left transition-all duration-150 relative"
+              className="p-5 rounded-xl border text-left transition-all duration-150 relative cursor-pointer"
               style={{
                 borderColor: selected ? '#3b82f6' : 'rgba(255,255,255,0.1)',
                 background: selected ? 'rgba(59,130,246,0.12)' : 'rgba(255,255,255,0.03)',
@@ -506,34 +680,34 @@ function StepMaturity({ value, onChange }: { value: string; onChange: (v: string
 }
 
 // ─── STEP 6: URGENCY ─────────────────────────────────────────────────────────
-function StepUrgency({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function StepUrgency({ config, value, onChange }: { config: AssessmentConfigData['step6Urgency']; value: string; onChange: (v: string) => void }) {
+  const stepData = config || DEFAULT_ASSESSMENT_DATA.step6Urgency
+  const urgencyList = stepData.urgencyList || DEFAULT_ASSESSMENT_DATA.step6Urgency.urgencyList
+
   return (
     <div className="w-full">
       <div className="mb-8">
         <div className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-3 flex items-center gap-3">
-          <span>Step 6 of 6</span>
-          <div className="h-px flex-1 bg-white/10" />
-          <span>Timeline</span>
+          <span>{stepData.stepEyebrow || 'Step 6 of 6 · Timeline'}</span>
         </div>
         <h2 className="text-3xl md:text-4xl text-white font-black leading-tight mb-3">
-          What&apos;s driving the timing on this?
+          {stepData.stepTitle}
         </h2>
         <p className="text-slate-400 text-base max-w-lg">
-          This changes how we structure your roadmap — internal exploring looks very different from an audit deadline.
+          {stepData.stepSubtitle}
         </p>
       </div>
 
       <div className="flex flex-col gap-2.5">
-        {URGENCY_LIST.map(u => {
+        {urgencyList.map(u => {
           const selected = value === u.value
           return (
             <button key={u.value} onClick={() => onChange(u.value)}
-              className="w-full flex items-center gap-5 px-5 py-5 rounded-xl border text-left transition-all duration-150"
+              className="w-full flex items-center gap-5 px-5 py-5 rounded-xl border text-left transition-all duration-150 cursor-pointer"
               style={{
                 borderColor: selected ? u.signalColor : 'rgba(255,255,255,0.1)',
                 background: selected ? u.signalColor + '12' : 'rgba(255,255,255,0.03)',
               }}>
-              {/* Signal badge — text only, no icon */}
               <div className="w-14 h-10 rounded-lg flex items-center justify-center font-black font-mono text-xs flex-shrink-0 border"
                 style={selected
                   ? { background: u.signalColor + '25', color: u.signalColor, borderColor: u.signalColor + '60' }
@@ -560,12 +734,12 @@ function StepUrgency({ value, onChange }: { value: string; onChange: (v: string)
 }
 
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
-function Sidebar({ answers, step }: { answers: AssessmentAnswers; step: number }) {
+function Sidebar({ answers, step, benchmarks }: { answers: AssessmentAnswers; step: number; benchmarks?: AssessmentConfigData['step3Volume']['benchmarks'] }) {
   if (step === 0) return null
   const score = calcScore(answers, step)
   const tier = score >= 70 ? 'Enterprise' : score >= 45 ? 'Mid-Market' : 'Growth'
   const tierColor = score >= 70 ? '#10b981' : score >= 45 ? '#3b82f6' : '#64748b'
-  const cost = livePainCost(answers.volume)
+  const cost = livePainCost(answers.volume, benchmarks)
 
   return (
     <div id="sidebar-score" className="hidden xl:flex flex-col gap-4 w-[280px] sticky top-24">
@@ -615,11 +789,13 @@ function Sidebar({ answers, step }: { answers: AssessmentAnswers; step: number }
 }
 
 // ─── RESULTS ─────────────────────────────────────────────────────────────────
-function Results({ result, answers, assessmentId }: { result: AssessmentResult; answers: AssessmentAnswers; assessmentId: string | null }) {
+function Results({ config, result, answers, assessmentId }: { config: AssessmentConfigData['tourAndResults']; result: AssessmentResult; answers: AssessmentAnswers; assessmentId: string | null }) {
   const [email, setEmail] = useState('')
   const [emailSent, setEmailSent] = useState(false)
   const [emailError, setEmailError] = useState('')
   const [isSending, setIsSending] = useState(false)
+
+  const resultsData = config || DEFAULT_ASSESSMENT_DATA.tourAndResults
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -644,9 +820,9 @@ function Results({ result, answers, assessmentId }: { result: AssessmentResult; 
 
   type Cat = 'quick-win' | 'strategic' | 'innovation'
   const catConfig: Record<Cat, { label: string; sub: string; color: string }> = {
-    'quick-win': { label: 'Quick Wins', sub: '0–3 months', color: '#10b981' },
-    'strategic': { label: 'Strategic', sub: '3–9 months', color: '#f59e0b' },
-    'innovation': { label: 'Innovation', sub: '9–18 months', color: '#a855f7' },
+    'quick-win': { label: resultsData.catQuickWinLabel || 'Quick Wins', sub: resultsData.catQuickWinSub || '0–3 months', color: '#10b981' },
+    'strategic': { label: resultsData.catStrategicLabel || 'Strategic', sub: resultsData.catStrategicSub || '3–9 months', color: '#f59e0b' },
+    'innovation': { label: resultsData.catInnovationLabel || 'Innovation', sub: resultsData.catInnovationSub || '9–18 months', color: '#a855f7' },
   }
 
   const scoreColor = result.leadScore >= 70 ? '#10b981' : result.leadScore >= 45 ? '#f59e0b' : '#ef4444'
@@ -655,25 +831,27 @@ function Results({ result, answers, assessmentId }: { result: AssessmentResult; 
     <div className="max-w-4xl mx-auto px-6 py-12 w-full">
       {/* Header */}
       <div className="mb-12">
-        <div className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-5">Assessment complete</div>
+        <div className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-5">{resultsData.assessmentCompleteLabel || 'Assessment complete'}</div>
         <div className="flex items-start justify-between gap-8 flex-wrap">
           <div className="flex-1 min-w-0">
-            <h2 className="text-4xl text-white font-black leading-tight mb-4">Your roadmap is ready.</h2>
+            <h2 className="text-4xl text-white font-black leading-tight mb-4">
+              {resultsData.resultsHeading || 'Your roadmap is ready.'}
+            </h2>
             <p className="text-slate-400 text-lg leading-relaxed max-w-lg">
-              Based on your inputs (including <strong>{answers.erp || 'your ERP'}</strong> and processing <strong>{answers.volume.invoicesPerMonth * 12} invoices/yr</strong>), our engine has generated this customized, sequenced action plan. Here is exactly what you should build, in what order, and the financial impact it will have.
+              {resultsData.resultsSubtitle || `Based on your inputs (including ${answers.erp || 'your ERP'} and processing ${answers.volume.invoicesPerMonth * 12} invoices/yr), our engine has generated this customized, sequenced action plan.`}
             </p>
           </div>
           <div className="flex items-center gap-6 bg-[#111827]/80 border border-white/10 rounded-2xl p-6 flex-shrink-0">
             <div className="text-center">
-              <div className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">Score</div>
+              <div className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">{resultsData.scoreLabel || 'Score'}</div>
               <div className="text-6xl font-black font-mono leading-none" style={{ color: scoreColor }}>{result.leadScore}</div>
               <div className="text-[10px] text-slate-700 mt-1">/&nbsp;100</div>
             </div>
             <div className="w-px h-16 bg-white/8" />
             <div className="text-center">
-              <div className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">Est. savings</div>
+              <div className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">{resultsData.estSavingsLabel || 'Est. savings'}</div>
               <div className="text-3xl font-black font-mono text-emerald-400">{fmtK(result.totalEstimatedSavings)}</div>
-              <div className="text-[10px] text-slate-700 mt-1">per year</div>
+              <div className="text-[10px] text-slate-700 mt-1">{resultsData.perYearLabel || 'per year'}</div>
             </div>
           </div>
         </div>
@@ -682,10 +860,10 @@ function Results({ result, answers, assessmentId }: { result: AssessmentResult; 
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-12">
         {[
-          { label: 'Opportunities', value: String(result.recommendations.length), unit: 'found' },
-          { label: 'Quick Wins', value: String(result.recommendations.filter(r => r.category === 'quick-win').length), unit: 'this quarter' },
-          { label: 'Fastest Payback', value: result.recommendations.length ? `${Math.min(...result.recommendations.map(r => r.estimatedPaybackMonths))} mo` : '—', unit: 'to value' },
-          { label: 'Profile', value: result.tier === 'enterprise' ? 'Enterprise' : result.tier === 'mid-market' ? 'Mid-Market' : 'SMB', unit: 'tier' },
+          { label: resultsData.kpiOpportunitiesLabel || 'Opportunities', value: String(result.recommendations.length), unit: resultsData.kpiOpportunitiesUnit || 'found' },
+          { label: resultsData.kpiQuickWinsLabel || 'Quick Wins', value: String(result.recommendations.filter(r => r.category === 'quick-win').length), unit: resultsData.kpiQuickWinsUnit || 'this quarter' },
+          { label: resultsData.kpiFastestPaybackLabel || 'Fastest Payback', value: result.recommendations.length ? `${Math.min(...result.recommendations.map(r => r.estimatedPaybackMonths))} mo` : '—', unit: resultsData.kpiFastestPaybackUnit || 'to value' },
+          { label: resultsData.kpiProfileLabel || 'Profile', value: result.tier === 'enterprise' ? 'Enterprise' : result.tier === 'mid-market' ? 'Mid-Market' : 'SMB', unit: resultsData.kpiProfileUnit || 'tier' },
         ].map(k => (
           <div key={k.label} className="bg-[#111827]/60 border border-white/10 rounded-xl px-5 py-5">
             <div className="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">{k.label}</div>
@@ -735,8 +913,12 @@ function Results({ result, answers, assessmentId }: { result: AssessmentResult; 
       {/* Email capture */}
       <div className="border border-slate-700/60 bg-[#111827]/60 rounded-2xl overflow-hidden mb-8">
         <div className="px-7 py-5 border-b border-slate-700/40">
-          <div className="font-bold text-white text-lg">Get the full report in your inbox</div>
-          <div className="text-slate-500 text-sm mt-1">We'll send a PDF with implementation steps, CFO talking points, and comparable customer outcomes. No spam.</div>
+          <div className="font-bold text-white text-lg">
+            {resultsData.emailCaptureHeadline || 'Get the full report in your inbox'}
+          </div>
+          <div className="text-slate-500 text-sm mt-1">
+            {resultsData.emailCaptureDescription || 'We\'ll send a PDF with implementation steps, CFO talking points, and comparable customer outcomes. No spam.'}
+          </div>
         </div>
         <div className="px-7 py-6">
           {emailSent ? (
@@ -760,10 +942,10 @@ function Results({ result, answers, assessmentId }: { result: AssessmentResult; 
               <button
                 type="submit"
                 disabled={isSending}
-                className="flex items-center gap-2.5 bg-white hover:bg-slate-100 text-slate-900 font-black text-base px-7 py-3.5 rounded-xl transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.12)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2.5 bg-white hover:bg-slate-100 text-slate-900 font-black text-base px-7 py-3.5 rounded-xl transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.12)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isSending ? <Activity className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
-                {isSending ? 'Sending…' : 'Send report'}
+                {isSending ? 'Sending…' : (resultsData.emailCaptureButtonText || 'Send report')}
               </button>
             </form>
           )}
@@ -779,8 +961,8 @@ function Results({ result, answers, assessmentId }: { result: AssessmentResult; 
         >
           <div className="w-10 h-10 rounded-lg bg-white/8 flex items-center justify-center font-black text-slate-400 text-base group-hover:text-white transition-colors">$</div>
           <div>
-            <div className="font-bold text-white text-base">Full ROI Calculator</div>
-            <div className="text-slate-500 text-sm mt-0.5">Build a 3-year financial model</div>
+            <div className="font-bold text-white text-base">{resultsData.ctaRoiTitle || 'Full ROI Calculator'}</div>
+            <div className="text-slate-500 text-sm mt-0.5">{resultsData.ctaRoiSubtitle || 'Build a 3-year financial model'}</div>
           </div>
           <ArrowRight className="w-4 h-4 text-slate-600 ml-auto group-hover:translate-x-1 group-hover:text-white transition-all" />
         </a>
@@ -790,8 +972,8 @@ function Results({ result, answers, assessmentId }: { result: AssessmentResult; 
         >
           <div className="w-10 h-10 rounded-lg bg-emerald-900/40 flex items-center justify-center font-black text-emerald-400 text-base">30</div>
           <div>
-            <div className="font-bold text-white text-base">Talk to the team</div>
-            <div className="text-slate-500 text-sm mt-0.5">30-min call with a solutions engineer</div>
+            <div className="font-bold text-white text-base">{resultsData.ctaContactTitle || 'Talk to the team'}</div>
+            <div className="text-slate-500 text-sm mt-0.5">{resultsData.ctaContactSubtitle || '30-min call with a solutions engineer'}</div>
           </div>
           <ArrowRight className="w-4 h-4 text-emerald-700 ml-auto group-hover:translate-x-1 group-hover:text-emerald-400 transition-all" />
         </a>
@@ -800,8 +982,9 @@ function Results({ result, answers, assessmentId }: { result: AssessmentResult; 
   )
 }
 
-// ─── MAIN ─────────────────────────────────────────────────────────────────────
-export default function AssessmentWizardClient({ initialConfig }: { initialConfig: SanityAssessmentConfig | null }) {
+// ─── MAIN WIZARD COMPONENT ────────────────────────────────────────────────────
+export default function AssessmentWizardClient({ initialConfig }: { initialConfig?: any }) {
+  const [config, setConfig] = useState<AssessmentConfigData>(DEFAULT_ASSESSMENT_DATA)
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState<AssessmentAnswers>(initialAnswers)
   const [result, setResult] = useState<AssessmentResult | null>(null)
@@ -812,13 +995,46 @@ export default function AssessmentWizardClient({ initialConfig }: { initialConfi
   const [dir, setDir] = useState<'f' | 'b'>('f')
   const [showTour, setShowTour] = useState(false)
 
+  // Fetch dynamic configuration from /api/site-config
+  useEffect(() => {
+    async function loadDynamicConfig() {
+      try {
+        const res = await fetch('/api/site-config')
+        if (res.ok) {
+          const siteCfg = await res.json()
+          if (siteCfg?.assessmentConfig) {
+            setConfig({
+              intro: { ...DEFAULT_ASSESSMENT_DATA.intro, ...siteCfg.assessmentConfig.intro },
+              step1Erp: { ...DEFAULT_ASSESSMENT_DATA.step1Erp, ...siteCfg.assessmentConfig.step1Erp },
+              step2Pain: { ...DEFAULT_ASSESSMENT_DATA.step2Pain, ...siteCfg.assessmentConfig.step2Pain },
+              step3Volume: {
+                ...DEFAULT_ASSESSMENT_DATA.step3Volume,
+                ...siteCfg.assessmentConfig.step3Volume,
+                benchmarks: {
+                  ...DEFAULT_ASSESSMENT_DATA.step3Volume.benchmarks,
+                  ...siteCfg.assessmentConfig.step3Volume?.benchmarks
+                }
+              },
+              step4State: { ...DEFAULT_ASSESSMENT_DATA.step4State, ...siteCfg.assessmentConfig.step4State },
+              step5Maturity: { ...DEFAULT_ASSESSMENT_DATA.step5Maturity, ...siteCfg.assessmentConfig.step5Maturity },
+              step6Urgency: { ...DEFAULT_ASSESSMENT_DATA.step6Urgency, ...siteCfg.assessmentConfig.step6Urgency },
+              tourAndResults: { ...DEFAULT_ASSESSMENT_DATA.tourAndResults, ...siteCfg.assessmentConfig.tourAndResults },
+            })
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load dynamic assessment config:', err)
+      }
+    }
+    loadDynamicConfig()
+  }, [])
+
   // Restore saved answers only — always start from step 0 (intro)
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) {
         const p = JSON.parse(saved)
-        // Restore answers only, never restore step — user always starts from intro
         if (p.answers) setAnswers(p.answers)
       }
     } catch {}
@@ -989,7 +1205,7 @@ export default function AssessmentWizardClient({ initialConfig }: { initialConfi
       {/* Main content */}
       <div className="relative z-10 pt-14">
         {result ? (
-          <Results result={result} answers={answers} assessmentId={assessmentId} />
+          <Results config={config.tourAndResults} result={result} answers={answers} assessmentId={assessmentId} />
         ) : (
           <div className="max-w-7xl mx-auto px-6 pt-10 pb-28 flex gap-14 items-start">
             {/* Step content with fade transition */}
@@ -999,13 +1215,13 @@ export default function AssessmentWizardClient({ initialConfig }: { initialConfi
                 transform: transitioning ? `translateY(${dir === 'f' ? '12px' : '-12px'})` : 'translateY(0)',
                 transition: 'opacity 200ms ease, transform 200ms ease',
               }}>
-                {step === 0 && <StepIntro onStart={() => go('f')} />}
-                {step === 1 && <StepERP value={answers.erp} onChange={v => setAnswers(p => ({ ...p, erp: v }))} />}
-                {step === 2 && <StepPain value={answers.painPoints} onChange={v => setAnswers(p => ({ ...p, painPoints: v }))} />}
-                {step === 3 && <StepVolume value={answers.volume} onChange={v => setAnswers(p => ({ ...p, volume: v }))} />}
-                {step === 4 && <StepState value={answers.currentState} onChange={v => setAnswers(p => ({ ...p, currentState: v }))} />}
-                {step === 5 && <StepMaturity value={answers.techMaturity} onChange={v => setAnswers(p => ({ ...p, techMaturity: v }))} />}
-                {step === 6 && <StepUrgency value={answers.urgency} onChange={v => setAnswers(p => ({ ...p, urgency: v }))} />}
+                {step === 0 && <StepIntro config={config.intro} onStart={() => go('f')} />}
+                {step === 1 && <StepERP config={config.step1Erp} value={answers.erp} onChange={v => setAnswers(p => ({ ...p, erp: v }))} />}
+                {step === 2 && <StepPain config={config.step2Pain} value={answers.painPoints} onChange={v => setAnswers(p => ({ ...p, painPoints: v }))} />}
+                {step === 3 && <StepVolume config={config.step3Volume} value={answers.volume} onChange={v => setAnswers(p => ({ ...p, volume: v }))} />}
+                {step === 4 && <StepState config={config.step4State} value={answers.currentState} onChange={v => setAnswers(p => ({ ...p, currentState: v }))} />}
+                {step === 5 && <StepMaturity config={config.step5Maturity} value={answers.techMaturity} onChange={v => setAnswers(p => ({ ...p, techMaturity: v }))} />}
+                {step === 6 && <StepUrgency config={config.step6Urgency} value={answers.urgency} onChange={v => setAnswers(p => ({ ...p, urgency: v }))} />}
               </div>
 
               {error && (
@@ -1015,24 +1231,24 @@ export default function AssessmentWizardClient({ initialConfig }: { initialConfi
               )}
             </div>
 
-            <Sidebar answers={answers} step={step} />
+            <Sidebar answers={answers} step={step} benchmarks={config.step3Volume.benchmarks} />
           </div>
         )}
       </div>
 
       {/* Floating tour tooltip */}
       {showTour && step >= 1 && step <= 3 && !result && (
-        <FloatingTour onDismiss={() => setShowTour(false)} />
+        <FloatingTour steps={config.tourAndResults.tourSteps} onDismiss={() => setShowTour(false)} />
       )}
 
-      {/* Bottom navigation bar — visible only in steps 1–6 */}
+      {/* Bottom navigation bar */}
       {step > 0 && !result && (
         <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/[0.07] bg-[#0d1117]/95 backdrop-blur-xl">
           <div className="max-w-7xl mx-auto px-6 h-[68px] flex items-center justify-between gap-4">
             {/* Back */}
             <button
               onClick={() => go('b')}
-              className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-white transition-colors bg-white/[0.04] hover:bg-white/[0.07] px-5 py-2.5 rounded-lg border border-white/[0.07] hover:border-white/15"
+              className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-white transition-colors bg-white/[0.04] hover:bg-white/[0.07] px-5 py-2.5 rounded-lg border border-white/[0.07] hover:border-white/15 cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" /> Back
             </button>
@@ -1063,7 +1279,7 @@ export default function AssessmentWizardClient({ initialConfig }: { initialConfi
               <button
                 onClick={handleSubmit}
                 disabled={!canGo || isSubmitting}
-                className="flex items-center gap-2.5 text-sm font-black px-8 py-3 rounded-lg transition-all bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-2.5 text-sm font-black px-8 py-3 rounded-lg transition-all bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 style={{ boxShadow: canGo ? '0 0 20px rgba(59,130,246,0.3)' : 'none' }}
               >
                 {isSubmitting ? <><Activity className="w-4 h-4 animate-spin" /> Analyzing…</> : <>Generate Roadmap <ArrowRight className="w-4 h-4" /></>}

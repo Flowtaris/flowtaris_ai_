@@ -11,6 +11,7 @@ type TrustSignal = {
 
 export default function TrustSignalsSection() {
   const [signals, setSignals] = useState<TrustSignal[]>([])
+  const [sectionConfig, setSectionConfig] = useState({ title: 'Enterprise-Grade Compliance & Reliability', bg_image: '' })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -20,6 +21,9 @@ export default function TrustSignalsSection() {
         const data = await res.json()
         if (data.trustSignals && Array.isArray(data.trustSignals)) {
           setSignals(data.trustSignals)
+        }
+        if (data.heroConfig?.trust_signals_section) {
+          setSectionConfig({ ...sectionConfig, ...data.heroConfig.trust_signals_section })
         }
       } catch (err) {
         console.error('Failed to fetch trust signals', err)
@@ -38,6 +42,11 @@ export default function TrustSignalsSection() {
   return (
     <section 
       className="relative w-full overflow-hidden border-t border-b border-white/[0.05] bg-[#030308] py-16"
+      style={sectionConfig.bg_image ? {
+        backgroundImage: `url('${sectionConfig.bg_image}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      } : {}}
       aria-label="Trust and Compliance Signals"
     >
       <style>{`
@@ -69,13 +78,14 @@ export default function TrustSignalsSection() {
 
       {/* Decorative Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
+        {sectionConfig.bg_image && <div className="absolute inset-0 bg-black/60" />}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[200px] bg-[#D4A847]/[0.03] blur-[80px] rounded-full" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 mb-10 text-center relative z-10">
         <p className="text-[11px] font-bold tracking-[0.2em] text-white/40 uppercase font-['Inter']">
-          Enterprise-Grade Compliance & Reliability
+          {sectionConfig.title}
         </p>
       </div>
 

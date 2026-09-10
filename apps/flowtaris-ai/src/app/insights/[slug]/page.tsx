@@ -155,65 +155,92 @@ export default async function InsightPage({ params }: Props) {
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#c084fc] blur-[150px] opacity-10" />
         <div className="absolute bottom-0 right-0 w-[40%] h-[50%] rounded-full bg-[#38bdf8] blur-[150px] opacity-5" />
         <Container size="xl" className="relative z-10">
-          <div className="max-w-4xl mx-auto flex flex-col gap-8">
 
-            {/* Breadcrumb */}
-            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-neutral-400 font-medium">
-              <Link href="/insights" className="hover:text-white transition-colors">Insights</Link>
-              <ChevronRight className="h-4 w-4 text-neutral-600" />
-              <span className="text-[#c084fc]">{data.category}</span>
-            </nav>
+          {/* Breadcrumb */}
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-neutral-400 font-medium mb-8">
+            <Link href="/insights" className="hover:text-white transition-colors">Insights</Link>
+            <ChevronRight className="h-4 w-4 text-neutral-600" />
+            <span className="text-[#c084fc]">{data.category}</span>
+          </nav>
 
-            {/* Tags */}
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="inline-flex items-center rounded-none border border-[#c084fc] bg-[#c084fc]/10 px-3 py-1 text-sm font-bold text-[#c084fc] shadow-[4px_4px_0px_#c084fc] uppercase tracking-wider">
-                {data.category}
+          {/* Two-column hero layout */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+
+            {/* LEFT: Text content */}
+            <div className="flex flex-col gap-6">
+
+              {/* Tags / Meta */}
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="inline-flex items-center rounded-none border border-[#c084fc] bg-[#c084fc]/10 px-3 py-1 text-sm font-bold text-[#c084fc] shadow-[4px_4px_0px_#c084fc] uppercase tracking-wider">
+                  {data.category}
+                </div>
+                {data.featured && (
+                  <div className="inline-flex items-center rounded-none border border-[#38bdf8] bg-[#38bdf8]/10 px-3 py-1 text-sm font-bold text-[#38bdf8] shadow-[4px_4px_0px_#38bdf8] uppercase tracking-wider">
+                    Featured
+                  </div>
+                )}
+                <span className="flex items-center gap-2 text-sm font-bold text-neutral-400">
+                  <Calendar className="h-4 w-4" />
+                  {formattedDate}
+                </span>
+                <span className="flex items-center gap-2 text-sm font-bold text-neutral-400">
+                  <Clock className="h-4 w-4" />
+                  {data.readTime} read
+                </span>
               </div>
-              {data.featured && (
-                <div className="inline-flex items-center rounded-none border border-[#38bdf8] bg-[#38bdf8]/10 px-3 py-1 text-sm font-bold text-[#38bdf8] shadow-[4px_4px_0px_#38bdf8] uppercase tracking-wider">
-                  Featured
+
+              {/* Title */}
+              <h1 id="article-header" className="text-4xl md:text-5xl font-black text-white leading-[1.1] tracking-tight">
+                {data.title}
+              </h1>
+
+              {/* Lede / Excerpt */}
+              <p className="text-lg md:text-xl font-semibold text-neutral-300 leading-relaxed border-l-4 border-[#38bdf8] pl-5">
+                {data.excerpt}
+              </p>
+
+              {/* Divider */}
+              <hr className="border-white/10" />
+
+              {/* Author */}
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#c084fc]/20 flex items-center justify-center border border-[#c084fc]/50 shrink-0 text-lg font-black text-[#c084fc]">
+                  {data.author?.charAt(0) ?? 'F'}
+                </div>
+                <div>
+                  <p className="font-black text-base text-white">{data.author}</p>
+                  <p className="text-sm font-medium text-neutral-400">{data.authorRole}</p>
+                </div>
+              </div>
+
+              {/* Tags */}
+              {data.tags?.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {data.tags.map((tag: string) => (
+                    <span key={tag} className="px-3 py-1 text-xs font-bold text-neutral-400 border border-white/10 rounded-full uppercase tracking-wider">
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               )}
-              <span className="flex items-center gap-2 text-sm font-bold text-neutral-400">
-                <Calendar className="h-4 w-4" />
-                {formattedDate}
-              </span>
-              <span className="flex items-center gap-2 text-sm font-bold text-neutral-400">
-                <Clock className="h-4 w-4" />
-                {data.readTime} read
-              </span>
             </div>
 
-            {/* Title */}
-            <h1 id="article-header" className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight">
-              {data.title}
-            </h1>
-
-            {/* Author */}
-            <div className="flex items-center gap-4 bg-[#111827] border-2 border-white/10 rounded-xl p-6 max-w-2xl shadow-xl">
-              <div className="w-16 h-16 rounded-lg bg-[#c084fc]/20 flex items-center justify-center border border-[#c084fc]/50 shrink-0">
-                <Brain className="h-8 w-8 text-[#c084fc]" />
+            {/* RIGHT: Hero image */}
+            {data.image ? (
+              <div className="relative rounded-2xl overflow-hidden border-2 border-white/15 shadow-2xl bg-white/5">
+                <img
+                  src={data.image}
+                  alt={data.title}
+                  className="w-full h-auto object-cover"
+                />
               </div>
-              <div>
-                <p className="font-black text-xl text-white">{data.author}</p>
-                <p className="text-sm font-bold text-[#38bdf8]">{data.authorRole}</p>
-                {data.authorBio && <p className="text-sm text-neutral-400 mt-1 font-medium leading-snug">{data.authorBio}</p>}
-              </div>
-            </div>
-
-            {/* Lede */}
-            <p className="text-xl md:text-2xl font-bold text-neutral-300 leading-relaxed border-l-4 border-[#38bdf8] pl-6">
-              {data.excerpt}
-            </p>
-
-            {/* Tags */}
-            {data.tags?.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {data.tags.map((tag: string) => (
-                  <span key={tag} className="px-3 py-1 text-xs font-bold text-neutral-400 border border-white/10 rounded-full uppercase tracking-wider">
-                    {tag}
-                  </span>
-                ))}
+            ) : (
+              /* Placeholder when no image */
+              <div className="relative rounded-2xl overflow-hidden border-2 border-white/10 shadow-2xl bg-[#111827] aspect-[4/3] flex items-center justify-center">
+                <div className="text-center p-8">
+                  <Brain className="h-16 w-16 text-[#c084fc]/40 mx-auto mb-4" />
+                  <p className="text-neutral-600 font-bold uppercase tracking-widest text-sm">Flowtaris AI Research</p>
+                </div>
               </div>
             )}
           </div>
@@ -289,11 +316,7 @@ export default async function InsightPage({ params }: Props) {
             {/* Article Content */}
             <div className="lg:col-span-8">
 
-              {data.image && (
-                <div className="mb-16 border-2 border-white/20 p-2 bg-white/5 rounded-2xl shadow-2xl overflow-hidden">
-                  <img src={data.image} alt={data.title} className="w-full h-auto rounded-xl" />
-                </div>
-              )}
+
 
               {data.sections.map((section: any) => (
                 <article key={section.id} id={section.id} className="mb-16 scroll-mt-32">
@@ -328,6 +351,13 @@ export default async function InsightPage({ params }: Props) {
                       )
                     })}
                   </div>
+                  {/* Section Image */}
+                  {section.image && (
+                    <div className="mt-8 rounded-2xl overflow-hidden border border-white/10 shadow-xl">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={section.image} alt={section.title} className="w-full h-auto" />
+                    </div>
+                  )}
                 </article>
               ))}
 
@@ -336,15 +366,28 @@ export default async function InsightPage({ params }: Props) {
                 <article id="key-claims" className="mb-16 scroll-mt-32">
                   <h2 className="text-3xl font-black text-white mb-8 pb-4 border-b-2 border-white/10 flex items-center gap-4">
                     <Lightbulb className="h-8 w-8 text-[#e8ff7d]" />
-                    Key Claims & Data Points
+                    Key Claims &amp; Data Points
                   </h2>
                   <div className="bg-[#111827] border border-white/10 rounded-2xl p-8 space-y-4 shadow-xl">
-                    {data.keyClaims.map((claim: string, i: number) => (
-                      <div key={i} className="flex items-start gap-4 p-5 bg-black/40 border border-[#e8ff7d]/20 rounded-xl hover:border-[#e8ff7d]/40 transition-colors">
-                        <span className="flex-shrink-0 text-xl font-black text-[#e8ff7d] w-6">{i + 1}.</span>
-                        <p className="text-lg font-bold text-white flex-1 leading-relaxed">{claim}</p>
-                      </div>
-                    ))}
+                    {data.keyClaims.map((claim: any, i: number) => {
+                      // Support both legacy string format and new {text, image} object format
+                      const claimText = typeof claim === 'string' ? claim : claim.text
+                      const claimImage = typeof claim === 'string' ? null : claim.image
+                      return (
+                        <div key={i} className="p-5 bg-black/40 border border-[#e8ff7d]/20 rounded-xl hover:border-[#e8ff7d]/40 transition-colors">
+                          <div className="flex items-start gap-4">
+                            <span className="flex-shrink-0 text-xl font-black text-[#e8ff7d] w-6">{i + 1}.</span>
+                            <p className="text-lg font-bold text-white flex-1 leading-relaxed">{claimText}</p>
+                          </div>
+                          {claimImage && (
+                            <div className="mt-4 rounded-xl overflow-hidden border border-[#e8ff7d]/20">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={claimImage} alt={`Claim ${i + 1} visual`} className="w-full h-auto" />
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
                 </article>
               )}

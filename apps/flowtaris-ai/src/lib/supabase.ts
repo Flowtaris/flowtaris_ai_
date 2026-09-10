@@ -156,6 +156,7 @@ export interface Insight {
   updated_at: string
 }
 
+
 export interface ROICConfig {
   id: string
   assumptions: any // JSONB
@@ -288,6 +289,17 @@ export async function getCaseStudyById(id: string) {
   return data
 }
 
+export async function getCaseStudyBySlug(slug: string) {
+  const client = createAdminClient()
+  const { data, error } = await client
+    .from('case_studies')
+    .select('*')
+    .eq('slug', slug)
+    .single()
+  if (error) return null
+  return data
+}
+
 export async function createCaseStudy(data: Omit<CaseStudy, 'id' | 'created_at' | 'updated_at'>) {
   const client = createAdminClient()
   const { data: newData, error } = await client
@@ -320,7 +332,11 @@ export async function deleteCaseStudy(id: string) {
 // Insights
 export async function getInsights() {
   const client = createAdminClient()
-  const { data, error } = await client.from('insights').select('*').order('published_at', { ascending: false })
+  const { data, error } = await client
+    .from('insights')
+    .select('*')
+    .order('sort_order', { ascending: true, nullsFirst: false })
+    .order('published_at', { ascending: false })
   if (error) throw error
   return data
 }
@@ -435,4 +451,4 @@ export async function updateROICConfig(data: Partial<ROICConfig>) {
     .single()
   if (error) throw error
   return updatedData
-}
+}

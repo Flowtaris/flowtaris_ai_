@@ -2,7 +2,17 @@
 
 import { useEffect, useState } from 'react'
 
-const stats = [
+const DEFAULT_HERO = {
+  bg_image: '/images/hero-bg.png',
+  eyebrow: 'The Future of Enterprise Finance',
+  headline_1: 'The Intelligence Layer for',
+  headline_2: 'Enterprise Finance.',
+  body: 'Watch autonomous AI agents read, decide, and act inside your ERP in real-time. Experience zero-touch document intelligence, self-healing workflows, and predictive analytics that eliminate manual effort.',
+  primary_cta: { label: 'Start Your Journey', href: '/assessment' },
+  secondary_cta: { label: 'Calculate ROI', href: '/roi-calculator' }
+}
+
+const DEFAULT_STATS = [
   { value: '200+', label: 'Enterprise Customers' },
   { value: '95%',  label: 'Automation Rate' },
   { value: '$50M+',label: 'Annual Savings' },
@@ -38,6 +48,21 @@ function TypingText({ text, delay = 0, speed = 40 }: { text: string, delay?: num
 }
 
 export function HomeHero() {
+  const [hero, setHero] = useState(DEFAULT_HERO)
+  const [stats, setStats] = useState(DEFAULT_STATS)
+
+  useEffect(() => {
+    fetch('/api/site-config')
+      .then(res => res.json())
+      .then(data => {
+        if (data?.heroConfig) {
+          if (data.heroConfig.hero) setHero({ ...DEFAULT_HERO, ...data.heroConfig.hero })
+          if (data.heroConfig.stats) setStats(data.heroConfig.stats)
+        }
+      })
+      .catch(console.error)
+  }, [])
+
   return (
     <>
       <style>{`
@@ -81,7 +106,7 @@ export function HomeHero() {
           {/* High opacity background image for maximum visibility */}
           <div style={{
             position: 'absolute', inset: 0,
-            backgroundImage: "url('/images/hero-bg.png')",
+            backgroundImage: `url('${hero.bg_image}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center center',
             backgroundRepeat: 'no-repeat',
@@ -124,7 +149,7 @@ export function HomeHero() {
               background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)', 
               height: 1, width: 40 
             }} />
-            <span>The Future of Enterprise Finance</span>
+            <span>{hero.eyebrow}</span>
             <span style={{ 
               background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)', 
               height: 1, width: 40 
@@ -141,14 +166,14 @@ export function HomeHero() {
             textShadow: '0 10px 40px rgba(0,0,0,0.5)',
           }}>
             <div className="hh-fade delay-1" style={{ color: 'white' }}>
-              The Intelligence Layer for
+              {hero.headline_1}
             </div>
             <div style={{
               background: 'linear-gradient(135deg, #f5d98c 0%, #D4A847 50%, #b3852b 100%)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
               minHeight: '1.1em', // prevents layout shift while typing
             }}>
-              <TypingText text="Enterprise Finance." delay={800} speed={60} />
+              <TypingText text={hero.headline_2} delay={800} speed={60} />
             </div>
           </h1>
 
@@ -160,14 +185,13 @@ export function HomeHero() {
             fontFamily: "'Inter', system-ui, sans-serif",
             textShadow: '0 2px 10px rgba(0,0,0,0.5)',
           }}>
-            Watch autonomous AI agents read, decide, and act inside your ERP in real-time. 
-            Experience zero-touch document intelligence, self-healing workflows, and predictive analytics that eliminate manual effort.
+            {hero.body}
           </p>
 
           {/* CTAs */}
           <div className="hh-fade delay-3" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
             <a
-              href="/assessment"
+              href={hero.primary_cta.href}
               className="hh-cta-primary"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 10,
@@ -180,13 +204,13 @@ export function HomeHero() {
                 fontFamily: "'Inter', system-ui, sans-serif",
               }}
             >
-              Start Your Journey
+              {hero.primary_cta.label}
               <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
                 <path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </a>
             <a
-              href="/roi-calculator"
+              href={hero.secondary_cta.href}
               className="hh-cta-secondary"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -200,7 +224,7 @@ export function HomeHero() {
                 fontFamily: "'Inter', system-ui, sans-serif",
               }}
             >
-              Calculate ROI
+              {hero.secondary_cta.label}
             </a>
           </div>
         </div>

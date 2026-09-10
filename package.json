@@ -9,8 +9,6 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
-    "sanity:typegen": "cd packages/sanity-studio && npx sanity typegen generate",
-    "sanity:deploy": "cd packages/sanity-studio && npx sanity deploy",
     "prepare": "husky install"
   },
   "devDependencies": {

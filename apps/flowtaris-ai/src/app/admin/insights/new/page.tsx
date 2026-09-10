@@ -1,14 +1,13 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createInsight } from '@/lib/supabase'
 
 import { 
-  Field, inputCls, textareaCls, StringListEditor, FaqEditor, SectionsEditor, ImageUploader 
+  Field, inputCls, textareaCls, StringListEditor, FaqEditor, SectionsEditor, ImageUploader, KeyClaimsEditor, KeyClaimItem 
 } from '../../components/AdminEditors'
 
 type FAQ = { question: string; answer: string }
-type Section = { id: string; title: string; content: string }
+type Section = { id: string; title: string; content: string; image?: string }
 
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -35,9 +34,9 @@ export default function NewInsightPage() {
   const [image, setImage] = useState('')
 
   // Dynamic arrays
-  const [keyClaims, setKeyClaims] = useState<string[]>([''])
+  const [keyClaims, setKeyClaims] = useState<KeyClaimItem[]>([{ text: '', image: '' }])
   const [topicClusters, setTopicClusters] = useState<string[]>([''])
-  const [sections, setSections] = useState<Section[]>([{ id: 'section-1', title: '', content: '' }])
+  const [sections, setSections] = useState<Section[]>([{ id: 'section-1', title: '', content: '', image: '' }])
   const [faqs, setFaqs] = useState<FAQ[]>([{ question: '', answer: '' }])
 
   // Auto-generate slug from title
@@ -51,29 +50,35 @@ export default function NewInsightPage() {
     e.preventDefault()
     setLoading(true); setError(null); setSuccess(null)
     try {
-      await createInsight({
-        slug,
-        title,
-        author,
-        excerpt,
-        published_at: publishDate ? new Date(publishDate).toISOString() : null,
-        rich_text: {
-          category,
-          authorRole,
-          authorBio,
-          readTime,
-          featured,
-          image,
-          keyClaims: keyClaims.filter(Boolean),
-          sections: sections.filter(s => s.title || s.content),
-        },
-        topic_clusters: topicClusters.filter(Boolean),
-        faq_items: faqs.filter(f => f.question || f.answer),
-        citations: [],
-        related_capability_ids: [],
-        seo: {},
-        geo_signals: {},
+      const res = await fetch('/api/insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug,
+          title,
+          author,
+          excerpt,
+          published_at: publishDate ? new Date(publishDate).toISOString() : null,
+          rich_text: {
+            category,
+            authorRole,
+            authorBio,
+            readTime,
+            featured,
+            image,
+            keyClaims: keyClaims.filter(c => c.text),
+            sections: sections.filter(s => s.title || s.content),
+          },
+          topic_clusters: topicClusters.filter(Boolean),
+          faq_items: faqs.filter(f => f.question || f.answer),
+          citations: [],
+          related_capability_ids: [],
+          seo: {},
+          geo_signals: {},
+        }),
       })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to create insight.')
       setSuccess('Insight created! Redirecting...')
       setTimeout(() => router.push('/admin/insights'), 1500)
     } catch (err: any) {
@@ -174,12 +179,7 @@ export default function NewInsightPage() {
             <textarea value={excerpt} onChange={e => setExcerpt(e.target.value)} required rows={3} className={textareaCls} placeholder="A compelling 2-3 sentence summary that appears on the insight card..." />
           </Field>
 
-          <StringListEditor
-            label="Key Claims / Data Points"
-            hint="The numbered bullets shown in the 'Key Takeaways' box at the top of the article. Each should be a striking stat or bold claim."
-            value={keyClaims}
-            onChange={setKeyClaims}
-          />
+          <KeyClaimsEditor value={keyClaims} onChange={setKeyClaims} />
 
           <SectionsEditor value={sections} onChange={setSections} />
         </div>

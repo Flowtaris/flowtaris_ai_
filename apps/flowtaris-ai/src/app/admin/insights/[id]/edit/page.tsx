@@ -1,14 +1,13 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { getInsightById, updateInsight, deleteInsight } from '@/lib/supabase'
 
 import { 
-  Field, inputCls, textareaCls, StringListEditor, FaqEditor, SectionsEditor, ImageUploader 
-} from '../../components/AdminEditors'
+  Field, inputCls, textareaCls, StringListEditor, FaqEditor, SectionsEditor, ImageUploader, KeyClaimsEditor, KeyClaimItem 
+} from '../../../components/AdminEditors'
 
 type FAQ = { question: string; answer: string }
-type Section = { id: string; title: string; content: string }
+type Section = { id: string; title: string; content: string; image?: string }
 
 
 export default function EditInsightPage() {
@@ -35,60 +34,74 @@ export default function EditInsightPage() {
   const [featured, setFeatured] = useState(false)
   const [excerpt, setExcerpt] = useState('')
   const [image, setImage] = useState('')
-  const [keyClaims, setKeyClaims] = useState<string[]>([''])
+  const [keyClaims, setKeyClaims] = useState<KeyClaimItem[]>([{ text: '', image: '' }])
   const [topicClusters, setTopicClusters] = useState<string[]>([''])
-  const [sections, setSections] = useState<Section[]>([{ id: 'section-1', title: '', content: '' }])
+  const [sections, setSections] = useState<Section[]>([{ id: 'section-1', title: '', content: '', image: '' }])
   const [faqs, setFaqs] = useState<FAQ[]>([{ question: '', answer: '' }])
 
   useEffect(() => {
     if (!id) return
-    getInsightById(id).then((data: any) => {
-      if (!data) { setError('Insight not found'); setLoadingData(false); return }
+    fetch(`/api/insights/${id}`)
+      .then(res => res.json())
+      .then((data: any) => {
+        if (!data || data.error) { setError('Insight not found'); setLoadingData(false); return }
 
-      setDbId(data.id)
-      setTitle(data.title || '')
-      setSlug(data.slug || '')
-      setAuthor(data.author || '')
-      setAuthorRole(data.rich_text?.authorRole || '')
-      setAuthorBio(data.rich_text?.authorBio || '')
-      setCategory(data.rich_text?.category || 'Research')
-      setReadTime(data.rich_text?.readTime || '10 min')
-      setFeatured(data.rich_text?.featured || false)
-      setImage(data.rich_text?.image || '')
-      setExcerpt(data.excerpt || '')
-      setPublishDate(data.published_at ? data.published_at.slice(0, 10) : '')
-      setKeyClaims(data.rich_text?.keyClaims?.length ? data.rich_text.keyClaims : [''])
-      setTopicClusters(data.topic_clusters?.length ? data.topic_clusters : [''])
-      setSections(data.rich_text?.sections?.length ? data.rich_text.sections : [{ id: 'section-1', title: '', content: '' }])
-      setFaqs(data.faq_items?.length ? data.faq_items : [{ question: '', answer: '' }])
-      setLoadingData(false)
-    }).catch(() => { setError('Failed to load insight'); setLoadingData(false) })
+        setDbId(data.id)
+        setTitle(data.title || '')
+        setSlug(data.slug || '')
+        setAuthor(data.author || '')
+        setAuthorRole(data.rich_text?.authorRole || '')
+        setAuthorBio(data.rich_text?.authorBio || '')
+        setCategory(data.rich_text?.category || 'Research')
+        setReadTime(data.rich_text?.readTime || '10 min')
+        setFeatured(data.rich_text?.featured || false)
+        setImage(data.rich_text?.image || '')
+        setExcerpt(data.excerpt || '')
+        setPublishDate(data.published_at ? data.published_at.slice(0, 10) : '')
+        // Handle both old string[] format and new {text,image}[] format
+        const rawClaims = data.rich_text?.keyClaims || []
+        const normalizedClaims: KeyClaimItem[] = rawClaims.length
+          ? rawClaims.map((c: any) => typeof c === 'string' ? { text: c, image: '' } : { text: c.text || '', image: c.image || '' })
+          : [{ text: '', image: '' }]
+        setKeyClaims(normalizedClaims)
+        setTopicClusters(data.topic_clusters?.length ? data.topic_clusters : [''])
+        setSections(data.rich_text?.sections?.length ? data.rich_text.sections.map((s: any) => ({ ...s, image: s.image || '' })) : [{ id: 'section-1', title: '', content: '', image: '' }])
+        setFaqs(data.faq_items?.length ? data.faq_items : [{ question: '', answer: '' }])
+        setLoadingData(false)
+      })
+      .catch(() => { setError('Failed to load insight'); setLoadingData(false) })
   }, [id])
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true); setError(null); setSuccess(null)
     try {
-      await updateInsight(dbId, {
-        slug,
-        title,
-        author,
-        excerpt,
-        published_at: publishDate ? new Date(publishDate).toISOString() : null,
-        rich_text: {
-          category,
-          authorRole,
-          authorBio,
-          readTime,
-          featured,
-          image,
-          keyClaims: keyClaims.filter(Boolean),
-          sections: sections.filter(s => s.title || s.content),
-        },
-        topic_clusters: topicClusters.filter(Boolean),
-        faq_items: faqs.filter(f => f.question || f.answer),
-        citations: [],
+      const res = await fetch(`/api/insights/${dbId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug,
+          title,
+          author,
+          excerpt,
+          published_at: publishDate ? new Date(publishDate).toISOString() : null,
+          rich_text: {
+            category,
+            authorRole,
+            authorBio,
+            readTime,
+            featured,
+            image,
+            keyClaims: keyClaims.filter(c => c.text),
+            sections: sections.filter(s => s.title || s.content),
+          },
+          topic_clusters: topicClusters.filter(Boolean),
+          faq_items: faqs.filter(f => f.question || f.answer),
+          citations: [],
+        }),
       })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to save changes.')
       setSuccess('✓ Insight saved successfully! Changes are live on the site within 60 seconds.')
     } catch (err: any) {
       setError(err.message || 'Failed to save changes.')
@@ -100,7 +113,8 @@ export default function EditInsightPage() {
   const handleDelete = async () => {
     setDeleting(true); setError(null)
     try {
-      await deleteInsight(dbId)
+      const res = await fetch(`/api/insights/${dbId}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed to delete insight.')
       router.push('/admin/insights')
     } catch (err: any) {
       setError(err.message || 'Failed to delete insight.')
@@ -232,12 +246,7 @@ export default function EditInsightPage() {
             <textarea value={excerpt} onChange={e => setExcerpt(e.target.value)} required rows={3} className={textareaCls} />
           </Field>
 
-          <StringListEditor
-            label="Key Claims / Data Points"
-            hint="Numbered bullet points shown in the highlighted 'Key Takeaways' box at the top of the article. Each should be a striking stat or bold claim."
-            value={keyClaims}
-            onChange={setKeyClaims}
-          />
+          <KeyClaimsEditor value={keyClaims} onChange={setKeyClaims} />
 
           <SectionsEditor value={sections} onChange={setSections} />
         </div>

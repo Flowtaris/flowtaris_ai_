@@ -642,13 +642,47 @@ const STATS = [
   { v: '15+', l: 'Languages Supported' }, { v: 'Free', l: 'All Tools, No Signup' },
 ]
 
+// ─── Section header defaults ──────────────────────────────────────────────────
+const DEFAULT_SUITE_HEADER = {
+  eyebrow: 'The Flowtaris Intelligence Suite',
+  headline_1: 'Stop guessing.',
+  headline_2: 'Start calculating.',
+  description: "Four enterprise-grade tools — built on real benchmarks — that prove AI's financial impact before you sign a contract.",
+}
+
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 export default function IntelligenceSuiteSection() {
   const [activeTab, setActiveTab] = useState(0)
+  const [suiteTools, setSuiteTools] = useState(TOOLS)
+  const [suiteHeader, setSuiteHeader] = useState(DEFAULT_SUITE_HEADER)
+  const [suiteStats, setSuiteStats] = useState(STATS)
   const { ref: sectionRef, visible: sectionVisible } = useReveal(0.1)
   const router = useRouter()
 
-  const tool = TOOLS[activeTab]
+  // Fetch dynamic config from admin
+  useEffect(() => {
+    fetch('/api/site-config')
+      .then(r => r.json())
+      .then(cfg => {
+        if (cfg?.intelligenceSuiteConfig) {
+          const saved = cfg.intelligenceSuiteConfig
+          if (saved.header) setSuiteHeader(prev => ({ ...prev, ...saved.header }))
+          if (saved.tools && Array.isArray(saved.tools)) {
+            setSuiteTools(prev => prev.map((t, i) => ({
+              ...t,
+              ...(saved.tools[i] || {}),
+              metrics: saved.tools[i]?.metrics || t.metrics,
+            })))
+          }
+          if (saved.stats && Array.isArray(saved.stats)) {
+            setSuiteStats(saved.stats)
+          }
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const tool = suiteTools[activeTab]
   const c = C[tool.color]
 
   const PREVIEWS = [
@@ -684,17 +718,16 @@ export default function IntelligenceSuiteSection() {
         }}>
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.035] mb-6">
             <div className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse" />
-            <span className="text-[11px] font-semibold tracking-[0.16em] text-white/40 uppercase">The Flowtaris Intelligence Suite</span>
+            <span className="text-[11px] font-semibold tracking-[0.16em] text-white/40 uppercase">{suiteHeader.eyebrow}</span>
           </div>
           <h2 id="suite-heading" className="text-3xl sm:text-4xl lg:text-[2.8rem] font-black tracking-tight text-white leading-tight mb-5">
-            Stop guessing.{' '}
+            {suiteHeader.headline_1}{' '}
             <span style={{ background: 'linear-gradient(135deg, #818cf8 0%, #34d399 50%, #fb7185 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Start calculating.
+              {suiteHeader.headline_2}
             </span>
           </h2>
           <p className="text-[15px] text-white/35 max-w-xl mx-auto leading-relaxed">
-            Four enterprise-grade tools — built on real benchmarks — that prove AI's financial impact
-            <em className="not-italic font-semibold text-white/55"> before</em> you sign a contract.
+            {suiteHeader.description}
           </p>
         </div>
 
@@ -703,7 +736,7 @@ export default function IntelligenceSuiteSection() {
           opacity: sectionVisible ? 1 : 0,
           transition: 'all 0.8s cubic-bezier(0.22,1,0.36,1) 0.15s',
         }} role="tablist">
-          {TOOLS.map((t, i) => {
+          {suiteTools.map((t, i) => {
             const tc = C[t.color]; const isActive = activeTab === i
             return (
               <button key={t.id} role="tab" aria-selected={isActive}
@@ -740,7 +773,7 @@ export default function IntelligenceSuiteSection() {
               ))}
             </div>
             <div className="flex items-center gap-4 mt-1">
-              <Link href={tool.href}
+              <Link href={(tool as any).ctaHref || tool.href}
                 className={`inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full font-bold text-[14px] bg-gradient-to-r ${c.cta} hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 group`}>
                 {tool.ctaLabel}
                 <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 16 16">
@@ -853,7 +886,7 @@ export default function IntelligenceSuiteSection() {
           transition: 'all 0.8s cubic-bezier(0.22,1,0.36,1) 0.4s',
         }}>
           <div className="flex flex-wrap justify-center gap-x-10 gap-y-6">
-            {STATS.map((s, i) => (
+            {suiteStats.map((s, i) => (
               <div key={i} className="text-center">
                 <p className="text-2xl font-black text-white tabular-nums">{s.v}</p>
                 <p className="text-[10px] text-white/22 uppercase tracking-widest mt-0.5 max-w-[110px] mx-auto leading-snug">{s.l}</p>

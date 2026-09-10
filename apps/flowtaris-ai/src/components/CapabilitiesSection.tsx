@@ -250,8 +250,8 @@ function CapabilityRow({ cap, index, isOpen, onToggle }: { cap: Cap; index: numb
                   <p className="text-4xl font-black tabular-nums leading-none" style={{ color: cap.accent, fontFamily: 'Inter, sans-serif' }}>{cap.metric}</p>
                   <p className="text-[11px] mt-1 max-w-xs leading-snug" style={{ color: 'rgba(255,255,255,0.35)' }}>{cap.metricLabel}</p>
                 </div>
-                <Link href={`/capabilities/${cap.slug}`} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-[13px] transition-all duration-200 hover:brightness-110 hover:-translate-y-0.5" style={{ background: cap.accentDim, border: `1px solid ${cap.accentBorder}`, color: cap.accent }}>
-                  See how it works
+                <Link href={(cap as any).ctaUrl || `/capabilities/${cap.slug}`} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-[13px] transition-all duration-200 hover:brightness-110 hover:-translate-y-0.5" style={{ background: cap.accentDim, border: `1px solid ${cap.accentBorder}`, color: cap.accent }}>
+                  {(cap as any).ctaLabel || 'See how it works'}
                   <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </Link>
               </div>
@@ -263,34 +263,62 @@ function CapabilityRow({ cap, index, isOpen, onToggle }: { cap: Cap; index: numb
   )
 }
 
+const DEFAULT_CAP_HEADER = {
+  eyebrow: 'Platform Capabilities',
+  headline_1: 'Here is exactly',
+  headline_2: 'how we do it.',
+  description: 'Six production-grade AI modules covering the complete finance automation lifecycle. Each one solves a specific, expensive problem.',
+  disclaimer: '* Performance metrics are based on aggregate historical data from production implementations. Individual results may vary.',
+}
+
 export default function CapabilitiesSection() {
   const [openIndex, setOpenIndex] = useState(0)
+  const [capData, setCapData] = useState(CAPABILITIES)
+  const [capHeader, setCapHeader] = useState(DEFAULT_CAP_HEADER)
   const { ref, visible } = useIntersection()
+
+  useEffect(() => {
+    fetch('/api/site-config')
+      .then(r => r.json())
+      .then(cfg => {
+        if (cfg?.capabilitiesSectionConfig) {
+          const saved = cfg.capabilitiesSectionConfig
+          if (saved.header) setCapHeader(prev => ({ ...prev, ...saved.header }))
+          if (saved.capabilities && Array.isArray(saved.capabilities)) {
+            setCapData(prev => prev.map((t, i) => ({
+              ...t,
+              ...(saved.capabilities[i] || {}),
+            })))
+          }
+        }
+      })
+      .catch(() => {})
+  }, [])
   return (
     <section ref={ref as React.RefObject<HTMLElement>} className="relative w-full overflow-hidden py-24 lg:py-32" aria-labelledby="capabilities-heading">
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div className="absolute inset-0 opacity-[0.014]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)', backgroundSize: '64px 64px' }}/>
-        <div className="absolute top-0 right-0 w-1/3 h-1/2 rounded-full blur-[140px] opacity-[0.07] transition-all duration-700" style={{ background: `radial-gradient(ellipse, ${CAPABILITIES[openIndex].accent}, transparent 70%)` }}/>
+        <div className="absolute top-0 right-0 w-1/3 h-1/2 rounded-full blur-[140px] opacity-[0.07] transition-all duration-700" style={{ background: `radial-gradient(ellipse, ${capData[openIndex].accent}, transparent 70%)` }}/>
       </div>
       <div className="relative z-10 max-w-[1200px] mx-auto px-5 sm:px-8" style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(28px)', transition: 'all 0.8s cubic-bezier(0.22,1,0.36,1)' }}>
         <div className="mb-16 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] mb-6">
             <div className="w-1.5 h-1.5 rounded-full bg-white/25 animate-pulse"/>
-            <span className="text-[10px] font-bold tracking-[0.16em] text-white/35 uppercase">Platform Capabilities</span>
+            <span className="text-[10px] font-bold tracking-[0.16em] text-white/35 uppercase">{capHeader.eyebrow}</span>
           </div>
           <h2 id="capabilities-heading" className="text-3xl sm:text-4xl lg:text-[2.7rem] font-black tracking-tight text-white leading-tight mb-4">
-            Here is exactly{' '}
-            <span style={{ background: 'linear-gradient(135deg, #6366f1 0%, #f59e0b 50%, #10b981 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>how we do it.</span>
+            {capHeader.headline_1}{' '}
+            <span style={{ background: 'linear-gradient(135deg, #6366f1 0%, #f59e0b 50%, #10b981 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{capHeader.headline_2}</span>
           </h2>
-          <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.38)', fontFamily: 'Inter, sans-serif' }}>Six production-grade AI modules covering the complete finance automation lifecycle. Each one solves a specific, expensive problem.</p>
+          <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.38)', fontFamily: 'Inter, sans-serif' }}>{capHeader.description}</p>
         </div>
         <div>
-          {CAPABILITIES.map((cap, i) => (
+          {capData.map((cap, i) => (
             <CapabilityRow key={cap.slug} cap={cap} index={i} isOpen={openIndex === i} onToggle={() => setOpenIndex(i)} />
           ))}
         </div>
         <div className="mt-8 text-right">
-          <p className="text-[11px] text-white/30 font-sans">* Performance metrics are based on aggregate historical data from production implementations. Individual results may vary.</p>
+          <p className="text-[11px] text-white/30 font-sans">{capHeader.disclaimer}</p>
         </div>
       </div>
     </section>

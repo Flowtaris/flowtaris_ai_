@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import InsightsClient from './InsightsClient'
-import { getInsights } from '@/lib/supabase'
+import { getInsights, getSiteConfig } from '@/lib/supabase'
 import { INSIGHTS } from '@/lib/insights-data'
 
 export const metadata: Metadata = {
@@ -17,6 +17,8 @@ export const revalidate = 60
 
 export default async function InsightsPage() {
   const dbInsights = await getInsights()
+  const siteConfig = await getSiteConfig()
+  const insightsHeroConfig = (siteConfig as any)?.insights_hero_config || null
 
   // Format DB insights
   const dbFormatted = dbInsights.map((i: any) => ({
@@ -42,5 +44,5 @@ export default async function InsightsPage() {
   const dynamicCategories = Array.from(new Set(allInsights.map((i: any) => i.category)))
   const categories = ['All', ...dynamicCategories]
 
-  return <InsightsClient insights={allInsights} categories={categories} />
+  return <InsightsClient insights={allInsights} categories={categories} heroConfig={insightsHeroConfig} />
 }

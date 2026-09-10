@@ -27,5 +27,5 @@ export default async function CaseStudiesPage() {
   // Filter only published case studies
   const publishedCaseStudies = caseStudies.filter(cs => cs.is_published)
 
-  return <CaseStudiesClient caseStudies={publishedCaseStudies} heroConfig={siteConfig.case_studies_hero_config} />
+  return <CaseStudiesClient caseStudies={publishedCaseStudies} heroConfig={siteConfig?.case_studies_hero_config} />
 }

@@ -57,14 +57,14 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
 
   return (
     <header
-      className="fixed top-6 right-6 z-50 pointer-events-auto"
+      className="fixed top-4 left-4 right-4 sm:left-auto sm:top-6 sm:right-6 z-50 pointer-events-auto transition-all duration-300"
       role="banner"
       aria-label="Flowtaris AI — primary site navigation"
     >
       {/* ── Ultra-Premium Glassmorphism Container ── */}
       <div
         className="
-          relative flex items-center gap-1.5 p-[5px] rounded-full
+          relative flex items-center justify-between sm:justify-start gap-1.5 p-[5px] rounded-full
           bg-[#000000]/40 backdrop-blur-[40px]
           border border-white/[0.08]
           shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.08)]
@@ -79,7 +79,7 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
         <Link
           href="/"
           className="
-            relative flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full
+            relative flex items-center gap-2 sm:gap-3 pl-2 pr-2 sm:pr-4 py-1.5 rounded-full
             hover:bg-white/[0.04] active:bg-white/[0.06]
             transition-all duration-300 ease-out group
             focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20
@@ -90,7 +90,7 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
           {showLogo && (
             <div
               className="
-                relative w-8 h-8 flex-shrink-0 rounded-full
+                relative w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0 rounded-full
                 bg-white overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.2)]
                 group-hover:shadow-[0_0_15px_rgba(212,168,71,0.3)]
                 transition-all duration-500 ease-out
@@ -109,18 +109,18 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
             </div>
           )}
 
-          <span className="flex items-center gap-2 select-none leading-none">
-            <span className="text-white font-semibold text-[14px] tracking-wide font-sans">
+          <span className="flex items-center gap-1.5 sm:gap-2 select-none leading-none">
+            <span className="text-white font-semibold text-[13px] sm:text-[14px] tracking-wide font-sans">
               {brandName}
             </span>
 
             {/* Premium animated .ai badge */}
             <span
               className="
-                relative inline-flex items-center gap-[3px] px-2 py-[3px] rounded-full
+                relative inline-flex items-center gap-[2px] sm:gap-[3px] px-1.5 sm:px-2 py-[2px] sm:py-[3px] rounded-full
                 bg-gradient-to-r from-[#D4A847]/20 via-[#f0c97a]/10 to-[#D4A847]/20
                 border border-[#D4A847]/40
-                text-[#f0c97a] text-[10px] font-bold tracking-widest uppercase
+                text-[#f0c97a] text-[9px] sm:text-[10px] font-bold tracking-widest uppercase
                 shadow-[0_0_12px_rgba(212,168,71,0.2),inset_0_1px_0_rgba(255,255,255,0.08)]
                 group-hover:shadow-[0_0_18px_rgba(212,168,71,0.4),inset_0_1px_0_rgba(255,255,255,0.12)]
                 group-hover:border-[#D4A847]/70 group-hover:text-[#fde68a]
@@ -128,18 +128,18 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
               "
             >
               {/* Animated AI spark */}
-              <span className="w-[5px] h-[5px] rounded-full bg-gradient-to-b from-[#fde68a] to-[#D4A847] animate-badge-pulse shadow-[0_0_6px_rgba(212,168,71,0.8)] flex-shrink-0" />
+              <span className="w-[4px] h-[4px] sm:w-[5px] sm:h-[5px] rounded-full bg-gradient-to-b from-[#fde68a] to-[#D4A847] animate-badge-pulse shadow-[0_0_6px_rgba(212,168,71,0.8)] flex-shrink-0" />
               {badgeText}
             </span>
           </span>
         </Link>
 
         {/* ── Separator ── */}
-        <div className="w-[1px] h-6 bg-gradient-to-b from-transparent via-white/[0.15] to-transparent mx-1 flex-shrink-0" aria-hidden="true" />
+        <div className="hidden sm:block w-[1px] h-6 bg-gradient-to-b from-transparent via-white/[0.15] to-transparent mx-1 flex-shrink-0" aria-hidden="true" />
 
         {/* ── PRIMARY NAV ── */}
         <nav
-          className="flex items-center gap-1"
+          className="hidden md:flex items-center gap-1"
           role="navigation"
           aria-label="Main navigation links"
         >
@@ -150,7 +150,7 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
               className={`w-4 h-4 flex-shrink-0 transition-colors duration-300
                 ${isActive(ctas.assessment.href) ? 'text-white' : 'text-white/70 group-hover:text-white'}`}
             />
-            <span className="hidden sm:inline">{ctas.assessment.label}</span>
+            <span>{ctas.assessment.label}</span>
           </Link>
 
           {/* ROI Calculator */}
@@ -160,8 +160,8 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
                 strokeWidth={isActive(ctas.roi.href) ? 2.5 : 2}
                 className={`w-4 h-4 flex-shrink-0 transition-colors duration-300
                   ${isActive(ctas.roi.href) ? 'text-white' : 'text-white/70 group-hover:text-white'}`}
-              />
-              <span className="hidden sm:inline">{ctas.roi.label}</span>
+            />
+              <span>{ctas.roi.label}</span>
             </Link>
           )}
 
@@ -173,14 +173,13 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
                 className={`w-4 h-4 flex-shrink-0 transition-colors duration-300
                   ${isActive(ctas.coi.href) ? 'text-amber-400' : 'text-amber-400/60 group-hover:text-amber-400'}`}
               />
-              <span className="hidden md:inline">{ctas.coi.label}</span>
-              <span className="hidden sm:inline md:hidden">{ctas.coi.mobileLabel || ctas.coi.label}</span>
+              <span>{ctas.coi.label}</span>
             </Link>
           )}
         </nav>
 
         {/* ── Separator ── */}
-        <div className="w-[1px] h-6 bg-gradient-to-b from-transparent via-white/[0.15] to-transparent mx-1 flex-shrink-0" aria-hidden="true" />
+        <div className="hidden md:block w-[1px] h-6 bg-gradient-to-b from-transparent via-white/[0.15] to-transparent mx-1 flex-shrink-0" aria-hidden="true" />
 
         {/* ── CORPORATE LINK ── */}
         <a
@@ -188,7 +187,7 @@ export default function SiteHeader({ config }: SiteHeaderProps = {}) {
           target="_blank"
           rel="noopener noreferrer"
           className="
-            relative flex items-center gap-1.5 pl-4 pr-5 py-2.5 rounded-full
+            hidden sm:flex relative items-center gap-1.5 pl-4 pr-5 py-2.5 rounded-full
             bg-transparent border border-transparent
             hover:bg-white/[0.04]
             text-[13px] font-medium tracking-wide

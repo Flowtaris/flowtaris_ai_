@@ -3,9 +3,16 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { ArrowUpRight, Github, Linkedin, Twitter, ArrowRight, Youtube, Instagram, Facebook, Mail, MapPin } from 'lucide-react'
 
 export default function SiteFooter({ config }: { config?: any } = {}) {
+  const pathname = usePathname()
+
+  // Hide footer on all admin pages
+  if (pathname?.startsWith('/admin')) {
+    return null
+  }
   const logoUrl = config?.logoUrl || "/images/logo.png"
   const tagline = config?.tagline || "The intelligence layer enterprise finance was missing. Built by the best, deployed in weeks."
 

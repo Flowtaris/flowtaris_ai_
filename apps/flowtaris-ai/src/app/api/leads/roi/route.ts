@@ -46,94 +46,127 @@ export async function POST(request: NextRequest) {
     // 2. Send Email via Resend
     if (resend) {
       const fmt = (v: number) => `$${Math.round(v).toLocaleString()}`
-      
+      const fmtM = (v: number) => v >= 1000000 ? `$${(v/1000000).toFixed(1)}M` : `$${Math.round(v/1000)}K`
+
+      // ─── Transactional-style email — plain text-first to avoid Gmail Promotions ───
       const emailHtml = `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 650px; margin: 0 auto; background-color: #ffffff; color: #1a1a1a; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
-          <!-- Header -->
-          <div style="background-color: #02050A; padding: 32px 40px; text-align: center; border-bottom: 2px solid #D4A847;">
-            <img src="https://flowtaris.com/images/logo.png" alt="Flowtaris AI" style="height: 40px; margin-bottom: 16px;" />
-            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">Your Enterprise AI Business Case</h1>
-            <p style="color: #a1a1aa; margin: 8px 0 0 0; font-size: 15px;">Custom analysis for ${inputs.erp} integration</p>
-          </div>
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+        <body style="margin: 0; padding: 0; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%;">
+                  
+                  <!-- Name / Greeting -->
+                  <tr>
+                    <td style="padding-bottom: 24px; font-size: 15px; color: #111827; line-height: 1.7;">
+                      Hi,
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom: 24px; font-size: 15px; color: #111827; line-height: 1.7;">
+                      Following your session on the Flowtaris ROI Calculator, I wanted to send across your personalised numbers so you have them for reference. Here's a quick summary based on your ${inputs.erp} configuration:
+                    </td>
+                  </tr>
 
-          <!-- Body -->
-          <div style="padding: 40px;">
-            <p style="font-size: 16px; line-height: 1.6; margin-top: 0;">Hello,</p>
-            <p style="font-size: 16px; line-height: 1.6;">Thank you for using the Flowtaris Financial X-Ray. Based on your provided parameters, we have calculated the projected financial impact of automating your <strong>${inputs.useCase}</strong> workflows using Flowtaris AI.</p>
+                  <!-- Key Numbers — simple table, no colored backgrounds -->
+                  <tr>
+                    <td style="padding-bottom: 32px;">
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
+                        <tr style="background: #f9fafb;">
+                          <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb;">Metric</td>
+                          <td style="padding: 10px 16px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb; text-align: right;">Your Estimate</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 14px 16px; font-size: 15px; color: #374151; border-bottom: 1px solid #f3f4f6;">Net Annual Savings</td>
+                          <td style="padding: 14px 16px; font-size: 15px; font-weight: 700; color: #059669; border-bottom: 1px solid #f3f4f6; text-align: right;">${fmt(outputs.res?.annualSavings || 0)}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 14px 16px; font-size: 15px; color: #374151; border-bottom: 1px solid #f3f4f6;">Payback Period</td>
+                          <td style="padding: 14px 16px; font-size: 15px; font-weight: 600; color: #111827; border-bottom: 1px solid #f3f4f6; text-align: right;">${outputs.res?.paybackMonths || 0} months</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 14px 16px; font-size: 15px; color: #374151; border-bottom: 1px solid #f3f4f6;">FTE Capacity Freed</td>
+                          <td style="padding: 14px 16px; font-size: 15px; font-weight: 600; color: #111827; border-bottom: 1px solid #f3f4f6; text-align: right;">${outputs.res?.fteFreed || 0} heads</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 14px 16px; font-size: 15px; color: #374151;">Cost of Delay (COI)</td>
+                          <td style="padding: 14px 16px; font-size: 15px; font-weight: 600; color: #dc2626; text-align: right;">${fmt((outputs.coi?.attritionCost || 0) + (outputs.coi?.complianceRisk || 0))} / yr</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
 
-            <!-- Metrics Grid -->
-            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; margin: 32px 0;">
-              <h3 style="margin: 0 0 20px 0; color: #0f172a; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Projected Annual Impact</h3>
-              
-              <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                  <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 15px;">Net Annual Savings</td>
-                  <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #10b981; font-size: 18px;">${fmt(outputs.res?.annualSavings || 0)}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 15px;">FTE Capacity Freed</td>
-                  <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 600; color: #0f172a; font-size: 16px;">${outputs.res?.fteFreed || 0} heads</td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 0; color: #64748b; font-size: 15px;">Payback Period</td>
-                  <td style="padding: 12px 0; text-align: right; font-weight: 600; color: #0f172a; font-size: 16px;">${outputs.res?.paybackMonths || 0} months</td>
-                </tr>
-              </table>
-            </div>
+                  <!-- Context paragraph -->
+                  <tr>
+                    <td style="padding-bottom: 20px; font-size: 15px; color: #374151; line-height: 1.7;">
+                      These figures are based on publicly available benchmarks for <strong>${inputs.erp}</strong> deployments in the <strong>${inputs.useCase}</strong> space. They're designed to give you a directionally accurate view of potential impact — not a guarantee, but a grounded starting point for an internal conversation.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom: 20px; font-size: 15px; color: #374151; line-height: 1.7;">
+                      Two things worth flagging:
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom: 20px;">
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td style="padding: 0 12px 12px 0; vertical-align: top; color: #6b7280; font-size: 15px;">1.</td>
+                          <td style="padding-bottom: 12px; font-size: 15px; color: #374151; line-height: 1.6;"><strong>Technical fit:</strong> The actual savings depend heavily on how your ${inputs.erp} data is structured. A quick technical call can validate this within 30 minutes.</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 0 12px 0 0; vertical-align: top; color: #6b7280; font-size: 15px;">2.</td>
+                          <td style="font-size: 15px; color: #374151; line-height: 1.6;"><strong>Low-risk start:</strong> We typically recommend beginning with a single high-volume process (like ${inputs.useCase}) before expanding — this lets you prove the ROI internally with minimal risk.</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom: 28px; font-size: 15px; color: #374151; line-height: 1.7;">
+                      If you'd like to dig into whether these numbers hold for your specific setup, I'm happy to set up a 30-minute call — <a href="https://flowtaris.ai/demo" style="color: #2563eb; text-decoration: underline;">book a slot here</a>.
+                    </td>
+                  </tr>
 
-            <!-- Cost of Inaction -->
-            <div style="background-color: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 24px; margin: 32px 0;">
-              <h3 style="margin: 0 0 16px 0; color: #9f1239; font-size: 16px;">The Hidden Cost of Inaction (COI)</h3>
-              <p style="margin: 0 0 12px 0; font-size: 14px; color: #881337; line-height: 1.6;">Delaying automation carries measurable risks to your organization:</p>
-              <ul style="margin: 0; padding-left: 20px; color: #9f1239; font-size: 14px; line-height: 1.6;">
-                <li><strong>Team Attrition Risk:</strong> ${fmt(outputs.coi?.attritionCost || 0)}/yr lost to manual burnout.</li>
-                <li><strong>Compliance & Error Risk:</strong> ${fmt(outputs.coi?.complianceRisk || 0)}/yr in potential audit penalties and manual entry errors.</li>
-              </ul>
-            </div>
+                  <!-- Sign-off -->
+                  <tr>
+                    <td style="padding-bottom: 8px; font-size: 15px; color: #374151; line-height: 1.7;">
+                      Best,<br>
+                      <strong>Priya</strong> at Flowtaris<br>
+                      <span style="color: #9ca3af; font-size: 13px;">Enterprise Solutions · <a href="https://flowtaris.ai" style="color: #9ca3af;">flowtaris.ai</a></span>
+                    </td>
+                  </tr>
 
-            <!-- Recommendations -->
-            <h3 style="margin: 40px 0 16px 0; color: #0f172a; font-size: 18px;">Recommended Next Steps</h3>
-            <p style="font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 24px;">To unlock these savings and mitigate your compliance risks, we recommend the following action plan:</p>
-            
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 32px;">
-              <tr>
-                <td style="padding: 0 16px 16px 0; vertical-align: top;"><div style="background: #02050A; color: white; width: 24px; height: 24px; border-radius: 12px; text-align: center; line-height: 24px; font-size: 12px; font-weight: bold;">1</div></td>
-                <td style="padding-bottom: 16px; font-size: 15px; color: #334155; line-height: 1.5;"><strong>Technical Validation:</strong> Schedule a brief call with our engineers to validate your specific ${inputs.erp} configuration and data structures.</td>
-              </tr>
-              <tr>
-                <td style="padding: 0 16px 0 0; vertical-align: top;"><div style="background: #02050A; color: white; width: 24px; height: 24px; border-radius: 12px; text-align: center; line-height: 24px; font-size: 12px; font-weight: bold;">2</div></td>
-                <td style="font-size: 15px; color: #334155; line-height: 1.5;"><strong>Pilot Deployment:</strong> Launch a controlled pilot on your most manual ${inputs.useCase} process to prove the ROI with zero risk.</td>
-              </tr>
-            </table>
+                  <!-- Disclaimer -->
+                  <tr>
+                    <td style="padding-top: 32px; border-top: 1px solid #f3f4f6;">
+                      <p style="margin: 0; font-size: 11px; color: #9ca3af; line-height: 1.6;">
+                        <em>These figures are illustrative estimates based on publicly available industry research benchmarks. Actual results will vary depending on your specific processes, data quality, ${inputs.erp} configuration, and implementation scope. This is not a guarantee of financial performance and should not be solely relied upon for financial planning decisions.</em>
+                      </p>
+                    </td>
+                  </tr>
 
-            <!-- CTA -->
-            <div style="text-align: center; margin: 40px 0;">
-              <a href="https://flowtaris.ai/demo" style="display: inline-block; background-color: #02050A; color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 30px; font-weight: 600; font-size: 16px; letter-spacing: 0.5px;">Schedule Your Technical Review</a>
-            </div>
-
-          </div>
-
-          <!-- Footer / Disclaimer -->
-          <div style="background-color: #f8fafc; padding: 32px 40px; border-top: 1px solid #e2e8f0;">
-            <p style="margin: 0 0 12px 0; font-size: 11px; color: #64748b; line-height: 1.6; text-align: justify;">
-              <strong>Disclaimer:</strong> The figures provided in this report are illustrative estimates based on publicly available industry benchmarks, aggregated client data, and the self-reported inputs provided. Actual results will vary depending on your specific internal processes, data quality, existing ${inputs.erp} configuration, and implementation scope. These projections do not constitute a guarantee of financial performance or savings and should not be solely relied upon for financial planning.
-            </p>
-            <p style="margin: 0; font-size: 12px; color: #94a3b8; text-align: center;">
-              © ${new Date().getFullYear()} Flowtaris AI. All rights reserved.<br/>
-              <a href="https://flowtaris.ai" style="color: #94a3b8; text-decoration: underline;">flowtaris.ai</a>
-            </p>
-          </div>
-        </div>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
       `
 
       const supportEmail = process.env.FLOWTARIS_SUPPORT_EMAIL || 'support@flowtaris.com'
       const adminEmail = process.env.FLOWTARIS_ADMIN_EMAIL
 
       const { data: resendData, error: resendError } = await resend.emails.send({
-        from: `Flowtaris AI <${supportEmail}>`,
+        from: `Priya at Flowtaris <${supportEmail}>`,
         to: [email],
-        subject: 'Your Flowtaris ROI Projections',
+        subject: `Your ${inputs.erp} ROI numbers`,
         html: emailHtml,
+        headers: {
+          'X-Entity-Ref-ID': `roi-${Date.now()}`,
+        },
       })
 
       if (resendError) {

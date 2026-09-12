@@ -373,16 +373,16 @@ function StepIntro({ config, onStart }: { config: AssessmentConfigData['intro'];
 // ─── EXACT BRAND LOGOS (PULLED FROM OFFICIAL SOURCES) ─────────────────────
 const ERP_LOGOS: Record<string, React.ReactNode> = {
   'NetSuite': (
-    <img src="https://logo.clearbit.com/netsuite.com" alt="NetSuite Logo" className="w-full h-full object-contain" crossOrigin="anonymous" />
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/NetSuite_Logo.svg" alt="Oracle NetSuite" className="w-full h-full object-contain" crossOrigin="anonymous" />
   ),
   'SAP': (
-    <img src="https://logo.clearbit.com/sap.com" alt="SAP Logo" className="w-full h-full object-contain" crossOrigin="anonymous" />
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/SAP_2011_logo.svg" alt="SAP S/4HANA" className="w-full h-full object-contain" crossOrigin="anonymous" />
   ),
   'Coupa': (
-    <img src="https://logo.clearbit.com/coupa.com" alt="Coupa Logo" className="w-full h-full object-contain" crossOrigin="anonymous" />
+    <img src="https://upload.wikimedia.org/wikipedia/en/7/75/Coupa_logo.svg" alt="Coupa" className="w-full h-full object-contain" crossOrigin="anonymous" />
   ),
   'Workday': (
-    <img src="https://logo.clearbit.com/workday.com" alt="Workday Logo" className="w-full h-full object-contain" crossOrigin="anonymous" />
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/Workday_logo.svg" alt="Workday" className="w-full h-full object-contain" crossOrigin="anonymous" />
   )
 }
 
@@ -423,7 +423,7 @@ function StepERP({ config, value, onChange }: { config: AssessmentConfigData['st
                 style={{ background: (erp.accent || '#3b82f6') + '20', color: erp.accent || '#3b82f6', border: `1px solid ${(erp.accent || '#3b82f6')}40` }}
               >
                 {ERP_LOGOS[erp.value] ? (
-                  <div className="w-7 h-7 flex items-center justify-center">
+                  <div className="w-10 h-6 flex items-center justify-center px-0.5">
                     {ERP_LOGOS[erp.value]}
                   </div>
                 ) : (

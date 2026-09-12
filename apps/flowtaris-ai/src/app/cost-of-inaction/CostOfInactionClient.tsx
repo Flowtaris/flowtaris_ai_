@@ -518,7 +518,7 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Annual Exposure</span>
                     </div>
                     <div className="text-lg font-black font-mono text-white">
-                      ${Math.round(outputs.totalAnnualCost).toLocaleString()}
+                      ${Math.round(outputs.annualRisk).toLocaleString()}
                     </div>
                   </div>
                 </div>

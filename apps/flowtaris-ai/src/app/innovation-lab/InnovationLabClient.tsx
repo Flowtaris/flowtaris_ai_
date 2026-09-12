@@ -347,22 +347,48 @@ export default function InnovationLabClient() {
                 </p>
               </header>
 
-              <div className="w-full flex justify-center py-6 relative mb-8">
-                 <div className="relative z-10 w-full max-w-[900px]">
-                    <FloatingProduct
-                      src="/images/innovation_lab_architecture.png"
-                      alt="Futuristic AI Model Architecture"
-                      frames={['/images/innovation_lab_architecture.png']}
-                      mouseParallax={true}
-                      parallaxStrength={0.2}
-                      autoRotate={true}
-                      rotationSpeed={20}
-                      width={900}
-                      height={450}
-                      borderRadius="24px"
-                      shadow={true}
-                      shadowIntensity={1.5}
-                    />
+              <div className="w-full flex justify-center py-12 relative mb-16">
+                 {/* Decorative background glow */}
+                 <div className="absolute inset-0 bg-brand-cyan-500/5 blur-[120px] rounded-full pointer-events-none" />
+                 
+                 <div className="relative z-10 w-full max-w-[1000px]">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-brand-cyan-500/20 via-brand-emerald-500/20 to-brand-cyan-500/20 rounded-[28px] blur-md" />
+                    <div className="relative rounded-[24px] border border-white/10 bg-[#0d0b14]/80 backdrop-blur-xl p-2 shadow-2xl">
+                      {/* Top bar (mock terminal/dashboard header) */}
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 mb-2">
+                        <div className="flex gap-2">
+                          <div className="w-2.5 h-2.5 rounded-full bg-white/20" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-white/20" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-white/20" />
+                        </div>
+                        <div className="text-[10px] font-mono text-brand-cyan-400/70 tracking-widest uppercase flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan-400 animate-pulse" />
+                          Live Neural Vector Graph
+                        </div>
+                        <div className="text-[10px] font-mono text-white/30">
+                          LAB_ENV_PROD_v2.4
+                        </div>
+                      </div>
+                      
+                      {/* Main Image */}
+                      <div className="relative overflow-hidden rounded-xl border border-white/5 group">
+                        <FloatingProduct
+                          src="/images/innovation_lab_abstract_viz.jpg"
+                          alt="Abstract Neural Network Data Visualization"
+                          frames={['/images/innovation_lab_abstract_viz.jpg']}
+                          mouseParallax={true}
+                          parallaxStrength={0.15}
+                          autoRotate={false}
+                          width={1000}
+                          height={500}
+                          borderRadius="12px"
+                          shadow={false}
+                        />
+                        {/* Overlay scanline effect */}
+                        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100%_4px] mix-blend-overlay opacity-50" />
+                        <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(13,11,20,0.8)] pointer-events-none" />
+                      </div>
+                    </div>
                  </div>
               </div>
 

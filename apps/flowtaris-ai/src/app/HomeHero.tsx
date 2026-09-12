@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 
 const DEFAULT_HERO = {
   bg_image: '/images/hero-bg.png',
@@ -105,16 +106,19 @@ export function HomeHero() {
       >
         {/* ── Background: Floating UI mockup image ── */}
         <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-          {/* High opacity background image for maximum visibility */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            backgroundImage: `url('${hero.bg_image}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center center',
-            backgroundRepeat: 'no-repeat',
-            opacity: 0.9,
-            filter: 'contrast(1.1) brightness(1.3)',
-          }} />
+          {/* High opacity background image for maximum visibility - using Next.js Image for LCP optimization */}
+          <div style={{ position: 'absolute', inset: 0 }}>
+            <Image 
+              src={hero.bg_image} 
+              alt="Hero Background" 
+              fill 
+              priority
+              quality={85}
+              sizes="100vw"
+              className="object-cover object-center opacity-90"
+              style={{ filter: 'contrast(1.1) brightness(1.3)' }}
+            />
+          </div>
 
           {/* Minimal dark overlay mainly at top/bottom for text/nav contrast */}
           <div style={{

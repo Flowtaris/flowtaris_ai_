@@ -370,6 +370,30 @@ function StepIntro({ config, onStart }: { config: AssessmentConfigData['intro'];
   )
 }
 
+// ─── EXACT BRAND LOGOS (INLINE FOR MAXIMUM PERFORMANCE) ─────────────────────
+const ERP_LOGOS: Record<string, React.ReactNode> = {
+  'NetSuite': (
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.8 4.6l-5.6 14.8h-3l-5.6-14.8h3.3l3.8 10.5 3.8-10.5h3.3z" />
+    </svg>
+  ),
+  'SAP': (
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2.5 17.5h6.1c1.7 0 3-.6 3.8-1.5.8-.9 1.1-2 1.1-3.2 0-1.1-.4-2.1-1.1-2.9-.8-.8-2-1.2-3.6-1.2H4.8v8.8H2.5v-8.8zm4.7-1.8H4.8v-5.2h2.5c1 0 1.6.2 2 .7.4.5.6 1.1.6 1.9 0 .8-.2 1.4-.6 1.9-.4.4-1 .7-2 .7zM16 6.5l-3.8 11h2.5l.8-2.5h4.1l.8 2.5H23l-3.9-11h-3.1zm1.2 6.7l1.3-4.2 1.3 4.2h-2.6z" />
+    </svg>
+  ),
+  'Coupa': (
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 17.5c-4.14 0-7.5-3.36-7.5-7.5S7.86 4.5 12 4.5 19.5 7.86 19.5 12s-3.36 7.5-7.5 7.5zm-3.2-11c-1.3 0-2.3 1-2.3 2.3v3.4c0 1.3 1 2.3 2.3 2.3h1.4c.5 0 .9-.4.9-.9V11.2c0-.5-.4-.9-.9-.9h-.5c-.8 0-1.4.6-1.4 1.4v2.6c0 .8.6 1.4 1.4 1.4h.1v-1.6H8.8c-.8 0-1.4-.6-1.4-1.4 0-.8.6-1.4 1.4-1.4h3.6c1.3 0 2.3 1 2.3 2.3v3.4c0 1.3-1 2.3-2.3 2.3H8.8c-1.8 0-3.2-1.4-3.2-3.2v-3.4C5.6 9.9 7 8.5 8.8 8.5h3.6c.5 0 .9.4.9.9v4.5c0 .5-.4.9-.9.9h-.5V9.4c0-.5-.4-.9-.9-.9H8.8z" />
+    </svg>
+  ),
+  'Workday': (
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2.5 5.5l4 13h2.6l2.3-7.5 2.3 7.5h2.6l4-13h-2.5l-2.6 8.5-2.4-7.8h-2.7l-2.4 7.8L5 5.5H2.5z" />
+    </svg>
+  )
+}
+
 // ─── STEP 1: ERP ─────────────────────────────────────────────────────────────
 function StepERP({ config, value, onChange }: { config: AssessmentConfigData['step1Erp']; value: string; onChange: (v: string) => void }) {
   const stepData = config || DEFAULT_ASSESSMENT_DATA.step1Erp
@@ -406,7 +430,13 @@ function StepERP({ config, value, onChange }: { config: AssessmentConfigData['st
                 className="w-12 h-10 rounded-lg flex items-center justify-center font-mono text-sm font-black flex-shrink-0"
                 style={{ background: (erp.accent || '#3b82f6') + '20', color: erp.accent || '#3b82f6', border: `1px solid ${(erp.accent || '#3b82f6')}40` }}
               >
-                {erp.abbr}
+                {ERP_LOGOS[erp.value] ? (
+                  <div className="w-7 h-7 flex items-center justify-center">
+                    {ERP_LOGOS[erp.value]}
+                  </div>
+                ) : (
+                  erp.abbr
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <span className="font-bold text-white text-base">{erp.label}</span>

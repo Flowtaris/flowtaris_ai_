@@ -97,42 +97,69 @@ function ProjectionChart({ baseCost, newCost, config, sizeIndex }: { baseCost: n
   const b1 = baseCost, b2 = baseCost * 1.1, b3 = baseCost * 1.21
   const n1 = newCost, n2 = newCost * 0.8, n3 = newCost * 0.82
   const maxVal = Math.max(b3) * 1.1
-  const h = 280, w = 600
+  // SVG coordinate system: left pad for Y labels, right pad for endpoint labels
+  const h = 220, w = 500, padL = 48, padR = 8
+  const cw = w - padL - padR  // chart width
   const getY = (val: number) => h - (val / maxVal) * h
-  const pB = `0,${getY(b1)} ${w/2},${getY(b2)} ${w},${getY(b3)}`
-  const pN = `0,${getY(n1)} ${w/2},${getY(n2)} ${w},${getY(n3)}`
+  // Points in chart-space, then offset by padL
+  const pB = `${padL},${getY(b1)} ${padL + cw/2},${getY(b2)} ${padL + cw},${getY(b3)}`
+  const pN = `${padL},${getY(n1)} ${padL + cw/2},${getY(n2)} ${padL + cw},${getY(n3)}`
+  const scanX = padL + (sizeIndex / 100) * cw
 
   return (
-    <div className="relative w-full h-[280px] mt-8">
-      <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-[11px] text-white/30 font-medium">
-        <span>{fmtM(maxVal)}</span><span>{fmtM(maxVal/2)}</span><span>$0</span>
-      </div>
-      <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="ml-12 overflow-visible">
-        <line x1="0" y1="0" x2={w} y2="0" stroke="rgba(255,255,255,0.05)" strokeDasharray="4 4" />
-        <line x1="0" y1={h/2} x2={w} y2={h/2} stroke="rgba(255,255,255,0.05)" strokeDasharray="4 4" />
-        <line x1="0" y1={h} x2={w} y2={h} stroke="rgba(255,255,255,0.1)" />
-        <path d={`M 0,${h} L ${pB} L ${w},${h} Z`} fill="url(#gradRed)" opacity={0.3} className="transition-all duration-700 ease-out" />
-        <polyline points={pB} fill="none" stroke="#ef4444" strokeWidth={2} className="transition-all duration-700 ease-out" />
-        <path d={`M 0,${h} L ${pN} L ${w},${h} Z`} fill="url(#gradGreen)" opacity={0.5} className="transition-all duration-700 ease-out" />
-        <polyline points={pN} fill="none" stroke="#10b981" strokeWidth={3} className="transition-all duration-700 ease-out" />
-        <circle cx={w} cy={getY(b3)} r={4} fill="#ef4444" />
-        <circle cx={w} cy={getY(n3)} r={4} fill="#10b981" />
-        <line x1={w} y1={getY(b3)} x2={w} y2={getY(n3)} stroke="rgba(255,255,255,0.2)" strokeDasharray="2 2" />
-        {/* Dynamic Vertical Laser Scanner synchronized with the slider */}
-        <g style={{ transform: `translateX(${(sizeIndex / 100) * w}px)`, transition: 'transform 0.1s linear' }}>
+    <div className="relative w-full mt-4">
+      <svg
+        width="100%"
+        viewBox={`0 0 ${w} ${h + 28}`}
+        preserveAspectRatio="xMidYMid meet"
+        className="overflow-visible"
+        style={{ display: 'block' }}
+      >
+        {/* Y-axis labels — inside SVG, no absolute div needed */}
+        <text x={padL - 6} y={getY(maxVal) + 4} textAnchor="end" fontSize="10" fill="rgba(255,255,255,0.3)" fontFamily="monospace">{fmtM(maxVal)}</text>
+        <text x={padL - 6} y={getY(maxVal/2) + 4} textAnchor="end" fontSize="10" fill="rgba(255,255,255,0.3)" fontFamily="monospace">{fmtM(maxVal/2)}</text>
+        <text x={padL - 6} y={h} textAnchor="end" fontSize="10" fill="rgba(255,255,255,0.3)" fontFamily="monospace">$0</text>
+
+        {/* Grid lines */}
+        <line x1={padL} y1={getY(maxVal)} x2={padL + cw} y2={getY(maxVal)} stroke="rgba(255,255,255,0.05)" strokeDasharray="4 4" />
+        <line x1={padL} y1={getY(maxVal/2)} x2={padL + cw} y2={getY(maxVal/2)} stroke="rgba(255,255,255,0.05)" strokeDasharray="4 4" />
+        <line x1={padL} y1={h} x2={padL + cw} y2={h} stroke="rgba(255,255,255,0.1)" />
+
+        {/* Status quo area + line */}
+        <path d={`M ${padL},${h} L ${pB} L ${padL + cw},${h} Z`} fill="url(#gradRed)" opacity={0.3}>
+          <animate attributeName="opacity" values="0;0.3" dur="0.7s" fill="freeze" />
+        </path>
+        <polyline points={pB} fill="none" stroke="#ef4444" strokeWidth={2} />
+
+        {/* Flowtaris area + line */}
+        <path d={`M ${padL},${h} L ${pN} L ${padL + cw},${h} Z`} fill="url(#gradGreen)" opacity={0.5}>
+          <animate attributeName="opacity" values="0;0.5" dur="0.7s" fill="freeze" />
+        </path>
+        <polyline points={pN} fill="none" stroke="#10b981" strokeWidth={2.5} />
+
+        {/* End-point dots */}
+        <circle cx={padL + cw} cy={getY(b3)} r={4} fill="#ef4444" />
+        <circle cx={padL + cw} cy={getY(n3)} r={4} fill="#10b981" />
+        <line x1={padL + cw} y1={getY(b3)} x2={padL + cw} y2={getY(n3)} stroke="rgba(255,255,255,0.2)" strokeDasharray="2 2" />
+
+        {/* Laser scanner */}
+        <g style={{ transform: `translateX(${scanX}px)`, transition: 'transform 0.1s linear' }}>
           <line x1={0} y1={0} x2={0} y2={h} stroke="url(#scannerGlow)" strokeWidth={1.5} />
           <polygon points="-4,0 4,0 0,6" fill="#06b6d4" />
-          <polygon points="-4,280 4,280 0,274" fill="#06b6d4" />
+          <polygon points={`-4,${h} 4,${h} 0,${h - 6}`} fill="#06b6d4" />
         </g>
+
+        {/* X-axis labels */}
+        <text x={padL} y={h + 18} textAnchor="middle" fontSize="10" fill="rgba(255,255,255,0.4)" fontFamily="sans-serif">{config.projectionLabels.y1}</text>
+        <text x={padL + cw/2} y={h + 18} textAnchor="middle" fontSize="10" fill="rgba(255,255,255,0.4)" fontFamily="sans-serif">{config.projectionLabels.y2}</text>
+        <text x={padL + cw} y={h + 18} textAnchor="middle" fontSize="10" fill="rgba(255,255,255,0.4)" fontFamily="sans-serif">{config.projectionLabels.y3}</text>
+
         <defs>
           <linearGradient id="gradRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#ef4444" stopOpacity="0.8" /><stop offset="100%" stopColor="#ef4444" stopOpacity="0" /></linearGradient>
           <linearGradient id="gradGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#10b981" stopOpacity="0.8" /><stop offset="100%" stopColor="#10b981" stopOpacity="0" /></linearGradient>
           <linearGradient id="scannerGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#06b6d4" stopOpacity="0" /><stop offset="50%" stopColor="#06b6d4" stopOpacity="1" /><stop offset="100%" stopColor="#06b6d4" stopOpacity="0" /></linearGradient>
         </defs>
       </svg>
-      <div className="absolute left-12 right-0 -bottom-6 flex justify-between text-[11px] text-white/40 font-medium">
-        <span>{config.projectionLabels.y1}</span><span>{config.projectionLabels.y2}</span><span>{config.projectionLabels.y3}</span>
-      </div>
     </div>
   )
 }
@@ -324,17 +351,17 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
               </div>
             </div>
             <div className="w-full lg:w-2/3 flex flex-col">
-              <div className="flex justify-between items-end mb-8">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-6 gap-3">
                 <div>
                   <h2 className="text-xl text-white font-bold mb-1 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-brand-emerald-500" /> {config.projectionLabels.title}</h2>
                   <p className="text-sm text-white/40">{config.projectionLabels.subtitle}</p>
                 </div>
-                <div className="text-right">
+                <div className="sm:text-right">
                   <div className="text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">{config.projectionLabels.tas}</div>
-                  <div className="text-2xl font-bold font-mono text-brand-red-400">{fmt(currentTotal)} / yr</div>
+                  <div className="text-xl sm:text-2xl font-bold font-mono text-brand-red-400">{fmt(currentTotal)} / yr</div>
                 </div>
               </div>
-              <div className="flex-1 w-full flex items-center justify-center">
+              <div className="flex-1 w-full min-w-0">
                 <ProjectionChart baseCost={currentTotal} newCost={currentTotal - res.annualSavings} config={config} sizeIndex={sizeIndex} />
               </div>
             </div>

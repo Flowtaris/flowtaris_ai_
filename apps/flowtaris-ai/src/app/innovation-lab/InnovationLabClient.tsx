@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { HeroPattern } from '@repo/ui'
 import { Section, Container, Stack, Grid, Card, CardHeader, CardTitle, CardContent, Button, Badge, Input, FloatingProduct } from '@repo/ui'
 import { ArrowRight, ChevronRight, Brain, Zap, FlaskConical, BarChart3, BookOpen, Lightbulb, Rocket, Target, Eye, Github, Twitter, Linkedin, ExternalLink, Clock, Calendar, Users, Award, CheckCircle, Loader2, Mail } from 'lucide-react'
@@ -303,415 +304,269 @@ export default function InnovationLabClient() {
     }
   }, [])
 
+  const heroRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  })
+  
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
+  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0])
+
   return (
-    <div className="flex flex-col flex-1 w-full">
-      <HeroPattern
-        headline={{
-          text: 'Innovation<br/>Lab',
-          split: ['words', 'lines'],
-          className: 'text-display-xl text-gradient-brand text-balance',
-        }}
-        subheadline={{
-          text: 'Cutting-edge research on conversational ERP, GenAI document understanding, predictive finance, and AI governance. Open benchmarks, model cards, and experimental prototypes.',
-          shape: 'wave',
-          className: 'text-headline-lg text-neutral-300 dark:text-neutral-400 text-balance max-w-3xl',
-        }}
-        cta={{
-          primary: { label: 'View Benchmarks', variant: 'default', className: 'glass-strong', href: '#benchmarks' },
-          secondary: { label: 'Read Publications', variant: 'outline', className: 'glass', href: '#publications' },
-        }}
-        stats={{
-          items: [
-            { label: '6', value: 'Research Areas' },
-            { label: '15+', value: 'Publications' },
-            { label: '4', value: 'Open Benchmarks' },
-            { label: '25', value: 'Team Members' },
-          ],
-        }}
-        scrollIndicator={true}
-        vignette={true}
-        noise={true}
-      />
+    <div className="flex flex-col flex-1 w-full bg-[#0a0812]">
+      {/* --- CUSTOM 3D ANIMATED HERO --- */}
+      <motion.section 
+        ref={heroRef}
+        className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden pt-20"
+      >
+        {/* Animated Background Gradients & Grids */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
+          <motion.div 
+            style={{ y, opacity }}
+            className="absolute -top-[40%] -left-[20%] w-[70%] h-[70%] rounded-full bg-brand-cyan-500/10 blur-[120px]" 
+          />
+          <motion.div 
+            style={{ y: useTransform(scrollYProgress, [0, 1], ["0%", "80%"]), opacity }}
+            className="absolute top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-brand-purple-500/10 blur-[120px]" 
+          />
+        </div>
 
-      <main className="flex-1 w-full">
-        {/* Research Areas */}
-        <section className="py-24 px-6" aria-labelledby="research-heading">
+        <Container size="xl" className="relative z-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="flex flex-col items-center"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-cyan-500/30 bg-brand-cyan-500/10 backdrop-blur-md mb-8">
+              <FlaskConical className="h-4 w-4 text-brand-cyan-400" />
+              <span className="text-[12px] font-mono tracking-[0.2em] text-brand-cyan-300 uppercase">Research & Development</span>
+            </div>
+            
+            <h1 className="text-display-2xl md:text-[120px] font-black tracking-tighter leading-[0.9] text-transparent bg-clip-text bg-gradient-to-br from-white via-neutral-200 to-neutral-600 mb-6 drop-shadow-2xl">
+              Innovation<br/>
+              <span className="text-gradient-brand">Lab</span>
+            </h1>
+            
+            <p className="text-headline-lg md:text-display-sm text-neutral-400 max-w-3xl mx-auto text-balance mb-12">
+              Cutting-edge research on <span className="text-white">conversational ERP</span>, <span className="text-white">GenAI document understanding</span>, and <span className="text-white">predictive finance</span>.
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <Button size="lg" className="glass-strong px-8 hover:ring-2 hover:ring-brand-cyan-500/50 transition-all duration-300" asChild>
+                <a href="#research-tracks">Explore Tracks <ArrowRight className="ml-2 h-5 w-5" /></a>
+              </Button>
+              <Button size="lg" variant="outline" className="glass px-8 hover:bg-white/5 transition-all duration-300" asChild>
+                <a href="#benchmarks">View Benchmarks</a>
+              </Button>
+            </div>
+          </motion.div>
+        </Container>
+      </motion.section>
+
+      <main className="flex-1 w-full relative z-20 bg-[#0a0812]">
+        
+        {/* --- INTERACTIVE BENTO / STICKY RESEARCH TRACKS --- */}
+        <section id="research-tracks" className="py-32 px-6 relative" aria-labelledby="research-heading">
           <Container size="xl">
-            <Stack gap={12} className="w-full">
-              <header className="text-center max-w-3xl mx-auto">
-                <h2 id="research-heading" className="text-display-md text-gradient-brand text-balance mb-6">
-                  Active Research Areas
-                </h2>
-                <p className="text-headline-md text-neutral-400 text-balance">
-                  Six tracks pushing the boundary of what's possible in enterprise finance AI
-                </p>
-              </header>
+            <header className="text-center max-w-3xl mx-auto mb-24">
+              <h2 id="research-heading" className="text-display-lg text-gradient-brand text-balance mb-6">
+                Active Research Tracks
+              </h2>
+              <p className="text-headline-md text-neutral-400 text-balance">
+                Six tracks pushing the boundary of what's possible in enterprise finance AI.
+              </p>
+            </header>
 
-              <div className="w-full flex justify-center py-12 relative mb-16">
-                 {/* Decorative background glow */}
-                 <div className="absolute inset-0 bg-brand-cyan-500/5 blur-[120px] rounded-full pointer-events-none" />
-                 
-                 <div className="relative z-10 w-full max-w-[1000px]">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-brand-cyan-500/20 via-brand-emerald-500/20 to-brand-cyan-500/20 rounded-[28px] blur-md" />
-                    <div className="relative rounded-[24px] border border-white/10 bg-[#0d0b14]/80 backdrop-blur-xl p-2 shadow-2xl">
-                      {/* Top bar (mock terminal/dashboard header) */}
-                      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 mb-2">
-                        <div className="flex gap-2">
-                          <div className="w-2.5 h-2.5 rounded-full bg-white/20" />
-                          <div className="w-2.5 h-2.5 rounded-full bg-white/20" />
-                          <div className="w-2.5 h-2.5 rounded-full bg-white/20" />
-                        </div>
-                        <div className="text-[10px] font-mono text-brand-cyan-400/70 tracking-widest uppercase flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan-400 animate-pulse" />
-                          Live Neural Vector Graph
-                        </div>
-                        <div className="text-[10px] font-mono text-white/30">
-                          LAB_ENV_PROD_v2.4
-                        </div>
-                      </div>
-                      
-                      {/* Main Image */}
-                      <div className="relative overflow-hidden rounded-xl border border-white/5 group">
-                        <FloatingProduct
-                          src="/images/innovation_lab_abstract_viz.jpg"
-                          alt="Abstract Neural Network Data Visualization"
-                          frames={['/images/innovation_lab_abstract_viz.jpg']}
-                          mouseParallax={true}
-                          parallaxStrength={0.15}
-                          autoRotate={false}
-                          width={1000}
-                          height={500}
-                          borderRadius="12px"
-                          shadow={false}
-                        />
-                        {/* Overlay scanline effect */}
-                        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100%_4px] mix-blend-overlay opacity-50" />
-                        <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(13,11,20,0.8)] pointer-events-none" />
-                      </div>
-                    </div>
-                 </div>
-              </div>
+            <div className="flex flex-col gap-32">
+              {researchAreas.map((area, i) => {
+                // Assign unique visuals based on track
+                const imageMap: Record<string, string> = {
+                  'predictive-finance': '/images/predictive_finance_viz.jpg',
+                  'agentic-workflows': '/images/agentic_workflow_viz.jpg',
+                }
+                const imageSrc = imageMap[area.id] || '/images/innovation_lab_abstract_viz.jpg'
 
-              <Grid columns={{ base: 1, md: 2, lg: 3 }} gap={6} className="w-full">
-                {researchAreas.map((area, i) => (
-                  <Card
+                const isEven = i % 2 === 0;
+
+                return (
+                  <motion.div 
                     key={area.id}
                     id={`research-${area.id}`}
-                    className={`glass-card h-full group interactive ${highlightId === area.id ? 'ring-2 ring-brand-cyan-500/50' : ''}`}
-                    style={{ animationDelay: `${i * 100}ms` }}
-                    onClick={() => highlightId === area.id && setHighlightId(null)}
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-20%" }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-12 lg:gap-24 items-center`}
                   >
-                    <CardHeader>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="w-10 h-10 rounded-xl bg-brand-cyan-500/20 flex items-center justify-center">
-                          <FlaskConical className="h-5 w-5 text-brand-cyan-400" />
+                    {/* Visual Side (Bento styling) */}
+                    <div className="w-full lg:w-1/2">
+                      <div className="relative group perspective-1000">
+                        <div className="absolute -inset-4 bg-gradient-to-r from-brand-cyan-500/20 to-brand-purple-500/20 rounded-[32px] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        <div className="relative rounded-[24px] overflow-hidden border border-white/10 bg-[#13111c] shadow-2xl transition-transform duration-700 ease-out group-hover:scale-[1.02] group-hover:rotate-y-2">
+                           <div className="flex items-center px-4 py-3 border-b border-white/5 bg-black/40">
+                             <div className="flex gap-2">
+                               <div className="w-3 h-3 rounded-full bg-neutral-600" />
+                               <div className="w-3 h-3 rounded-full bg-neutral-600" />
+                               <div className="w-3 h-3 rounded-full bg-neutral-600" />
+                             </div>
+                             <div className="mx-auto text-[10px] font-mono tracking-widest text-brand-cyan-400 uppercase opacity-70">
+                               TRACK_{area.id.toUpperCase().replace('-', '_')}
+                             </div>
+                           </div>
+                           <img 
+                             src={imageSrc} 
+                             alt={area.title}
+                             className="w-full h-auto object-cover transform transition-transform duration-1000 group-hover:scale-105 opacity-90 mix-blend-screen"
+                           />
                         </div>
-                        <Badge variant={statusColors[area.status as keyof typeof statusColors]} className="text-body-xs">
-                          {statusLabels[area.status as keyof typeof statusLabels]}
-                        </Badge>
                       </div>
-                      <CardTitle className="text-headline-sm">{area.title}</CardTitle>
-                      <p className="text-body-sm text-brand-cyan-300">{area.timeline}</p>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-body-md text-neutral-300">{area.description}</p>
+                    </div>
 
-                      <div className="flex flex-wrap gap-1.5">
-                        {area.metrics.map((metric) => (
-                          <Badge key={metric} variant="ghost" className="text-body-xs px-2 py-1">
-                            {metric}
-                          </Badge>
+                    {/* Content Side */}
+                    <div className="w-full lg:w-1/2 flex flex-col items-start text-left">
+                      <Badge variant={statusColors[area.status as keyof typeof statusColors]} className="text-body-sm px-3 py-1 mb-6 glass-strong uppercase tracking-widest">
+                        {statusLabels[area.status as keyof typeof statusLabels]}
+                      </Badge>
+                      <h3 className="text-display-sm text-white mb-6 leading-tight">{area.title}</h3>
+                      <p className="text-headline-sm text-neutral-400 mb-8 max-w-lg">{area.description}</p>
+                      
+                      <div className="grid grid-cols-2 gap-4 w-full max-w-lg mb-8">
+                        {area.metrics.map((metric, idx) => (
+                          <div key={idx} className="glass rounded-xl p-4 border border-white/5 hover:border-brand-cyan-500/30 transition-colors duration-300">
+                            <span className="block text-body-sm text-brand-cyan-300 font-mono mb-1">{metric.split(':')[0]}</span>
+                            <span className="block text-headline-sm text-white">{metric.split(':')[1] || metric}</span>
+                          </div>
                         ))}
                       </div>
 
-                      <div className="flex items-center justify-between text-body-xs text-neutral-400 pt-4 border-t border-white/10">
-                        <span>Team: {area.team}</span>
-                        <span>Papers: {area.publications}</span>
-                      </div>
-
-                      <div className="flex gap-2 pt-4">
+                      <div className="flex gap-4">
                         {area.demoUrl && (
-                          <Button variant="ghost" size="sm" className="flex-1" asChild>
+                          <Button variant="default" className="glass-strong" asChild>
                             <a href={area.demoUrl} target="_blank" rel="noopener noreferrer">
-                              <Eye className="mr-2 h-4 w-4" />
-                              Demo
+                              <Eye className="mr-2 h-4 w-4" /> Live Demo
                             </a>
                           </Button>
                         )}
                         {area.githubUrl && (
-                          <Button variant="ghost" size="sm" className="flex-1" asChild>
+                          <Button variant="outline" className="glass" asChild>
                             <a href={area.githubUrl} target="_blank" rel="noopener noreferrer">
-                              <Github className="mr-2 h-4 w-4" />
-                              Code
+                              <Github className="mr-2 h-4 w-4" /> Source Code
                             </a>
                           </Button>
                         )}
                       </div>
-                      {highlightId === area.id && (
-                        <div className="flex items-center gap-2 text-body-xs text-brand-cyan-400 pt-2 border-t border-brand-cyan-500/20">
-                          <span>← Deep-linked from assessment results. Click to dismiss highlight.</span>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </Grid>
-            </Stack>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
           </Container>
         </section>
 
-        {/* Open Benchmarks */}
-        <section id="benchmarks" className="py-24 px-6 bg-gradient-to-b from-brand-navy-900/50 to-transparent" aria-labelledby="benchmarks-heading">
-          <Container size="xl">
+        {/* Open Benchmarks (Preserved but styled up) */}
+        <section id="benchmarks" className="py-32 px-6 bg-gradient-to-b from-[#13111c] to-[#0a0812] relative overflow-hidden" aria-labelledby="benchmarks-heading">
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-cyan-500/5 rounded-full blur-[150px] pointer-events-none" />
+          <Container size="xl" className="relative z-10">
             <Stack gap={12} className="w-full">
               <header className="text-center max-w-3xl mx-auto">
-                <h2 id="benchmarks-heading" className="text-display-md text-gradient-brand text-balance mb-6">
+                <h2 id="benchmarks-heading" className="text-display-md text-white mb-6">
                   Open Benchmarks
                 </h2>
-                <p className="text-headline-md text-neutral-400 text-balance">
+                <p className="text-headline-md text-neutral-400">
                   Reproducible, transparent benchmarks for finance AI. Data, code, and methodology open-sourced.
                 </p>
               </header>
 
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {benchmarks.map((benchmark, i) => (
-                  <Card key={benchmark.name} className="glass-card group interactive" style={{ animationDelay: `${i * 100}ms` }}>
-                    <CardContent className="p-8">
-                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-3">
-                            <Badge variant={benchmark.status === 'Published' ? 'success' : benchmark.status === 'In Progress' ? 'warning' : 'ghost'} className="text-body-xs">
-                              {benchmark.status}
-                            </Badge>
-                            <span className="text-body-xs text-neutral-400">{benchmark.date}</span>
-                          </div>
-                          <h3 className="text-headline-lg text-white mb-2 group-hover:text-brand-cyan-300 transition-colors">{benchmark.name}</h3>
-                          <p className="text-body-md text-neutral-400 mb-4">{benchmark.description}</p>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1, duration: 0.5 }}
+                    key={benchmark.name}
+                  >
+                    <Card className="glass-card group hover:border-brand-cyan-500/30 transition-all duration-500 h-full">
+                      <CardContent className="p-8 flex flex-col h-full">
+                        <div className="flex items-center gap-3 mb-6">
+                          <Badge variant={benchmark.status === 'Published' ? 'success' : benchmark.status === 'In Progress' ? 'warning' : 'ghost'} className="text-body-xs uppercase tracking-wider">
+                            {benchmark.status}
+                          </Badge>
+                          <span className="text-body-xs text-neutral-500 font-mono">{benchmark.date}</span>
+                        </div>
+                        <h3 className="text-headline-lg text-white mb-4 group-hover:text-brand-cyan-300 transition-colors">{benchmark.name}</h3>
+                        <p className="text-body-md text-neutral-400 mb-8 flex-1">{benchmark.description}</p>
+                        
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-6 border-t border-white/5">
                           <div className="flex flex-wrap gap-2">
                             {benchmark.metrics.map((metric) => (
-                              <Badge key={metric} variant="outline" className="text-body-sm px-3 py-1">
+                              <Badge key={metric} variant="outline" className="text-body-xs px-2 py-1 bg-white/5">
                                 {metric}
                               </Badge>
                             ))}
                           </div>
-                        </div>
-                        <div className="flex gap-3">
-                          <Button variant="ghost" size="sm" asChild>
-                            <a href={benchmark.url} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="mr-2 h-4 w-4" />
-                              View Results
-                            </a>
-                          </Button>
-                          <Button variant="ghost" size="sm" asChild>
-                            <a href={benchmark.github} target="_blank" rel="noopener noreferrer">
-                              <Github className="mr-2 h-4 w-4" />
-                              Code & Data
-                            </a>
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </Stack>
-          </Container>
-        </section>
-
-        {/* Publications */}
-        <section id="publications" className="py-24 px-6" aria-labelledby="publications-heading">
-          <Container size="xl">
-            <Stack gap={12} className="w-full">
-              <header className="text-center max-w-3xl mx-auto">
-                <h2 id="publications-heading" className="text-display-md text-gradient-brand text-balance mb-6">
-                  Publications & Thought Leadership
-                </h2>
-                <p className="text-headline-md text-neutral-400 text-balance">
-                  Peer-reviewed papers, whitepapers, and technical articles from our research team
-                </p>
-              </header>
-
-              <div className="space-y-4">
-                {publications.map((pub, i) => (
-                  <Card key={pub.title} className="glass-card group interactive" style={{ animationDelay: `${i * 100}ms` }}>
-                    <CardContent className="p-6">
-                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <Badge variant="outline" className="text-body-xs">{pub.type}</Badge>
-                            <span className="text-body-xs text-neutral-400">{new Date(pub.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm" className="hover:bg-brand-cyan-500/10 hover:text-brand-cyan-300" asChild>
+                              <a href={benchmark.url} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-4 w-4" />
+                              </a>
+                            </Button>
+                            <Button variant="ghost" size="sm" className="hover:bg-white/10" asChild>
+                              <a href={benchmark.github} target="_blank" rel="noopener noreferrer">
+                                <Github className="h-4 w-4" />
+                              </a>
+                            </Button>
                           </div>
-                          <h3 className="text-headline-md text-white mb-2 group-hover:text-brand-cyan-300 transition-colors">{pub.title}</h3>
-                          <p className="text-body-sm text-neutral-400">{pub.venue}</p>
-                          <p className="text-body-sm text-neutral-500 mt-1">Authors: {pub.authors.join(', ')}</p>
                         </div>
-                        <Button variant="ghost" size="sm" asChild>
-                          <a href={pub.url} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="mr-2 h-4 w-4" />
-                            Read
-                          </a>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
                 ))}
               </div>
             </Stack>
           </Container>
         </section>
 
-        {/* Team */}
-        <section className="py-24 px-6 bg-gradient-to-b from-brand-navy-900/50 to-transparent" aria-labelledby="team-heading">
-          <Container size="xl">
-            <Stack gap={12} className="w-full">
-              <header className="text-center max-w-3xl mx-auto">
-                <h2 id="team-heading" className="text-display-md text-gradient-brand text-balance mb-6">
-                  Lab Team
-                </h2>
-                <p className="text-headline-md text-neutral-400 text-balance">
-                  Researchers, engineers, and domain experts pushing finance AI forward
-                </p>
-              </header>
-
-              <Grid columns={{ base: 1, md: 2, lg: 3 }} gap={6} className="w-full max-w-4xl mx-auto">
-                {team.map((member, i) => (
-                  <Card key={member.name} className="glass-card text-center h-full" style={{ animationDelay: `${i * 100}ms` }}>
-                    <CardContent className="p-8">
-                      <div className="w-20 h-20 rounded-full bg-brand-cyan-500/20 flex items-center justify-center mx-auto mb-4 text-2xl font-display text-brand-cyan-400">
-                        {member.avatar}
-                      </div>
-                      <h4 className="text-headline-sm text-white mb-1">{member.name}</h4>
-                      <Badge variant="outline" className="text-body-xs mb-4">{member.role}</Badge>
-                      <p className="text-body-sm text-neutral-400">Focus: {member.focus}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Grid>
-            </Stack>
-          </Container>
-        </section>
-
-        {/* Get Involved */}
-        <section className="py-24 px-6" aria-labelledby="involved-heading">
-          <Container size="xl">
-            <Stack gap={12} className="w-full max-w-3xl mx-auto text-center">
-              <header>
-                <h2 id="involved-heading" className="text-display-md text-gradient-brand text-balance mb-6">
-                  Get Involved
-                </h2>
-                <p className="text-headline-md text-neutral-400 text-balance">
-                  We collaborate with academia, industry partners, and open-source community
-                </p>
-              </header>
-
-              <Grid columns={{ base: 1, md: 3 }} gap={6} className="w-full">
-                <Card className="glass-card h-full">
-                  <CardHeader>
-                    <div className="w-10 h-10 rounded-xl bg-brand-cyan-500/20 flex items-center justify-center mx-auto mb-4">
-                      <Github className="h-5 w-5 text-brand-cyan-400" />
-                    </div>
-                    <CardTitle className="text-headline-sm text-center">Open Source</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-body-sm text-neutral-400 text-center mb-6">Contribute to our benchmarks, models, and tools on GitHub</p>
-                    <Button variant="ghost" className="w-full" asChild>
-                      <a href="https://github.com/flowtaris-ai" target="_blank" rel="noopener noreferrer">
-                        View Repositories
-                        <ExternalLink className="ml-2 h-4 w-4" />
-                      </a>
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass-card h-full">
-                  <CardHeader>
-                    <div className="w-10 h-10 rounded-xl bg-brand-purple-500/20 flex items-center justify-center mx-auto mb-4">
-                      <BookOpen className="h-5 w-5 text-brand-purple-400" />
-                    </div>
-                    <CardTitle className="text-headline-sm text-center">Research Collaboration</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-body-sm text-neutral-400 text-center mb-6">Partner with us on joint research, benchmarking, or academic publications</p>
-                    <Button variant="ghost" className="w-full" asChild>
-                      <a href="mailto:research@flowtaris.ai">
-                        Contact Research Team
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </a>
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass-card h-full">
-                  <CardHeader>
-                    <div className="w-10 h-10 rounded-xl bg-brand-green-500/20 flex items-center justify-center mx-auto mb-4">
-                      <Users className="h-5 w-5 text-brand-green-400" />
-                    </div>
-                    <CardTitle className="text-headline-sm text-center">Join the Team</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-body-sm text-neutral-400 text-center mb-6">We're hiring ML researchers, engineers, and finance domain experts</p>
-                    <Button variant="ghost" className="w-full" asChild>
-                      <a href="/careers">
-                        View Open Roles
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </a>
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              {/* Design Partner Program Waitlist */}
-              <div className="pt-8">
-                <Card className="glass-strong border border-brand-cyan-500/30 bg-gradient-to-r from-brand-cyan-500/5 to-transparent max-w-2xl mx-auto">
-                  <CardHeader className="text-center">
-                    <div className="w-12 h-12 rounded-xl bg-brand-cyan-500/20 flex items-center justify-center mx-auto mb-4">
-                      <Rocket className="h-6 w-6 text-brand-cyan-400" />
-                    </div>
-                    <CardTitle className="text-headline-lg">Join the Design Partner Program</CardTitle>
-                    <p className="text-body-md text-neutral-300 mt-2">
-                      Get early access to pilot capabilities, influence product roadmap, and co-design with our research team
-                    </p>
-                  </CardHeader>
-                  <CardContent>
-                    <WaitlistForm capabilitySlug="conversational-erp" />
-                  </CardContent>
-                </Card>
-              </div>
-            </Stack>
-          </Container>
-        </section>
-
-        {/* Newsletter */}
-        <section className="py-24 px-6 bg-gradient-to-b from-brand-navy-900/50 to-transparent">
+        {/* Newsletter & Footer CTA */}
+        <section className="py-32 px-6">
           <Container size="lg">
-            <div className="glass-strong rounded-3xl p-8 md:p-12 text-center border border-brand-cyan-500/30 bg-gradient-to-r from-brand-cyan-500/5 to-transparent">
-              <Lightbulb className="h-10 w-10 text-brand-cyan-400 mx-auto mb-6" />
-              <h2 className="text-display-lg text-gradient-brand mb-4 text-balance">
-                Stay at the Frontier
-              </h2>
-              <p className="text-headline-md text-neutral-300 mb-8 max-w-2xl mx-auto text-balance">
-                Monthly updates on new research, benchmark results, open-source releases, and lab experiments. No spam.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
-                <Input
-                  type="email"
-                  placeholder="researcher@university.edu"
-                  className="flex-1 glass max-w-md"
-                />
-                <Button size="lg" className="glass-strong px-10 py-4" asChild>
-                  <a href="#lab-newsletter">
-                    Subscribe to Lab Notes
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </a>
-                </Button>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative rounded-[40px] p-8 md:p-16 text-center border border-white/10 bg-[#13111c] overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-brand-cyan-500/10 via-transparent to-brand-purple-500/10 opacity-50" />
+              <div className="relative z-10">
+                <Lightbulb className="h-12 w-12 text-brand-cyan-400 mx-auto mb-8 animate-pulse" />
+                <h2 className="text-display-lg text-white mb-6">
+                  Stay at the Frontier
+                </h2>
+                <p className="text-headline-md text-neutral-400 mb-10 max-w-2xl mx-auto">
+                  Monthly updates on new research, benchmark results, open-source releases, and lab experiments. No spam.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+                  <Input
+                    type="email"
+                    placeholder="researcher@university.edu"
+                    className="flex-1 glass max-w-md h-14 text-lg px-6 rounded-2xl"
+                  />
+                  <Button size="lg" className="h-14 px-10 rounded-2xl bg-white text-black hover:bg-neutral-200 transition-colors" asChild>
+                    <a href="#lab-newsletter">
+                      Subscribe <ArrowRight className="ml-2 h-5 w-5" />
+                    </a>
+                  </Button>
+                </div>
+                <p className="text-body-xs text-neutral-500">Read our <a href="/privacy" className="underline hover:text-white">Privacy Policy</a>.</p>
               </div>
-              <p className="text-body-xs text-neutral-500">Read our <a href="/privacy" className="underline hover:text-brand-cyan-400">Privacy Policy</a>.</p>
-            </div>
+            </motion.div>
           </Container>
         </section>
       </main>
-
-
     </div>
   )
 }

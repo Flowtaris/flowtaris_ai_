@@ -118,9 +118,12 @@ export async function POST(request: NextRequest) {
         </html>
       `
 
+      const supportEmail = process.env.FLOWTARIS_SUPPORT_EMAIL || 'support@flowtaris.com'
+      const adminEmail = process.env.FLOWTARIS_ADMIN_EMAIL
+
       const { error: emailError } = await resend.emails.send({
-        from: `Flowtaris AI <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>`,
-        to: [process.env.RESEND_TO_EMAIL || email],
+        from: `Flowtaris AI <${supportEmail}>`,
+        to: [email],
         subject: `Your Flowtaris AI Readiness Report — Score: ${result.leadScore}/100`,
         html: emailHtml,
       })
@@ -128,6 +131,22 @@ export async function POST(request: NextRequest) {
       if (emailError) {
         console.error('Resend error:', emailError)
         // Still return success if DB save worked — don't fail the whole request
+      }
+
+      // ─── ADMIN NOTIFICATION ───
+      if (adminEmail) {
+        const adminHtml = `
+          <h2>New Assessment Lead</h2>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Score:</strong> ${result.leadScore}/100</p>
+          <p><strong>Top Recommendation:</strong> ${result.matches[0]?.title || 'N/A'}</p>
+        `
+        await resend.emails.send({
+          from: `Flowtaris Alerts <${supportEmail}>`,
+          to: adminEmail.split(',').map(e => e.trim()),
+          subject: `🔥 New Assessment Lead: ${email}`,
+          html: adminHtml,
+        }).catch(err => console.error('Admin email error:', err))
       }
     } else {
       console.log('RESEND_API_KEY not set or no result data. Skipping email.')

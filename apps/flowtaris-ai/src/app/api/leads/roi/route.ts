@@ -65,9 +65,12 @@ export async function POST(request: NextRequest) {
         </div>
       `
 
+      const supportEmail = process.env.FLOWTARIS_SUPPORT_EMAIL || 'support@flowtaris.com'
+      const adminEmail = process.env.FLOWTARIS_ADMIN_EMAIL
+
       const { data: resendData, error: resendError } = await resend.emails.send({
-        from: `Flowtaris AI <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>`,
-        to: [process.env.RESEND_TO_EMAIL || email],
+        from: `Flowtaris AI <${supportEmail}>`,
+        to: [email],
         subject: 'Your Flowtaris ROI Projections',
         html: emailHtml,
       })
@@ -75,6 +78,24 @@ export async function POST(request: NextRequest) {
       if (resendError) {
         console.error('Resend error:', resendError)
         return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
+      }
+
+      // ─── ADMIN NOTIFICATION ───
+      if (adminEmail) {
+        const adminHtml = `
+          <h2>New ROI Lead</h2>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Platform:</strong> ${inputs.erp}</p>
+          <p><strong>Use Case:</strong> ${inputs.useCase}</p>
+          <p><strong>Net Annual Savings:</strong> $${outputs.res?.annualSavings?.toLocaleString() || 0}</p>
+          <p><strong>FTE Freed:</strong> ${outputs.res?.fteFreed || 0}</p>
+        `
+        await resend.emails.send({
+          from: `Flowtaris Alerts <${supportEmail}>`,
+          to: adminEmail.split(',').map(e => e.trim()),
+          subject: `💰 New ROI Lead: ${email}`,
+          html: adminHtml,
+        }).catch(err => console.error('Admin email error:', err))
       }
     } else {
        console.log('RESEND_API_KEY not found. Skipping email send.')

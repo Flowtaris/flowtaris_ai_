@@ -46,15 +46,16 @@ export async function POST(request: NextRequest) {
 
     // 2. Send confirmation + internal alert via Resend
     if (resend) {
-      const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
-      const toOverride = process.env.RESEND_TO_EMAIL
+      const supportEmail = process.env.FLOWTARIS_SUPPORT_EMAIL || 'support@flowtaris.com'
+      const adminEmail = process.env.FLOWTARIS_ADMIN_EMAIL
 
       // Internal notification to team
-      await resend.emails.send({
-        from: `Flowtaris AI <${fromEmail}>`,
-        to: [toOverride || 'leads@flowtaris.ai'],
-        subject: `📋 New Demo Request — ${name || email} (${company || 'Unknown Co.'})`,
-        html: `
+      if (adminEmail) {
+        await resend.emails.send({
+          from: `Flowtaris Alerts <${supportEmail}>`,
+          to: adminEmail.split(',').map(e => e.trim()),
+          subject: `📋 New Demo Request — ${name || email} (${company || 'Unknown Co.'})`,
+          html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1a1a2e;">
             <h2 style="margin: 0 0 8px; font-size: 22px;">New Demo Request</h2>
             <p style="color: #64748b; margin: 0 0 24px;">Someone just booked a demo on Flowtaris AI.</p>
@@ -67,24 +68,23 @@ export async function POST(request: NextRequest) {
             </table>
           </div>
         `,
-      }).catch(e => console.error('Failed to send internal demo alert:', e))
-
-      // Confirmation to the requester (only if not in sandbox override mode)
-      if (!toOverride) {
-        await resend.emails.send({
-          from: `Flowtaris AI <${fromEmail}>`,
-          to: [email],
-          subject: `Your demo request has been received — Flowtaris AI`,
-          html: `
-            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1a1a2e;">
-              <h2 style="margin: 0 0 8px;">Hi ${name || 'there'},</h2>
-              <p style="color: #374151; line-height: 1.7;">Thank you for requesting a demo of <strong>Flowtaris AI</strong>. Our solutions team will be in touch within 1 business day to schedule your technical review.</p>
-              <p style="color: #374151; line-height: 1.7;">In the meantime, you can explore more about how we automate finance operations at <a href="https://flowtaris.ai" style="color: #0ea5e9;">flowtaris.ai</a>.</p>
-              <p style="color: #94a3b8; font-size: 13px; margin-top: 32px;">— The Flowtaris Team</p>
-            </div>
-          `,
-        }).catch(e => console.error('Failed to send demo confirmation to user:', e))
+        }).catch(e => console.error('Failed to send internal demo alert:', e))
       }
+
+      // Confirmation to the requester
+      await resend.emails.send({
+        from: `Flowtaris AI <${supportEmail}>`,
+        to: [email],
+        subject: `Your demo request has been received — Flowtaris AI`,
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1a1a2e;">
+            <h2 style="margin: 0 0 8px;">Hi ${name || 'there'},</h2>
+            <p style="color: #374151; line-height: 1.7;">Thank you for requesting a demo of <strong>Flowtaris AI</strong>. Our solutions team will be in touch within 1 business day to schedule your technical review.</p>
+            <p style="color: #374151; line-height: 1.7;">In the meantime, you can explore more about how we automate finance operations at <a href="https://flowtaris.ai" style="color: #0ea5e9;">flowtaris.ai</a>.</p>
+            <p style="color: #94a3b8; font-size: 13px; margin-top: 32px;">— The Flowtaris Team</p>
+          </div>
+        `,
+      }).catch(e => console.error('Failed to send demo confirmation to user:', e))
     } else {
       console.log('RESEND_API_KEY not set — skipping email notification')
     }

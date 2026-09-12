@@ -444,7 +444,7 @@ export default function InnovationLabClient() {
 
                       <div className="flex gap-4">
                         {area.demoUrl && (
-                          <Button variant="default" className="glass-strong" asChild>
+                          <Button className="glass-strong" asChild>
                             <a href={area.demoUrl} target="_blank" rel="noopener noreferrer">
                               <Eye className="mr-2 h-4 w-4" /> Live Demo
                             </a>

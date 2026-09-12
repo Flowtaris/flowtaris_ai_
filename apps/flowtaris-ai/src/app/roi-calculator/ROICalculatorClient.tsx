@@ -93,7 +93,7 @@ function MarketTicker({ config }: { config: typeof DEFAULT_ROI_CONFIG }) {
 }
 
 // ─── Custom SVG Area Chart ──────────────────────────────────────────────────
-function ProjectionChart({ baseCost, newCost, config }: { baseCost: number, newCost: number, config: typeof DEFAULT_ROI_CONFIG }) {
+function ProjectionChart({ baseCost, newCost, config, sizeIndex }: { baseCost: number, newCost: number, config: typeof DEFAULT_ROI_CONFIG, sizeIndex: number }) {
   const b1 = baseCost, b2 = baseCost * 1.1, b3 = baseCost * 1.21
   const n1 = newCost, n2 = newCost * 0.8, n3 = newCost * 0.82
   const maxVal = Math.max(b3) * 1.1
@@ -118,9 +118,16 @@ function ProjectionChart({ baseCost, newCost, config }: { baseCost: number, newC
         <circle cx={w} cy={getY(b3)} r={4} fill="#ef4444" />
         <circle cx={w} cy={getY(n3)} r={4} fill="#10b981" />
         <line x1={w} y1={getY(b3)} x2={w} y2={getY(n3)} stroke="rgba(255,255,255,0.2)" strokeDasharray="2 2" />
+        {/* Dynamic Vertical Laser Scanner synchronized with the slider */}
+        <g style={{ transform: `translateX(${(sizeIndex / 100) * w}px)`, transition: 'transform 0.1s linear' }}>
+          <line x1={0} y1={0} x2={0} y2={h} stroke="url(#scannerGlow)" strokeWidth={1.5} />
+          <polygon points="-4,0 4,0 0,6" fill="#06b6d4" />
+          <polygon points="-4,280 4,280 0,274" fill="#06b6d4" />
+        </g>
         <defs>
           <linearGradient id="gradRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#ef4444" stopOpacity="0.8" /><stop offset="100%" stopColor="#ef4444" stopOpacity="0" /></linearGradient>
           <linearGradient id="gradGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#10b981" stopOpacity="0.8" /><stop offset="100%" stopColor="#10b981" stopOpacity="0" /></linearGradient>
+          <linearGradient id="scannerGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#06b6d4" stopOpacity="0" /><stop offset="50%" stopColor="#06b6d4" stopOpacity="1" /><stop offset="100%" stopColor="#06b6d4" stopOpacity="0" /></linearGradient>
         </defs>
       </svg>
       <div className="absolute left-12 right-0 -bottom-6 flex justify-between text-[11px] text-white/40 font-medium">
@@ -201,18 +208,34 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          inputs: { erp, useCase, sizeIndex },
-          outputs: { res },
+          inputs: { 
+            erp, 
+            useCase, 
+            sizeIndex,
+            invoiceVolume: m.vol,
+            fteCount: Math.ceil((m.vol * m.hrs) / 2000)
+          },
+          outputs: { 
+            res,
+            coi: {
+              attritionCost: m.attritionCost,
+              complianceRisk: m.complianceCost
+            }
+          },
           email,
           assessment_id: null
         })
       })
-      if (!resp.ok) throw new Error('Failed to send')
+      if (!resp.ok) {
+        setShowErrorPopup(true)
+        setTimeout(() => setShowErrorPopup(false), 3000)
+        throw new Error('Failed to send')
+      }
+      setSent(true)
     } catch (err) {
       console.error(err)
     } finally {
       setIsSimulating(false)
-      setSent(true)
     }
   }
 
@@ -254,9 +277,9 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
             
             <div className="relative">
               {showTooltip && (
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-brand-cyan-500 text-black text-[10px] font-bold px-3 py-1.5 rounded-full shadow-[0_0_15px_rgba(6,182,212,0.5)] whitespace-nowrap animate-in fade-in slide-in-from-bottom-2 duration-300 z-20">
+                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white text-black text-[10px] font-extrabold px-3 py-1.5 rounded-full shadow-[0_0_25px_rgba(255,255,255,0.8)] whitespace-nowrap animate-in fade-in slide-in-from-bottom-2 duration-300 z-20">
                   Slide to adjust volume
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-brand-cyan-500 rotate-45"></div>
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45"></div>
                 </div>
               )}
               <input type="range" min="0" max="100" value={sizeIndex} onChange={e => { setSizeIndex(parseInt(e.target.value)); setShowTooltip(false); }} 
@@ -309,7 +332,7 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
                 </div>
               </div>
               <div className="flex-1 w-full flex items-center justify-center">
-                <ProjectionChart baseCost={currentTotal} newCost={currentTotal - res.annualSavings} config={config} />
+                <ProjectionChart baseCost={currentTotal} newCost={currentTotal - res.annualSavings} config={config} sizeIndex={sizeIndex} />
               </div>
             </div>
           </div>

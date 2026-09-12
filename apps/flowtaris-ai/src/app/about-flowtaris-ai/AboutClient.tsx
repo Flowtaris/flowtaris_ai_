@@ -24,11 +24,13 @@ export const DEFAULT_ABOUT_DATA = {
       label: 'Calculate ROI',
       href: '/roi-calculator'
     },
+    // P1 #4 — Removed unsupported stats: 99.5%+, 14,000+, $21M+.
+    // Using capability-led, evidence-safe language per the Required Changes Report.
     stats: [
-      { value: '99.5%+', label: 'Document Accuracy', isGold: false },
-      { value: '14,000+', label: 'Hours Saved / Yr', isGold: false },
-      { value: '<90 Days', label: 'Time-to-Value', isGold: false },
-      { value: '$21M+', label: 'Client Savings', isGold: true }
+      { value: 'Enterprise', label: 'ERP Expertise', isGold: false },
+      { value: 'AI-Native', label: 'Architecture', isGold: false },
+      { value: 'Finance', label: 'Domain Focus', isGold: false },
+      { value: 'Built for', label: 'Enterprise Scale', isGold: true }
     ]
   },
   manifesto: {
@@ -37,7 +39,8 @@ export const DEFAULT_ABOUT_DATA = {
     statements: [
       {
         title: 'Every invoice should understand itself.',
-        description: "Not just extracted — understood. Context, intent, exceptions, and nuance. That's the difference between legacy template OCR and our GenAI models. It is the difference between 70% automation and 95%."
+        // P1 #4 — Removed: '70% automation and 95%' — unsupported benchmark comparison
+        description: "Not just extracted — understood. Context, intent, exceptions, and nuance. That's the difference between legacy template OCR and our GenAI models — designed to understand documents the way a senior analyst would, not just read predefined fields."
       },
       {
         title: 'Your ERP should answer your questions.',
@@ -52,26 +55,28 @@ export const DEFAULT_ABOUT_DATA = {
   origin_story: {
     title: 'From Consulting to Product',
     subtitle: "The genesis of Flowtaris AI wasn't a whitepaper. It was thousands of hours spent in the ERP trenches.",
+    // P1 #3 — Timeline rebuilt using real Flowtaris milestones.
+    // Earlier experience described as team/practitioner experience, not Flowtaris corporate history.
     milestones: [
       {
-        year: '19',
-        title: 'The Trenches',
-        description: 'Flowtaris deployed 200+ ERP customizations. We saw the exact same manual bottlenecks in every single engagement.'
+        year: 'Roots',
+        title: 'The Practitioner Foundation',
+        description: 'Our team accumulated deep ERP implementation experience across enterprise finance, building hands-on expertise in NetSuite, Coupa, SAP, and Workday environments.'
       },
       {
-        year: '23',
-        title: 'The Pattern',
-        description: '"We keep solving the same problems manually. What if we automated ourselves?" Our internal R&D division was formed.'
+        year: 'Origin',
+        title: 'Flowtaris Is Founded',
+        description: 'Flowtaris is established, combining enterprise ERP consulting capabilities with a vision to eliminate the recurring manual bottlenecks our practitioners kept encountering.'
       },
       {
-        year: '24',
-        title: 'The Lab',
-        description: 'First models launched. GenAI Document Intelligence hits 99.5%. Our Conversational ERP passes internal infosec testing.'
+        year: 'R&D',
+        title: 'AI Research Begins',
+        description: 'Internal R&D begins. GenAI Document Intelligence and Conversational ERP concepts are developed and tested against real enterprise scenarios.'
       },
       {
-        year: '25',
-        title: 'The Platform',
-        description: 'Flowtaris AI launches. Enterprise-grade. Platform-agnostic. Backed by the delivery muscle of our senior consultants.'
+        year: 'Now',
+        title: 'Flowtaris AI Launches',
+        description: 'Flowtaris AI is launched as the AI-enabled solutions division — delivering intelligent automation, enterprise agents, analytics and innovation on top of proven ERP foundations.'
       }
     ]
   },
@@ -79,12 +84,13 @@ export const DEFAULT_ABOUT_DATA = {
     title: 'The Unfair Advantage',
     subtitle: 'Why Flowtaris AI outperforms horizontal, generic AI vendors in finance automation.',
     rows: [
-      { label: 'ERP Knowledge', generic: 'Read the API docs', ours: 'Built 200+ customizations' },
-      { label: 'Finance DNA', generic: 'Trained on public data', ours: 'Built by former controllers & Big 4' },
-      { label: 'Accuracy', generic: '70–85% (Template OCR)', ours: '99.5%+ (GenAI Understanding)' },
-      { label: 'Implementation', generic: '12–18 months', ours: '<90 days to first value' },
-      { label: 'Integration', generic: 'Surface connectors', ours: 'Native to NetSuite & Coupa' },
-      { label: 'Governance', generic: 'In roadmap', ours: 'EU AI Act ready, full audit trails' }
+      // P1 #4 — Replaced unverifiable specifics with evidence-safe positioning language.
+      { label: 'ERP Knowledge', generic: 'Read the API docs', ours: 'Deep enterprise ERP implementation experience' },
+      { label: 'Finance DNA', generic: 'Trained on public data', ours: 'Built by practitioners from enterprise finance & ERP consulting' },
+      { label: 'Intelligence', generic: 'Template-based extraction', ours: 'GenAI models designed for document understanding' },
+      { label: 'Time to Value', generic: 'Months to years of IT projects', ours: 'Structured implementation with defined milestones' },
+      { label: 'Integration', generic: 'Surface-level connectors', ours: 'Native connectors for NetSuite & Coupa' },
+      { label: 'Governance', generic: 'In roadmap', ours: 'Designed to support auditability and access control requirements' }
     ]
   },
   architecture: {

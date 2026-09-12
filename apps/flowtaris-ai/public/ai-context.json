@@ -1,0 +1,24 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Flowtaris AI",
+  "description": "Enterprise AI automation platform for finance teams.",
+  "url": "https://flowtaris.ai",
+  "logo": "https://flowtaris.ai/images/flowtaris.avif",
+  "parentOrganization": {
+    "@type": "Organization",
+    "name": "Flowtaris",
+    "url": "https://flowtaris.com"
+  },
+  "knowsAbout": [
+    "Accounts Payable Automation",
+    "ERP AI Integration",
+    "NetSuite AI",
+    "SAP AI",
+    "Coupa AI",
+    "Workday AI",
+    "GenAI Document Extraction",
+    "Predictive Cash Flow Analytics",
+    "AI Governance"
+  ]
+}

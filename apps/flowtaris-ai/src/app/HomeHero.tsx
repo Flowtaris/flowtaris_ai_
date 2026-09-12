@@ -12,11 +12,13 @@ const DEFAULT_HERO = {
   secondary_cta: { label: 'Calculate ROI', href: '/roi-calculator' }
 }
 
+// P1 #1 — Removed unsupported corporate-scale figures (200+ customers, 95% automation, $50M+ savings).
+// Replaced with capability-led, evidence-safe language per the Required Changes Report.
 const DEFAULT_STATS = [
-  { value: '200+', label: 'Enterprise Customers' },
-  { value: '95%',  label: 'Automation Rate' },
-  { value: '$50M+',label: 'Annual Savings' },
-  { value: '4',    label: 'ERP Platforms' },
+  { value: 'Enterprise', label: 'Grade Platform' },
+  { value: 'Finance',    label: 'Focused AI' },
+  { value: 'ERP-Native', label: 'Architecture' },
+  { value: '4',          label: 'ERP Platforms' },
 ]
 
 function TypingText({ text, delay = 0, speed = 40 }: { text: string, delay?: number, speed?: number }) {

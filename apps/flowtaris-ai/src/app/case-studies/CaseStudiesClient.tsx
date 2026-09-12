@@ -32,6 +32,22 @@ export default function CaseStudiesClient({
   return (
     <div className="min-h-screen bg-[#050608] text-white">
 
+      {/* ── P1 #6 DISCLOSURE BANNER — Required by Website Changes Report ─── */}
+      <div
+        className="w-full px-6 py-4 text-center text-sm"
+        style={{
+          background: 'rgba(192,132,252,0.06)',
+          borderBottom: '1px solid rgba(192,132,252,0.15)',
+        }}
+      >
+        <span style={{ color: 'rgba(255,255,255,0.55)' }}>
+          <span style={{ color: '#c084fc', fontWeight: 600 }}>Illustrative Enterprise Use Cases — </span>
+          These scenarios demonstrate how Flowtaris AI capabilities can address common enterprise finance and automation challenges.
+          Metrics shown are illustrative examples and should not be interpreted as actual customer results
+          unless explicitly identified as a verified Flowtaris engagement.
+        </span>
+      </div>
+
       {/* ── HERO ──────────────────────────────────────────────────────────────── */}
       <section className="relative pt-36 pb-20 px-6 overflow-hidden">
         {/* Background */}
@@ -41,9 +57,10 @@ export default function CaseStudiesClient({
         </div>
 
         <div className="max-w-5xl mx-auto relative z-10">
+          {/* P1 #5 — Badge renamed from 'Verified Customer Results' → 'Illustrative Enterprise Use Cases' */}
           <div className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.3em] text-[#c084fc] bg-[#c084fc]/10 border border-[#c084fc]/30 px-5 py-2 rounded-full mb-10">
             <span className="w-1.5 h-1.5 rounded-full bg-[#c084fc] animate-pulse" />
-            {heroConfig?.badgeText || 'Verified Customer Results'}
+            {heroConfig?.badgeText || 'Illustrative Enterprise Use Cases'}
           </div>
 
           <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black leading-[1.02] tracking-tight mb-8">
@@ -56,13 +73,13 @@ export default function CaseStudiesClient({
             {heroConfig?.subtitle || 'Three enterprise deployments across NetSuite, SAP, Coupa, and Workday — with real before/after data, full technical architectures, and team testimonials. Client names anonymized per confidentiality agreements.'}
           </p>
 
-          {/* Aggregate numbers */}
+          {/* P1 #5 — Removed unverifiable specific numbers. Admin panel controls these via heroConfig. */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-14">
             {[
-              { number: heroConfig?.metric1Value || '$27M+', label: heroConfig?.metric1Label || 'Combined Value Delivered', accent: '#c084fc' },
-              { number: heroConfig?.metric2Value || '5', label: heroConfig?.metric2Label || 'Enterprise Deployments', accent: '#38bdf8' },
-              { number: heroConfig?.metric3Value || '<8 wks', label: heroConfig?.metric3Label || 'Average Time to Value', accent: '#34d399' },
-              { number: heroConfig?.metric4Value || '99%', label: heroConfig?.metric4Label || 'Avg Automation Rate Achieved', accent: '#fb923c' },
+              { number: heroConfig?.metric1Value || 'Multi-', label: heroConfig?.metric1Label || 'Industry Scenarios', accent: '#c084fc' },
+              { number: heroConfig?.metric2Value || 'ERP', label: heroConfig?.metric2Label || 'Platform Coverage', accent: '#38bdf8' },
+              { number: heroConfig?.metric3Value || 'AI', label: heroConfig?.metric3Label || 'Driven Automation', accent: '#34d399' },
+              { number: heroConfig?.metric4Value || 'Finance', label: heroConfig?.metric4Label || 'Domain Focus', accent: '#fb923c' },
             ].map(stat => (
               <div key={stat.label} className="rounded-2xl border border-white/[0.07] bg-white/[0.03] p-5 backdrop-blur-sm">
                 <div className="text-3xl font-black mb-1" style={{ color: stat.accent }}>{stat.number}</div>

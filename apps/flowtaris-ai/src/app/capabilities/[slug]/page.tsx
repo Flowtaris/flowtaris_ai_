@@ -73,19 +73,22 @@ const STATIC_FALLBACKS: Record<string, any> = {
     category: 'DOCUMENT PROCESSING',
     title: 'GenAI Document Intelligence',
     accent_color: '#f59e0b',
-    headline: 'Your Finance Team Is Spending $53,820 Per Analyst Per Year Doing Something AI Can Do in 3 Minutes.',
-    subheadline: 'Flowtaris AI extracts, validates, and routes every invoice, PO, and contract — at 99.4% accuracy — directly into NetSuite, Coupa, SAP, or Workday. No templates. No rules configuration. No manual keying.',
-    maturity: 'production',
-    problem_eyebrow: 'THE BOARDROOM PROBLEM',
+    // P1 #7 — Removed: '99.4% accuracy', '2.1M documents', '10,000 docs/hr', '28 languages', '120+ fields', '$4.5M Annual Savings'.
+    // Replaced with evidence-safe, capability-led language per the Required Changes Report.
+    // Performance varies by document type, data quality, configuration and deployment architecture.
+    headline: 'Your Finance Team Spends Significant Time Doing Something AI Is Designed to Handle.',
+    subheadline: 'Flowtaris AI extracts, validates, and routes invoices, POs, and contracts — directly into NetSuite, Coupa, SAP, or Workday. GenAI models designed to understand documents, not just read templates.',
+    maturity: 'early-access',
+    problem_eyebrow: 'THE DOCUMENT CHALLENGE',
     problem_headline: 'Finance doesn\'t have a data problem. It has a document problem nobody\'s solved yet.',
-    problem_body: 'The average enterprise finance team processes 80,000–400,000 documents per year. Every one of those documents requires a human to read it, understand it, extract data from it, validate it against a purchase order, and key it into an ERP. At scale, that\'s not a process — it\'s a liability.\n\nLegacy OCR tools promised to fix this in 2018. They didn\'t. They required templates per vendor, broke every time a vendor changed their invoice format, and created a new exception queue that still needed a human.\n\nFlowtaris AI doesn\'t use templates. It uses large language models fine-tuned on 2.1M real enterprise financial documents. It reads invoices the way a CFO\'s best analyst would — with context, judgment, and confidence scoring.',
-    problem_stat_value: '$53K',
-    problem_stat_label: 'per analyst per year lost to manual document processing. Across 10 people, that\'s $530,000.',
+    problem_body: 'The average enterprise finance team processes tens of thousands of documents per year. Every one of those documents traditionally requires a human to read, extract, validate, and key data into an ERP. At scale, that manual effort creates a meaningful liability.\n\nLegacy OCR tools required templates per vendor and broke when formats changed. Flowtaris AI uses GenAI models designed to understand documents contextually — without rigid template configuration.',
+    problem_stat_value: 'Hours',
+    problem_stat_label: 'of analyst time per week spent on manual document processing that AI is designed to eliminate.',
     stats: [
-      { value: '99.4%', label: 'Extraction Accuracy', context: 'across 2.1M enterprise documents' },
-      { value: '3 min', label: 'Invoice to ERP Post', context: 'was 4 days manual average' },
-      { value: '85%', label: 'Straight-Through Rate', context: 'zero human touch required' },
-      { value: '$4.5M', label: 'Annual Savings', context: 'at 50,000 invoices per year' },
+      { value: 'High', label: 'Extraction Accuracy', context: 'performance varies by document type and data quality' },
+      { value: 'Fast', label: 'Invoice to ERP Post', context: 'designed for significant speed improvement over manual' },
+      { value: 'High', label: 'Straight-Through Rate', context: 'designed to minimize human touch for standard documents' },
+      { value: 'Significant', label: 'Cost Reduction Potential', context: 'illustrative — actual results vary by configuration and scope' },
     ],
     steps: [
       {
@@ -95,7 +98,8 @@ const STATIC_FALLBACKS: Record<string, any> = {
         image: '/images/capabilities/cap1-invoice-extract.png',
         imageAlt: 'AI document capture and classification dashboard',
         imageRight: false,
-        bullets: ['Connects to 40+ document sources', 'Auto-classifies invoice, PO, contract, receipt', 'Supports 28 languages including multilingual documents', 'Processes 10,000 documents per hour at enterprise tier'],
+        // P1 #7 — Removed: '28 languages', '10,000 documents per hour', '40+ document sources', '120+ fields'
+        bullets: ['Connects to multiple document sources including email, portals, and shared drives', 'Auto-classifies common document types: invoice, PO, contract, receipt', 'Designed for multilingual document support', 'High-volume processing capability — actual throughput depends on deployment configuration'],
       },
       {
         eyebrow: 'STEP 02 — EXTRACT & VALIDATE',
@@ -104,7 +108,8 @@ const STATIC_FALLBACKS: Record<string, any> = {
         image: '/images/capabilities/cap1-3way-match.png',
         imageAlt: 'AI field extraction and 3-way matching validation',
         imageRight: true,
-        bullets: ['Extracts 120+ standard fields per document type', '3-way PO/GR/Invoice matching in <500ms', 'Configurable tolerance rules per vendor or category', 'Exception queue with AI-suggested resolution for every mismatch'],
+        // P1 #7 — Removed: '120+ standard fields', '3-way PO/GR/Invoice matching in <500ms'
+        bullets: ['Extracts key fields per document type with confidence scoring', '3-way PO/GR/Invoice matching logic', 'Configurable tolerance rules per vendor or category', 'Exception queue with AI-suggested resolution for mismatches'],
       },
       {
         eyebrow: 'STEP 03 — POST TO ERP',
@@ -126,11 +131,13 @@ const STATIC_FALLBACKS: Record<string, any> = {
     faq_items: [
       {
         question: 'How does Flowtaris handle invoices from vendors it has never seen before?',
-        answer: 'Unlike legacy OCR tools that require a template per vendor, Flowtaris uses a large language model trained on 2.1M real financial documents across hundreds of industries. It reads invoices contextually — the same way a senior AP analyst does — so new vendor formats are processed correctly from day one. In our benchmark, 94.7% of first-time vendor invoices were processed straight-through with zero human intervention.',
+        // P1 #7 — Removed: '94.7% first-time vendor invoices straight-through without human intervention'
+        answer: 'Unlike legacy OCR tools that require a template per vendor, Flowtaris uses large language models designed to read invoices contextually — understanding structure, context, and vendor-specific formats. New vendor formats are processed from day one without template configuration. Confidence scoring flags any uncertain extractions for human review.',
       },
       {
         question: 'What is your accuracy rate, and how do you define it?',
-        answer: 'We report 99.4% field-level extraction accuracy — measured as the percentage of extracted field values that match the ground truth (verified against the vendor\'s original data). This is measured across 2.1M documents in production deployments over 24 months. We do not cherry-pick document types — this includes handwritten delivery notes, scanned fax invoices, and multilingual documents.',
+        // P1 #7 — Removed: '99.4% field-level extraction accuracy across 2.1M documents in production over 24 months'
+        answer: 'We design our extraction models for high field-level accuracy across diverse document types, measured as the percentage of extracted field values that match the ground truth. Accuracy varies by document type, format quality, language and vendor complexity. Confidence scores are provided per field, and extractions below configured thresholds are flagged for human review.',
       },
       {
         question: 'What happens when the AI is wrong or uncertain?',
@@ -138,7 +145,8 @@ const STATIC_FALLBACKS: Record<string, any> = {
       },
       {
         question: 'How long does implementation take?',
-        answer: 'Our fastest production deployment took 11 days from contract signature to first invoices processing. The median is 21 days. We connect to your email inbox and ERP on Day 1, configure your business rules in Week 1, and run parallel processing alongside your existing team in Week 2 before cutover.',
+        // P1 #7 — Removed: '11 days fastest deployment', '21 days median' as specific unverified timeline claims
+        answer: 'Our implementation timeline is designed to be structured and fast — with production deployment typically achievable within weeks, not months. Week 1 focuses on ERP connectivity and rules configuration; Week 2 on parallel processing and user acceptance testing before cutover. Actual timelines depend on your ERP configuration, data quality, and organizational readiness.',
       },
       {
         question: 'Will Flowtaris work with our existing ERP setup or do we need a new implementation?',
@@ -164,8 +172,9 @@ const STATIC_FALLBACKS: Record<string, any> = {
     cta_secondary_label: 'Start AI Readiness Assessment',
     cta_secondary_href: '/assessment',
     related_slugs: ['autonomous-workflow-engine', 'predictive-analytics', 'integration-health-monitoring'],
-    seo_title: 'AI Invoice Processing & Document Intelligence for NetSuite, Coupa & SAP | Flowtaris AI',
-    seo_description: 'Eliminate manual AP processing. Flowtaris AI extracts invoice data at 99.4% accuracy and posts directly to NetSuite, Coupa, SAP, and Workday. Average ROI in 47 days.',
+    // P1 #7 — Removed specific unverifiable claims from seo_description
+    seo_title: 'AI Document Intelligence for NetSuite, Coupa & SAP | Flowtaris AI',
+    seo_description: 'Eliminate manual document processing. Flowtaris AI extracts and validates invoice data and posts directly to NetSuite, Coupa, SAP, and Workday using GenAI models designed for enterprise finance.',
     seo_keywords: 'AI invoice processing, GenAI document intelligence, AP automation, NetSuite invoice automation, Coupa AI, SAP accounts payable AI',
     is_published: true,
   },
@@ -178,17 +187,19 @@ const STATIC_FALLBACKS: Record<string, any> = {
     accent_color: '#10b981',
     headline: 'Your Approval Workflows Are Running on Email, Spreadsheets, and Hope.',
     subheadline: 'Flowtaris AI replaces fragile, manual approval chains with self-healing workflows that route, escalate, and resolve — automatically — across NetSuite, Coupa, SAP, and Workday.',
-    maturity: 'production',
-    problem_eyebrow: 'THE OPERATIONAL PROBLEM',
-    problem_headline: 'The average enterprise invoice sits in an approval queue for 4.2 days. That queue runs on email.',
-    problem_body: 'Finance transformation projects always tackle the ERP. They almost never tackle the workflow layer that sits on top of it — the approval chains, escalation paths, and exception queues that determine whether an invoice gets paid in 3 days or 43 days.\n\nThe result: companies spend $2M+ on an ERP implementation, then manage AP exceptions with a shared Outlook inbox and a color-coded spreadsheet.\n\nFlowtaris Autonomous Workflow Engine replaces that chaos with an AI-native orchestration layer that reads your ERP data, understands your business rules, and routes every document to the right person at the right time — or auto-approves it without a person at all.',
-    problem_stat_value: '4.2 days',
-    problem_stat_label: 'average invoice sits in approval queue. Every day costs early-pay discounts and vendor relationships.',
+    // P1 #8 — Removed: '92% Straight-Through Rate', '$2.1M Annual Savings', '60+ Pre-Built Templates' as unverified production figures.
+    // Replaced with evidence-safe, capability-led language.
+    maturity: 'available-for-poc',
+    problem_eyebrow: 'THE OPERATIONAL CHALLENGE',
+    problem_headline: 'Approval workflows built on email and spreadsheets create delays and risk.',
+    problem_body: 'Finance transformation projects invest heavily in ERP systems but often leave the workflow layer — approval chains, escalation paths, and exception queues — running on email and shared spreadsheets. Flowtaris Autonomous Workflow Engine is designed to replace that fragile infrastructure with an AI-native orchestration layer.',
+    problem_stat_value: 'Days',
+    problem_stat_label: 'that invoices typically wait in manual approval queues — creating cost, risk, and vendor relationship strain.',
     stats: [
-      { value: '92%', label: 'Straight-Through Rate', context: 'auto-approved without human intervention' },
-      { value: '4.2 → 0.3 days', label: 'Approval Cycle Time', context: 'median across production deployments' },
-      { value: '$2.1M', label: 'Annual Savings', context: 'per 10,000 invoices at $45/hr cost' },
-      { value: '60+', label: 'Pre-Built Templates', context: 'AP, PO, contract, travel & expense' },
+      { value: 'High', label: 'Straight-Through Potential', context: 'auto-approval for qualifying standard documents' },
+      { value: 'Faster', label: 'Approval Cycle Time', context: 'designed to significantly reduce manual delays' },
+      { value: 'Significant', label: 'Cost Reduction Potential', context: 'illustrative — actual results vary by configuration' },
+      { value: 'Multiple', label: 'Pre-Built Templates', context: 'for AP, PO, contract, and T&E workflows' },
     ],
     steps: [
       {
@@ -273,17 +284,19 @@ const STATIC_FALLBACKS: Record<string, any> = {
     accent_color: '#8b5cf6',
     headline: 'Your CFO Is Making $50M Decisions With Lagging Data That Is 30 Days Old.',
     subheadline: 'Flowtaris AI delivers real-time cash flow forecasting, vendor risk scoring, and spend anomaly detection — giving your finance leadership the signals they need before problems become crises.',
-    maturity: 'production',
+    // P1 #9 — Removed: '$8M+ Fraud Prevented', '94% Forecast Accuracy', '3.2% Spend Reduction' as unverified production figures.
+    // These require actual production evidence. Replaced with evidence-safe language.
+    maturity: 'available-for-poc',
     problem_eyebrow: 'THE INTELLIGENCE GAP',
-    problem_headline: 'ERP systems are the world\'s best record-keeping tools. They\'re terrible forecasting tools.',
-    problem_body: 'Every Fortune 500 CFO has the same problem: their ERP is a perfect ledger of what happened. It tells you almost nothing about what\'s about to happen.\n\nCash flow forecasting still happens in Excel. Vendor risk is assessed annually by a consultant. Spend anomaly detection means an AP clerk reviewing 400 transactions manually every Monday morning.\n\nFlowtaris Predictive Analytics changes the intelligence layer above your ERP. Instead of reports about the past, your finance leadership gets signals about the future — delivered in real time, actionable in seconds.',
-    problem_stat_value: '30 days',
-    problem_stat_label: 'behind. That\'s how old your ERP reports are when your CFO reads them. Decisions made on stale data cost companies millions.',
+    problem_headline: 'ERP systems record what happened. AI is designed to signal what\'s about to happen.',
+    problem_body: 'Cash flow forecasting still happens in Excel for many enterprises. Vendor risk is assessed periodically. Spend anomaly detection relies on manual review. Flowtaris Predictive Analytics is designed to change the intelligence layer above your ERP — delivering forward-looking signals rather than lagging reports.',
+    problem_stat_value: 'Weeks',
+    problem_stat_label: 'that ERP reporting lags behind real events — costing decision-makers timely intelligence.',
     stats: [
-      { value: '94%', label: 'Forecast Accuracy', context: '90-day rolling cash flow prediction' },
-      { value: '12 days', label: 'Early Warning Lead Time', context: 'average before cash position crisis' },
-      { value: '3.2%', label: 'Spend Reduction', context: 'from anomaly detection program' },
-      { value: '$8M+', label: 'Fraud Prevented', context: 'across production customer base in 2024' },
+      { value: 'High', label: 'Forecast Accuracy', context: 'performance varies by data quality and history depth' },
+      { value: 'Early', label: 'Warning Lead Time', context: 'designed to surface signals before they become crises' },
+      { value: 'Meaningful', label: 'Spend Reduction Potential', context: 'illustrative — actual results vary by configuration' },
+      { value: 'Designed to', label: 'Detect Anomalies', context: 'including duplicates, risk signals and unusual patterns' },
     ],
     steps: [
       {
@@ -368,17 +381,19 @@ const STATIC_FALLBACKS: Record<string, any> = {
     accent_color: '#06b6d4',
     headline: 'Your $5M ERP Is Locked Behind 40 Screens Nobody on Your Team Knows How to Use.',
     subheadline: 'Flowtaris Conversational ERP lets every finance team member — from the AP clerk to the CFO — access, query, and act on ERP data in plain English. No training. No navigation. No waiting.',
-    maturity: 'production',
-    problem_eyebrow: 'THE USABILITY CRISIS',
-    problem_headline: 'The average enterprise ERP requires 6 months of training to use effectively. Most users learn 4% of its capabilities.',
-    problem_body: 'Enterprise ERP systems are engineering marvels. They store every transaction your company has ever made, support hundreds of report types, and can model virtually any financial scenario.\n\nNobody uses 96% of that capability because finding and using it requires navigating 40+ screens, knowing the exact field names, and remembering which of 200 report templates you need.\n\nFlowtaris Conversational ERP puts a natural language interface in front of your ERP. Your team asks questions in plain English — or via Slack — and gets accurate answers, run reports, and executes approved actions without opening the ERP interface at all.',
-    problem_stat_value: '45 min',
-    problem_stat_label: 'average time to produce a custom ERP report manually. Flowtaris delivers the same result in 4 minutes — in Slack.',
+    // P1 #10 — Removed: '140+ Supported Commands', '80% Query Resolution', specific model/RAG claims, '6 ERPs' count.
+    // Conversational ERP capability for controlled enterprise queries and actions, subject to system permissions and configured integrations.
+    maturity: 'available-for-poc',
+    problem_eyebrow: 'THE ERP USABILITY CHALLENGE',
+    problem_headline: 'Complex ERP interfaces create barriers to timely financial insight.',
+    problem_body: 'Enterprise ERP systems contain rich financial data but accessing it often requires significant training, navigating complex screens, and knowing technical field names. Flowtaris Conversational ERP is designed to provide a natural language interface to your ERP — enabling your team to query and act on data without opening the ERP UI.',
+    problem_stat_value: 'Minutes',
+    problem_stat_label: 'is the goal — vs hours — for standard ERP queries answered through the conversational interface.',
     stats: [
-      { value: '80%', label: 'Query Resolution', context: 'answered without opening ERP UI' },
-      { value: '4 min', label: 'Report Delivery Time', context: 'vs 45 min manual average' },
-      { value: '140+', label: 'Supported Commands', context: 'across AP, AR, GL, procurement' },
-      { value: '6 ERPs', label: 'Supported Systems', context: 'NetSuite, Coupa, SAP, Workday, Oracle, Dynamics' },
+      { value: 'Natural', label: 'Language Interface', context: 'query your ERP in plain English or via Slack/Teams' },
+      { value: 'Fast', label: 'Report Delivery', context: 'designed for significant speed improvement over manual ERP reporting' },
+      { value: 'Controlled', label: 'ERP Actions', context: 'subject to system permissions and configured integrations' },
+      { value: 'Multiple', label: 'ERP Platforms', context: 'NetSuite, Coupa, SAP, Workday and more' },
     ],
     steps: [
       {
@@ -419,7 +434,8 @@ const STATIC_FALLBACKS: Record<string, any> = {
     faq_items: [
       {
         question: 'How accurate are the natural language query results?',
-        answer: 'In our benchmark across 500+ real finance queries, Flowtaris returns accurate results for 97.3% of queries on the first attempt. The remaining 2.7% trigger a clarifying question that resolves the ambiguity — we never return confidently wrong data. Accuracy is higher for transactional queries (invoices, payments, vendors) and slightly lower for complex analytical queries that require multi-step reasoning.',
+        // P1 #10 — Removed: '97.3% accuracy on first attempt' and '500+ real finance queries' benchmark
+        answer: 'Flowtaris is designed to return accurate results for natural language finance queries by building a semantic index against your specific ERP schema, vendor master, and chart of accounts. The system handles ambiguous queries by asking clarifying questions rather than guessing. Query accuracy depends on data quality, ERP schema complexity, and the specificity of the question.',
       },
       {
         question: 'What ERP permissions does Flowtaris need?',
@@ -445,8 +461,9 @@ const STATIC_FALLBACKS: Record<string, any> = {
     cta_secondary_label: 'Calculate Time Savings',
     cta_secondary_href: '/roi-calculator',
     related_slugs: ['autonomous-workflow-engine', 'integration-health-monitoring'],
+    // P1 #10 — Updated SEO descriptions to remove unverifiable benchmark claims
     seo_title: 'Conversational ERP Interface — AI Natural Language for NetSuite, SAP & Workday | Flowtaris',
-    seo_description: 'Query NetSuite, SAP, Coupa, and Workday in plain English via Slack or web. Flowtaris Conversational ERP delivers reports in 4 minutes, not 45.',
+    seo_description: 'Query NetSuite, SAP, Coupa, and Workday in plain English via Slack or web. Flowtaris Conversational ERP delivers controlled enterprise queries and actions, subject to configured integrations.',
     seo_keywords: 'conversational ERP, AI ERP interface, natural language NetSuite, Slack ERP integration, AI finance assistant',
     is_published: true,
   },
@@ -458,18 +475,21 @@ const STATIC_FALLBACKS: Record<string, any> = {
     title: 'Integration Health Monitoring',
     accent_color: '#ef4444',
     headline: 'Your ERP Integrations Failed Three Times This Month. Your Finance Team Found Out on Day Four.',
-    subheadline: 'Flowtaris monitors every data flow between your ERP and connected systems — in real time. When something breaks, you know in 8 minutes and in 73% of cases, the system fixes itself before a human ever sees it.',
-    maturity: 'production',
-    problem_eyebrow: 'THE SILENT FAILURE PROBLEM',
-    problem_headline: 'Integration failures are the most expensive IT event finance teams never budget for.',
-    problem_body: 'Every enterprise with a modern ERP stack has integrations connecting it to procurement platforms, banks, payment systems, reporting tools, and operational systems. Each of those integrations is a potential point of failure — and most failures are invisible for hours or days.\n\nWhen a MuleSoft flow silently stops processing invoices at 2am on a Friday, the finance team finds out Monday morning when a CFO asks why payment run failed. By then, the financial impact is already done.\n\nFlowtaris Integration Health Monitoring puts a real-time observability layer over every data flow — detecting failures in minutes, auto-remediating 73% of common errors, and giving your IT and finance teams a shared view of integration health they\'ve never had before.',
-    problem_stat_value: '4 days',
-    problem_stat_label: 'average time before a silent integration failure is discovered. By then, downstream financial data is corrupted.',
+    // P1 #11 — Updated subheadline to remove '8 minutes' and '73%' unverified production claims
+    subheadline: 'Flowtaris monitors data flows between your ERP and connected systems in real time. When something breaks, the system is designed to detect it quickly — and for common known failure patterns, attempt automated remediation before your team needs to act.',
+    // P1 #11 — Removed: '99.97% Uptime', '8 min MTTD', '73% auto-remediated', '200+ data points', 'eBPF', 'LSTM', '<0.1% overhead'.
+    // AI-assisted integration observability designed to surface failures, anomalies and remediation signals across enterprise integrations.
+    maturity: 'available-for-poc',
+    problem_eyebrow: 'THE INTEGRATION VISIBILITY PROBLEM',
+    problem_headline: 'Integration failures are often invisible until they create downstream financial impact.',
+    problem_body: 'Enterprise finance depends on integrations between ERP systems, procurement platforms, payment systems, and reporting tools. When those integrations fail silently, the finance team often discovers the impact hours or days later. Flowtaris Integration Health Monitoring is designed to provide real-time observability across your integration layer — surfacing failures and anomalies faster than manual monitoring.',
+    problem_stat_value: 'Hours',
+    problem_stat_label: 'that integration failures can go undetected — creating corrupted financial data and downstream business impact.',
     stats: [
-      { value: '99.97%', label: 'Uptime Monitored', context: 'across all connected ERP integrations' },
-      { value: '8 min', label: 'Mean Time to Detect', context: 'integration failures and anomalies' },
-      { value: '73%', label: 'Auto-Remediated', context: 'common errors fixed without human intervention' },
-      { value: '200+', label: 'Data Points Monitored', context: 'per integration per minute, real-time' },
+      { value: 'Real-Time', label: 'Observability', context: 'designed to detect failures faster than manual monitoring' },
+      { value: 'Fast', label: 'Failure Detection', context: 'AI-assisted anomaly detection across integration layers' },
+      { value: 'Automated', label: 'Remediation', context: 'for common failure patterns — scope depends on configuration' },
+      { value: 'Multiple', label: 'Integration Platforms', context: 'MuleSoft, Boomi, Azure Data Factory, Workato and more' },
     ],
     steps: [
       {
@@ -497,12 +517,14 @@ const STATIC_FALLBACKS: Record<string, any> = {
         image: '/images/capabilities/premium-dark-erp.png',
         imageAlt: 'Auto-remediation execution log and playbook library',
         imageRight: false,
-        bullets: ['400+ pre-built remediation playbooks', 'Auto-restarts failed connections and clears message queues', 'Schema drift detection and auto-mapping updates', 'Full remediation audit log for post-incident review'],
+        // P1 #11 — Removed: '73% auto-remediated', '400+ remediation playbooks' as unverifiable production claims
+        bullets: ['Maintains a library of remediation playbooks for common integration failure patterns', 'Designed to auto-remediate known failures — scope depends on configuration and environment', 'Schema drift detection and auto-mapping capabilities', 'Full remediation audit log for post-incident review'],
       },
     ],
     technical_details: [
-      { component: 'Monitoring Agent', technology: 'Lightweight Go agent + eBPF probes', description: 'Deploys alongside your integration middleware, capturing 200+ metrics per integration at sub-second granularity with <0.1% overhead' },
-      { component: 'Anomaly Detection', technology: 'LSTM Neural Network + threshold rules', description: 'Detects both statistical anomalies and threshold breaches, with separate models per integration type and traffic pattern' },
+      // P1 #11 — Removed: 'eBPF probes', 'LSTM Neural Network', '<0.1% overhead' as unverified architecture claims
+      { component: 'Monitoring Agent', technology: 'Lightweight monitoring agent', description: 'Deploys alongside your integration middleware, capturing health metrics per integration with low performance overhead' },
+      { component: 'Anomaly Detection', technology: 'ML-based anomaly detection', description: 'Detects both statistical anomalies and threshold breaches, designed for different integration types and traffic patterns' },
       { component: 'Remediation Engine', technology: 'Decision tree + LLM Reasoning', description: 'Matches failure signatures to playbooks, executes safe remediation actions autonomously, escalates novel patterns with AI-generated diagnosis' },
       { component: 'Alert Correlation', technology: 'Graph-based event correlation', description: 'Groups related alerts from multiple systems into a single incident, suppressing noise and providing root cause context within the alert' },
     ],
@@ -536,8 +558,9 @@ const STATIC_FALLBACKS: Record<string, any> = {
     cta_secondary_label: 'Calculate Downtime Cost',
     cta_secondary_href: '/cost-of-inaction',
     related_slugs: ['autonomous-workflow-engine', 'ai-governance-compliance'],
-    seo_title: 'ERP Integration Health Monitoring & Observability — NetSuite, SAP, Coupa | Flowtaris AI',
-    seo_description: 'Real-time monitoring, anomaly detection, and auto-remediation for ERP integrations. Detect failures in 8 minutes. Auto-fix 73% of issues before your team knows.',
+    // P1 #11 — Removed specific unverifiable claims from SEO description
+    seo_title: 'ERP Integration Health Monitoring & Observability | Flowtaris AI',
+    seo_description: 'AI-assisted integration observability designed to surface failures, anomalies and remediation signals across enterprise integrations connecting NetSuite, SAP, Coupa and Workday.',
     seo_keywords: 'ERP integration monitoring, NetSuite integration health, MuleSoft monitoring, API monitoring finance, iPaaS observability',
     is_published: true,
   },
@@ -549,18 +572,22 @@ const STATIC_FALLBACKS: Record<string, any> = {
     title: 'AI Governance & Compliance',
     accent_color: '#eab308',
     headline: 'Your Auditor Is Going to Ask How Every AI Decision Was Made. Do You Have an Answer?',
-    subheadline: 'Flowtaris AI Governance gives you complete auditability, model explainability, and compliance controls over every AI-driven action in your finance operation — built for SOX, GDPR, and the EU AI Act.',
-    maturity: 'production',
+    // P1 #12 — Replaced: 'built for SOX, GDPR, and the EU AI Act' with 'designed to support' language
+    subheadline: 'Flowtaris AI Governance is designed to support enterprise governance, auditability, access control and data-management requirements — giving you complete visibility into every AI-driven action in your finance operation.',
+    // P1 #12 — Removed: 'SOC 2 compliant', 'GDPR compliant', 'EU AI Act compliant' certification language.
+    // Replaced with 'designed to support' language per the Required Changes Report.
+    // Exact current status: SOC 2 Type II assessment in progress. Certifications should not be implied unless legally supportable.
+    maturity: 'available-for-poc',
     problem_eyebrow: 'THE GOVERNANCE IMPERATIVE',
-    problem_headline: 'AI in finance without governance is not a technology problem. It\'s a fiduciary risk.',
-    problem_body: 'The SEC, the EU AI Act, and your external auditors are all asking the same question: can you explain every consequential decision your AI systems made, who authorized them, and what controls prevented errors?\n\nFor companies deploying AI in accounts payable, procurement, and financial reporting, the answer has to be yes — or the risk exposure from an adverse audit finding, a GDPR data breach, or an SEC investigation exceeds the efficiency gains from AI automation by an order of magnitude.\n\nFlowtaris AI Governance is not an add-on. It\'s the control layer that makes every other Flowtaris capability compliant by design — not by retrofitting.',
-    problem_stat_value: '<24 hrs',
-    problem_stat_label: 'to generate a complete AI audit pack for any date range. The industry average without Flowtaris is 3-4 weeks.',
+    problem_headline: 'AI in finance without governance creates auditability and fiduciary risk.',
+    problem_body: 'As AI is deployed in accounts payable, procurement, and financial reporting, regulators and auditors are asking whether every consequential AI decision can be explained, authorized, and audited. Flowtaris AI Governance is designed to support enterprise governance, auditability, access control and data-management requirements across your AI-driven finance operations.',
+    problem_stat_value: 'Hours',
+    problem_stat_label: 'is the design target to generate an AI audit pack — vs weeks of manual preparation without purpose-built governance tools.',
     stats: [
-      { value: '100%', label: 'Audit Trail Coverage', context: 'per AI decision, per transaction' },
-      { value: 'SOX Ready', label: 'Compliance Framework', context: 'COSO-aligned control documentation' },
-      { value: '<24 hrs', label: 'Audit Pack Generation', context: 'vs 3-4 weeks manual preparation' },
-      { value: 'EU AI Act', label: 'Regulatory Coverage', context: 'High-risk AI system documentation built-in' },
+      { value: 'Full', label: 'Audit Trail Coverage', context: 'every AI decision logged with context and reasoning' },
+      { value: 'Designed for', label: 'SOX Readiness', context: 'control documentation and evidence packaging' },
+      { value: 'Fast', label: 'Audit Pack Generation', context: 'designed to accelerate compliance evidence assembly' },
+      { value: 'Designed to', label: 'Support Governance', context: 'auditability, access control and data-management requirements' },
     ],
     steps: [
       {
@@ -635,8 +662,9 @@ const STATIC_FALLBACKS: Record<string, any> = {
     cta_secondary_label: 'Download AI Governance Framework',
     cta_secondary_href: '/cost-of-inaction',
     related_slugs: ['predictive-analytics', 'integration-health-monitoring'],
-    seo_title: 'AI Governance & SOX Compliance for Finance AI Systems | Flowtaris AI',
-    seo_description: 'Complete AI governance for finance teams. Immutable audit trails, model explainability, SOX-compliant controls, GDPR Article 22, and EU AI Act documentation built-in.',
+    // P1 #12 — Updated SEO to remove 'compliant' language and replace with 'designed to support'
+    seo_title: 'AI Governance & Compliance Support for Finance AI Systems | Flowtaris AI',
+    seo_description: 'Designed to support enterprise governance, auditability, access control and data-management requirements. Immutable audit trails, model explainability and structured control documentation for finance AI.',
     seo_keywords: 'AI governance finance, SOX AI compliance, GDPR Article 22 AI, EU AI Act finance, audit trail AI automation, model explainability finance',
     is_published: true,
   },

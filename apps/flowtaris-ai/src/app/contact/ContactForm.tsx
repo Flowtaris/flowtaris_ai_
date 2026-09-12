@@ -14,16 +14,18 @@ export const DEFAULT_CONTACT_DATA = {
     headline_highlight: 'something',
     headline_part2: 'real.',
     description: "Every enterprise transformation begins with one conversation. Tell us where your finance ops hurt most — we'll show you exactly how AI removes it.",
+    // P1 #13 — Removed: '3 Global Offices', '98% CSAT Score', '50+ Team Members', 'Day 47 ROI'.
+    // Using evidence-safe delivery/coverage language per the Required Changes Report.
     stats: [
       { value: '< 4 hrs', label: 'Avg Response' },
-      { value: '3', label: 'Global Offices' },
-      { value: '98%', label: 'CSAT Score' },
-      { value: '50+', label: 'Team Members' },
+      { value: 'Global', label: 'Delivery Coverage' },
+      { value: 'Enterprise', label: 'Grade Security' },
+      { value: '4', label: 'ERP Platforms' },
     ],
     imageSrc: '/images/contact-hero.png',
-    imageAlt: 'Flowtaris global AI finance reach — connecting Palo Alto, London, Singapore',
-    floating_card_1: { label: 'Avg Time to Value', value: '21 Days' },
-    floating_card_2: { label: 'ROI Achieved By', value: 'Day 47' },
+    imageAlt: 'Flowtaris AI — global delivery coverage across North America, UK & Europe, Middle East and APAC',
+    floating_card_1: { label: 'Enterprise AI', value: 'Finance Focus' },
+    floating_card_2: { label: 'Deployment', value: 'Structured POC' },
   },
   meeting: {
     calendly_url: 'https://calendly.com/flowtaris-info',
@@ -36,19 +38,21 @@ export const DEFAULT_CONTACT_DATA = {
     erp_platforms: 'NetSuite, Coupa, SAP S/4HANA, Workday, Oracle Fusion, Microsoft Dynamics, Multi-Platform, Not Sure',
     invoice_volumes: 'Under 10,000 / year, 10,000 – 50,000 / year, 50,000 – 100,000 / year, 100,000 – 500,000 / year, 500,000+ / year, Not Sure'
   },
+  // P1 #13 — Replaced: '3 Global Offices' with 'Global Delivery Coverage'.
   global_presence: {
-    eyebrow: 'Global Presence',
-    headline: 'We work all over the world.\nOne standard of service.',
+    eyebrow: 'Global Delivery Coverage',
+    headline: 'We work with enterprises worldwide.\nOne standard of service.',
     offices: [
-      { region: 'North America', scope: 'HQ & AMER Operations', timezone: 'PT / ET', email: 'amer@flowtaris.com', hours: 'Follow-the-sun Support' },
-      { region: 'Europe & UK', scope: 'EMEA Operations', timezone: 'GMT / CET', email: 'emea@flowtaris.com', hours: 'Follow-the-sun Support' },
-      { region: 'Asia Pacific', scope: 'APAC Operations', timezone: 'SGT / AEST', email: 'apac@flowtaris.com', hours: 'Follow-the-sun Support' },
+      { region: 'North America', scope: 'AMER Delivery Coverage', timezone: 'PT / ET', email: 'amer@flowtaris.com', hours: 'Follow-the-sun Support' },
+      { region: 'Europe & UK', scope: 'EMEA Delivery Coverage', timezone: 'GMT / CET', email: 'emea@flowtaris.com', hours: 'Follow-the-sun Support' },
+      { region: 'Asia Pacific', scope: 'APAC Delivery Coverage', timezone: 'SGT / AEST', email: 'apac@flowtaris.com', hours: 'Follow-the-sun Support' },
     ]
   },
+  // P1 #13 — Removed: 'SOC 2 Type II' certified claim (in-progress), '21 days fastest deployment' specific claim, '2M+ invoices / 28 languages' unsupported scale claims.
   trust_signals: [
-    { title: 'Data Never Leaves Your Control', body: 'SOC 2 Type II in progress. AES-256 at rest, TLS 1.3 in transit. Your data is never used to train models.' },
-    { title: 'Live Production in 21 Days', body: 'Our fastest deployment was 11 days. The median is 21. No 12-month IT projects.' },
-    { title: 'Built for Enterprise Scale', body: 'From 10,000 to 2M+ invoices per year. Multi-entity, multi-currency, 28 languages.' },
+    { title: 'Data Security by Design', body: 'AES-256 encryption at rest, TLS 1.3 in transit. Your data is never used to train models. SOC 2 Type II assessment in progress.' },
+    { title: 'Structured Implementation Approach', body: 'Our methodology is designed for rapid enterprise deployment, with defined milestones and dedicated support from day one.' },
+    { title: 'Built for Enterprise Scale', body: 'Designed to handle high-volume, multi-entity, multi-currency finance operations across the ERP platforms you already use.' },
   ],
   faq: {
     eyebrow: 'Quick Answers',
@@ -665,7 +669,7 @@ export default function ContactForm() {
                 )}
               </p>
               <p className="text-gray-600 text-sm mb-14">
-                While you wait — explore how other enterprises achieved ROI in 47 days.
+                While you wait — explore how Flowtaris AI capabilities address real enterprise challenges.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -6,13 +6,14 @@ import { analytics } from '@flowtaris/analytics'
 import { ChevronDown, BarChart3, PieChart, Zap, FileText, CheckCircle2, Activity } from 'lucide-react'
 
 export const DEFAULT_ROI_CONFIG = {
+  // P2 #14 — Removed: '99.4% confidence (Based on 2.1M verified documents)', renamed ticker from 'Live Market Benchmarks' to 'Industry Benchmarks (Illustrative)'
   shutdown: false,
-  tickerPrefix: 'Live Market Benchmarks',
+  tickerPrefix: 'Industry Benchmarks (Illustrative)',
   tickerItems: [
-    'Avg AP Cost: $14.20/invoice',
-    'Flowtaris Target: $1.15/invoice',
-    'Industry Error Rate: 4.8%',
-    'Flowtaris Confidence Score: 99.4% (Based on 2.1M verified documents)'
+    'Est. Manual AP Cost: $12–15/invoice (source: industry research)',
+    'Automation Target: Significant cost reduction potential',
+    'Industry Error Rate: 3–5% (industry estimates)',
+    'Flowtaris AI: GenAI models designed for enterprise document understanding'
   ],
   platforms: ['NetSuite', 'SAP', 'Coupa', 'Workday', 'Salesforce'],
   useCases: [
@@ -228,8 +229,8 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
           <div className="flex-[2] w-full px-4">
             <div className="flex justify-between items-end mb-2">
               <label className="text-[10px] uppercase tracking-widest text-white/40 font-semibold flex gap-2 items-center">
-                {config.dropdownLabels.scale} 
-                <span className="bg-brand-emerald-500/20 text-brand-emerald-400 px-1.5 py-0.5 rounded text-[8px]">LIVE DATA SYNC</span>
+                {/* P2 #14 — Removed: 'LIVE DATA SYNC' badge which implies live market connectivity */}
+                {config.dropdownLabels.scale}
               </label>
               <span className="text-brand-cyan-400 font-mono text-sm font-bold">{m.vol.toLocaleString()} docs/yr</span>
             </div>
@@ -352,6 +353,15 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
               )}
             </div>
           </div>
+        </div>
+        {/* P2 #15 — ROI Disclaimer: outputs are illustrative estimates based on industry benchmarks, not guaranteed results */}
+        <div className="mt-6 pt-4 border-t border-white/5 text-center">
+          <p className="text-[10px] text-white/25 leading-relaxed max-w-3xl mx-auto">
+            <span className="font-semibold text-white/35">Illustrative estimates only.</span>{' '}
+            Results shown are based on publicly available industry research benchmarks and are designed to illustrate potential value.
+            Actual results depend on your specific processes, data quality, ERP configuration, and implementation scope.
+            These figures are not a guarantee of performance or savings and should not be relied upon as such.
+          </p>
         </div>
       </div>
     </div>

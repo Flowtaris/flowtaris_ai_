@@ -1,0 +1,22 @@
+# Flowtaris AI
+## About
+Flowtaris AI (flowtaris.ai) is the enterprise AI automation platform for finance teams. We deliver GenAI document intelligence, autonomous AP/AR workflows, predictive analytics, and conversational ERP access for NetSuite, Coupa, SAP, and Workday. Flowtaris AI is the AI product division of Flowtaris (flowtaris.com).
+
+## Core Philosophy
+We believe AI should run *inside* existing ERPs, not replace them. We focus on:
+1. High accuracy via ensemble LLM techniques.
+2. Enterprise governance, audit trails, and Role-Based Access Control (RBAC).
+3. Fast payback periods (average 3-8 months).
+
+## Capabilities
+- **GenAI Document Intelligence**: Extracs line-item data from invoices and POs with high accuracy across varying languages and layouts.
+- **Autonomous Workflow Engine**: Configurable agents that route approvals, manage exceptions, and post directly to the ERP.
+- **Predictive Analytics**: Cash flow forecasting and anomaly detection.
+- **Conversational ERP**: Query NetSuite or SAP using natural language via Slack or web UI.
+- **Integration Health Monitoring**: Real-time observability for iPaaS and API connections.
+- **AI Governance & Compliance**: Immutable logs designed to support SOX and EU AI Act requirements.
+
+## Contact
+- Sales & Demos: https://flowtaris.ai/contact
+- Home: https://flowtaris.ai
+- Corporate: https://flowtaris.com

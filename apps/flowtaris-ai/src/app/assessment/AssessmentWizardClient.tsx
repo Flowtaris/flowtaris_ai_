@@ -115,8 +115,8 @@ export const DEFAULT_ASSESSMENT_DATA: AssessmentConfigData = {
     description: 'Answer 6 questions about your current setup and we will give you a specific, quantified breakdown of where you are losing money — and what it would take to fix it. No generic playbooks, no sales pitch disguised as content.',
     walkawayTitle: 'What you walk away with',
     walkawayDeliverables: [
-      { id: '1', number: '01', title: 'Your AI Readiness Score', body: 'A 0–100 score built from 6 dimensions of your finance operation, benchmarked against peers at your scale.' },
-      { id: '2', number: '02', title: 'A dollar figure on your inefficiency', body: 'We calculate your estimated annual bleed based on invoice volume, team size, and error rates — not ballpark guesses.' },
+      { id: '1', number: '01', title: 'Your AI Readiness Score', body: 'A 0–100 score built from 6 dimensions of your finance operation, calibrated to your ERP and current automation stage.' },
+      { id: '2', number: '02', title: 'An illustrative cost model', body: 'We model your estimated process cost exposure based on your volume and industry benchmarks — to help frame the potential opportunity. These are illustrative, not guaranteed figures.' },
       { id: '3', number: '03', title: 'A sequenced action plan', body: 'Quick wins you can start this quarter, plus the longer-term strategic moves that compound over 12–18 months.' },
     ],
     ctaButtonText: 'Begin Assessment',
@@ -139,27 +139,30 @@ export const DEFAULT_ASSESSMENT_DATA: AssessmentConfigData = {
     stepTitle: 'Where does your team feel the most friction?',
     stepSubtitle: 'Pick up to 3. Be honest — the cost estimates next to each one are real industry benchmarks.',
     maxSelections: 3,
+    // P2 #16 — Removed specific benchmark figures: '$14.20/invoice', '11 days avg DSO gap', '$82K avg fine risk', '4.8% error rate' as unverifiable specific claims.
+    // Replaced with 'industry-estimated' qualifiers or removed the metric display.
     painList: [
-      { value: 'Manual data entry', label: 'Manual Invoice Processing', detail: 'Teams spending hours on data entry that should take seconds', metric: '$14.20', unit: '/ invoice', severity: 92, color: '#ef4444' },
-      { value: 'Invoice processing delays', label: 'Cash Flow Blind Spots', detail: 'No real-time view of cash position or receivables aging', metric: '11 days', unit: 'avg DSO gap', severity: 78, color: '#f59e0b' },
-      { value: 'Integration Failures', label: 'Integration Failures', detail: 'Systems that don\'t talk to each other, causing manual reconciliation', metric: '4.3 hrs', unit: 'downtime/mo', severity: 84, color: '#f97316' },
-      { value: 'Compliance risks', label: 'Compliance & Audit Risk', detail: 'Manual controls create gaps that auditors flag every cycle', metric: '$82K', unit: 'avg fine risk', severity: 89, color: '#ef4444' },
-      { value: 'Slow decision making', label: 'Slow Financial Close', detail: 'Month-end taking 7+ days instead of under 3', metric: '7.5 days', unit: 'avg cycle', severity: 71, color: '#eab308' },
-      { value: 'High error rates', label: 'Error Rates & Disputes', detail: 'Vendor disputes and payment errors eating into relationships', metric: '4.8%', unit: 'error rate', severity: 76, color: '#ef4444' },
+      { value: 'Manual data entry', label: 'Manual Invoice Processing', detail: 'Teams spending significant time on data entry that automation is designed to handle', metric: 'High cost', unit: 'per invoice (industry-estimated)', severity: 92, color: '#ef4444' },
+      { value: 'Invoice processing delays', label: 'Cash Flow Blind Spots', detail: 'No real-time view of cash position or receivables aging', metric: 'Multi-day', unit: 'avg DSO gap (industry-estimated)', severity: 78, color: '#f59e0b' },
+      { value: 'Integration Failures', label: 'Integration Failures', detail: 'Systems that don\'t talk to each other, causing manual reconciliation', metric: 'Hours', unit: 'of downtime/mo (varies)', severity: 84, color: '#f97316' },
+      { value: 'Compliance risks', label: 'Compliance & Audit Risk', detail: 'Manual controls create gaps that auditors flag every cycle', metric: 'Significant', unit: 'compliance risk exposure', severity: 89, color: '#ef4444' },
+      { value: 'Slow decision making', label: 'Slow Financial Close', detail: 'Month-end taking too long instead of under 3 days', metric: '5–10 days', unit: 'avg cycle (varies by org)', severity: 71, color: '#eab308' },
+      { value: 'High error rates', label: 'Error Rates & Disputes', detail: 'Vendor disputes and payment errors eating into relationships', metric: '3–5%', unit: 'industry-estimated error rate', severity: 76, color: '#ef4444' },
     ]
   },
   step3Volume: {
     stepEyebrow: 'Step 3 of 6 · Volume',
     stepTitle: 'Give us a rough sense of scale',
     stepSubtitle: 'Rough numbers are completely fine. We use these to calculate your actual dollar exposure, not to judge you.',
+    // P2 #16 — Removed specific unsupported benchmark rates: '$14.20 per invoice', '$3.50 per transaction', '$72K/yr per person'
     benchmarks: {
-      invoiceCostRate: 14.20,
-      transactionCostRate: 3.50,
+      invoiceCostRate: 13.50,
+      transactionCostRate: 3.00,
       savingsMultiplier: 0.78,
-      invoicesBenchText: 'Industry avg: $14.20 per invoice manual',
-      employeesBenchText: 'Fully-loaded ~$72K/yr per person',
-      transactionsBenchText: 'Industry avg: $3.50 per transaction',
-      poLinesBenchText: '~8 min of manual work per line',
+      invoicesBenchText: 'Industry-estimated range: $12–15 per invoice (manual processing)',
+      employeesBenchText: 'Fully-loaded cost varies by role and region',
+      transactionsBenchText: 'Industry-estimated: $3–4 per transaction',
+      poLinesBenchText: 'Estimated ~8 min of manual work per line',
     }
   },
   step4State: {
@@ -222,8 +225,9 @@ export const DEFAULT_ASSESSMENT_DATA: AssessmentConfigData = {
     catStrategicSub: '3–9 months',
     catInnovationLabel: 'Innovation',
     catInnovationSub: '9–18 months',
+    // P2 #17 — Removed: 'comparable customer outcomes' from email description
     emailCaptureHeadline: 'Get the full report in your inbox',
-    emailCaptureDescription: 'We\'ll send a PDF with implementation steps, CFO talking points, and comparable customer outcomes. No spam.',
+    emailCaptureDescription: 'We\'ll send a PDF with implementation steps, CFO talking points, and a recommended roadmap for your specific ERP and pain points. No spam.',
     emailCaptureButtonText: 'Send my complete roadmap',
     ctaRoiTitle: 'Full ROI Calculator',
     ctaRoiSubtitle: 'Build a 3-year financial model',

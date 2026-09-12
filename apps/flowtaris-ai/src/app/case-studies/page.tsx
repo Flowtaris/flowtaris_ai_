@@ -3,13 +3,14 @@ import CaseStudiesClient from './CaseStudiesClient'
 
 import { getCaseStudies, getSiteConfig } from '@/lib/supabase'
 
+// P1 #5 & #6 — Removed 'verified' and '$21M+' claims from metadata. Using evidence-safe language.
 export const metadata: Metadata = {
-  title: 'Case Studies — Real Enterprise AI Results | Flowtaris AI',
-  description: 'Three verified enterprise AI automation deployments. $21M+ in combined savings and risk reduction across NetSuite, SAP, Coupa, and Workday. Full technical details and before/after metrics.',
+  title: 'Use Cases | Flowtaris AI',
+  description: 'Illustrative enterprise AI automation use cases showing how Flowtaris AI capabilities can address common finance, ERP and integration challenges across NetSuite, SAP, Coupa, and Workday.',
   alternates: { canonical: 'https://flowtaris.ai/case-studies' },
   openGraph: {
-    title: 'Case Studies — Real Enterprise AI Results | Flowtaris AI',
-    description: 'Three verified enterprise deployments. $21M+ savings across NetSuite, SAP, Coupa, and Workday.',
+    title: 'Illustrative Use Cases | Flowtaris AI',
+    description: 'See how Flowtaris AI capabilities can address common enterprise finance, ERP and integration challenges.',
     url: 'https://flowtaris.ai/case-studies',
     siteName: 'Flowtaris AI',
     type: 'website',

@@ -177,10 +177,10 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-100">
+    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-100 pt-[100px] lg:pt-[120px]">
       
       {/* ─── HEADER ─── */}
-      <header className="border-b border-slate-200 bg-white sticky top-16 z-30">
+      <header className="border-b border-slate-200 bg-white sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between">
           <div className="text-sm font-bold text-slate-500 uppercase tracking-widest">
             Cost of Inaction Analysis

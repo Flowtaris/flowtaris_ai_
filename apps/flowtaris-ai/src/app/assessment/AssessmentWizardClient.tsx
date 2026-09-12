@@ -373,16 +373,16 @@ function StepIntro({ config, onStart }: { config: AssessmentConfigData['intro'];
 // ─── EXACT BRAND LOGOS (PULLED FROM OFFICIAL SOURCES) ─────────────────────
 const ERP_LOGOS: Record<string, React.ReactNode> = {
   'NetSuite': (
-    <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/NetSuite_Logo.svg" alt="Oracle NetSuite" className="w-full h-full object-contain" crossOrigin="anonymous" />
+    <img src="https://logo.clearbit.com/netsuite.com" alt="Oracle NetSuite" className="w-full h-full object-contain" />
   ),
   'SAP': (
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/SAP_2011_logo.svg" alt="SAP S/4HANA" className="w-full h-full object-contain" crossOrigin="anonymous" />
+    <img src="https://logo.clearbit.com/sap.com" alt="SAP S/4HANA" className="w-full h-full object-contain" />
   ),
   'Coupa': (
-    <img src="https://upload.wikimedia.org/wikipedia/en/7/75/Coupa_logo.svg" alt="Coupa" className="w-full h-full object-contain" crossOrigin="anonymous" />
+    <img src="https://logo.clearbit.com/coupa.com" alt="Coupa" className="w-full h-full object-contain" />
   ),
   'Workday': (
-    <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/Workday_logo.svg" alt="Workday" className="w-full h-full object-contain" crossOrigin="anonymous" />
+    <img src="https://logo.clearbit.com/workday.com" alt="Workday" className="w-full h-full object-contain" />
   )
 }
 

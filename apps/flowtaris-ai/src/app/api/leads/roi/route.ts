@@ -134,8 +134,9 @@ export async function POST(request: NextRequest) {
                   <tr>
                     <td style="padding-bottom: 8px; font-size: 15px; color: #374151; line-height: 1.7;">
                       Best,<br>
-                      <strong>Priya</strong> at Flowtaris<br>
-                      <span style="color: #9ca3af; font-size: 13px;">Enterprise Solutions · <a href="https://flowtaris.ai" style="color: #9ca3af;">flowtaris.ai</a></span>
+                      <strong>Flowtaris Team</strong><br>
+                      <span style="color: #9ca3af; font-size: 13px; font-style: italic;">The Science of Business Flow</span><br>
+                      <span style="color: #9ca3af; font-size: 13px;"><a href="https://flowtaris.ai" style="color: #9ca3af;">flowtaris.ai</a> &nbsp;·&nbsp; <a href="https://flowtaris.ai/demo" style="color: #9ca3af;">Book a call</a></span>
                     </td>
                   </tr>
 
@@ -159,11 +160,42 @@ export async function POST(request: NextRequest) {
       const supportEmail = process.env.FLOWTARIS_SUPPORT_EMAIL || 'support@flowtaris.com'
       const adminEmail = process.env.FLOWTARIS_ADMIN_EMAIL
 
+      // Plain-text mirror — critical signal for Gmail Primary routing
+      const emailText = [
+        `Hi,`,
+        ``,
+        `Following your session on the Flowtaris ROI Calculator, here are your personalised numbers for ${inputs.erp}:`,
+        ``,
+        `--- YOUR ESTIMATES ---`,
+        `Net Annual Savings:   ${fmt(outputs.res?.annualSavings || 0)}`,
+        `Payback Period:       ${outputs.res?.paybackMonths || 0} months`,
+        `FTE Capacity Freed:   ${outputs.res?.fteFreed || 0} heads`,
+        `Cost of Delay (COI):  ${fmt((outputs.coi?.attritionCost || 0) + (outputs.coi?.complianceRisk || 0))} / yr`,
+        ``,
+        `These figures are based on publicly available benchmarks for ${inputs.erp} in the ${inputs.useCase} space. Directionally accurate — not a guarantee, but a grounded starting point for an internal conversation.`,
+        ``,
+        `Two things worth flagging:`,
+        ``,
+        `1. Technical fit: Actual savings depend heavily on how your ${inputs.erp} data is structured. A quick 30-min call can validate this.`,
+        `2. Low-risk start: We typically recommend beginning with ${inputs.useCase} before expanding — this lets you prove ROI internally with minimal risk.`,
+        ``,
+        `If you'd like to validate these numbers for your specific setup, book a slot here: https://flowtaris.ai/demo`,
+        ``,
+        `Best,`,
+        `Flowtaris Team`,
+        `The Science of Business Flow`,
+        `https://flowtaris.ai`,
+        ``,
+        `---`,
+        `These are illustrative estimates based on publicly available industry benchmarks. Actual results will vary. Not a guarantee of financial performance.`,
+      ].join('\n')
+
       const { data: resendData, error: resendError } = await resend.emails.send({
-        from: `Priya at Flowtaris <${supportEmail}>`,
+        from: `Flowtaris Team <${supportEmail}>`,
         to: [email],
-        subject: `Your ${inputs.erp} ROI numbers`,
+        subject: `Your ${inputs.erp} ROI analysis`,
         html: emailHtml,
+        text: emailText,
         headers: {
           'X-Entity-Ref-ID': `roi-${Date.now()}`,
         },

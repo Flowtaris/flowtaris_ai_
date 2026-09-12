@@ -370,19 +370,19 @@ function StepIntro({ config, onStart }: { config: AssessmentConfigData['intro'];
   )
 }
 
-// ─── EXACT BRAND LOGOS (PULLED FROM OFFICIAL SOURCES) ─────────────────────
+// ─── EXACT BRAND LOGOS (SERVED LOCALLY FOR 100% RELIABILITY) ───────────
 const ERP_LOGOS: Record<string, React.ReactNode> = {
   'NetSuite': (
-    <img src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://netsuite.com&size=128" alt="Oracle NetSuite" className="w-full h-full object-contain rounded-md" />
+    <img src="/images/logos/netsuite.png" alt="Oracle NetSuite" className="w-full h-full object-contain rounded-md" />
   ),
   'SAP': (
-    <img src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://sap.com&size=128" alt="SAP S/4HANA" className="w-full h-full object-contain rounded-md" />
+    <img src="/images/logos/sap.png" alt="SAP S/4HANA" className="w-full h-full object-contain rounded-md" />
   ),
   'Coupa': (
-    <img src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://coupa.com&size=128" alt="Coupa" className="w-full h-full object-contain rounded-md" />
+    <img src="/images/logos/coupa.png" alt="Coupa" className="w-full h-full object-contain rounded-md" />
   ),
   'Workday': (
-    <img src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://workday.com&size=128" alt="Workday" className="w-full h-full object-contain rounded-md" />
+    <img src="/images/logos/workday.png" alt="Workday" className="w-full h-full object-contain rounded-md" />
   )
 }
 

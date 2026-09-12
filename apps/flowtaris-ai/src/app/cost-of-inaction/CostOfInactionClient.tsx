@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, useSpring, useTransform } from 'framer-motion'
-import { Shield, TrendingUp, DollarSign, Timer, ArrowRight, Info, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react'
+import { Shield, TrendingUp, DollarSign, Timer, ArrowRight, Info, CheckCircle2, ChevronDown, ChevronUp, AlertTriangle, Zap, TrendingDown } from 'lucide-react'
 import { calculateInaction, type InactionInputs, type InactionOutputs } from '@flowtaris/inaction-engine'
 import { analytics } from '@flowtaris/analytics'
 
@@ -134,13 +134,21 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
   const [narrative, setNarrative] = useState('')
   const [email, setEmail] = useState('')
   const [emailSent, setEmailSent] = useState(false)
+  const [emailLoading, setEmailLoading] = useState(false)
+  const [dailyTick, setDailyTick] = useState(0)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     if (params.get('invoices')) setState((p: any) => ({ ...p, annualVolume: parseInt(params.get('invoices')!) || p.annualVolume }))
     if (params.get('delay')) setState((p: any) => ({ ...p, monthsDelay: parseInt(params.get('delay')!) || p.monthsDelay }))
     analytics.inaction.open({ source: 'direct' })
-  }, [])
+    // Live daily cost ticker — increments every second
+    const dailyRate = (outputs?.monthlyLeakage || 0) / 30 / 24 / 3600
+    const ticker = setInterval(() => {
+      setDailyTick(t => t + dailyRate)
+    }, 1000)
+    return () => clearInterval(ticker)
+  }, [outputs?.monthlyLeakage])
 
   useEffect(() => {
     const inputs: InactionInputs = {
@@ -168,12 +176,22 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email) return
-    setEmailSent(true)
-    fetch('/api/leads/demo', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, urgently: outputs.monthlyLeakage > 50000 ? 'high' : 'standard' }),
-    }).catch(console.error)
+    setEmailLoading(true)
+    try {
+      await fetch('/api/leads/inaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: 'direct',
+          email,
+          outputs,
+          state,
+        }),
+      })
+    } catch (err) { console.error(err) } finally {
+      setEmailLoading(false)
+      setEmailSent(true)
+    }
   }
 
   return (
@@ -446,35 +464,86 @@ export default function CostOfInactionClient({ initialConfig }: { initialConfig:
               </div>
             </div>
 
-            {/* Inline CTA */}
-            <div className="bg-slate-900 rounded-3xl p-8 md:p-12 text-white shadow-xl">
-              <div className="text-center max-w-2xl mx-auto">
-                <h3 className="text-2xl font-black mb-4">
+            {/* ── LIVE WARNING CTA ── */}
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+              {/* Animated danger background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0f] via-[#0f0a0a] to-[#0a0a0f]" />
+              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 20% 80%, #ef444440, transparent 60%), radial-gradient(circle at 80% 20%, #06b6d420, transparent 60%)' }} />
+              
+              <div className="relative p-8 md:p-12">
+                {/* LIVE badge row */}
+                <div className="flex flex-wrap items-center gap-3 mb-6">
+                  <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-full px-3 py-1.5">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping absolute" />
+                    <span className="w-2 h-2 rounded-full bg-red-500 relative" />
+                    <span className="text-red-400 text-xs font-bold uppercase tracking-wider">Live Analysis</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full px-3 py-1.5">
+                    <AlertTriangle className="w-3 h-3 text-amber-400" />
+                    <span className="text-amber-400 text-xs font-bold">Inaction detected</span>
+                  </div>
+                </div>
+
+                {/* Heading */}
+                <h3 className="text-2xl md:text-3xl font-black text-white mb-2 leading-tight">
                   {config.rightSide?.cta?.heading || DEFAULT_COI_CONFIG.rightSide.cta.heading}
                 </h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-8">
+                <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-xl">
                   {config.rightSide?.cta?.subtext || DEFAULT_COI_CONFIG.rightSide.cta.subtext}
                 </p>
-                
+
+                {/* Live cost ticker */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <TrendingDown className="w-3.5 h-3.5 text-red-400" />
+                      <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">Leaking This Session</span>
+                    </div>
+                    <div className="text-lg font-black font-mono text-white">
+                      ${Math.round(dailyTick).toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Zap className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Monthly Leakage</span>
+                    </div>
+                    <div className="text-lg font-black font-mono text-white">
+                      ${Math.round(outputs.monthlyLeakage).toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <AlertTriangle className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Annual Exposure</span>
+                    </div>
+                    <div className="text-lg font-black font-mono text-white">
+                      ${Math.round(outputs.totalAnnualCost).toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Form */}
                 {emailSent ? (
                   <div className="inline-flex items-center justify-center gap-2 py-4 px-8 text-green-400 bg-green-400/10 border border-green-400/20 rounded-xl font-bold">
-                    <CheckCircle2 className="w-5 h-5" /> Meeting Request Confirmed
+                    <CheckCircle2 className="w-5 h-5" /> Report sent — check your inbox
                   </div>
                 ) : (
-                  <form onSubmit={handleEmailSubmit} className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <input 
-                      type="email" 
-                      required 
+                  <form onSubmit={handleEmailSubmit} className="flex flex-col sm:flex-row gap-3">
+                    <input
+                      type="email"
+                      required
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      placeholder="work@company.com" 
-                      className="bg-white/10 border border-white/20 px-6 py-4 rounded-xl outline-none focus:ring-2 focus:ring-white text-white text-sm font-medium w-full sm:w-80 placeholder:text-slate-500"
+                      placeholder="work@company.com"
+                      className="bg-white/10 border border-white/20 px-5 py-4 rounded-xl outline-none focus:ring-2 focus:ring-red-500/50 text-white text-sm font-medium w-full sm:w-80 placeholder:text-slate-600 transition-all"
                     />
-                    <button 
+                    <button
                       type="submit"
-                      className="bg-white hover:bg-slate-100 text-slate-900 px-8 py-4 rounded-xl font-black text-sm transition-colors flex items-center justify-center gap-2"
+                      disabled={emailLoading}
+                      className="bg-white hover:bg-red-50 text-slate-900 px-7 py-4 rounded-xl font-black text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60 whitespace-nowrap"
                     >
-                      {config.rightSide?.cta?.buttonText || DEFAULT_COI_CONFIG.rightSide.cta.buttonText} <ArrowRight className="w-4 h-4" />
+                      {emailLoading ? <span className="animate-pulse">Sending...</span> : <>{config.rightSide?.cta?.buttonText || DEFAULT_COI_CONFIG.rightSide.cta.buttonText} <ArrowRight className="w-4 h-4" /></>}
                     </button>
                   </form>
                 )}

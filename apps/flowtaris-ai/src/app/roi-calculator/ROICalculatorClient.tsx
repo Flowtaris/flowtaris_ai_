@@ -135,6 +135,7 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
   const [erp, setErp] = useState(config.platforms[0])
   const [useCase, setUseCase] = useState(config.useCases[0].id)
   const [sizeIndex, setSizeIndex] = useState(50)
+  const [showTooltip, setShowTooltip] = useState(false)
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [showPressEnter, setShowPressEnter] = useState(false)
@@ -158,7 +159,23 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
   const pAttr = (m.attritionCost / currentTotal) * 100
   const pComp = (m.complianceCost / currentTotal) * 100
 
-  useEffect(() => { analytics.roi.open({ source: 'executive-dashboard' }) }, [])
+  useEffect(() => { 
+    analytics.roi.open({ source: 'executive-dashboard' }) 
+    
+    // Auto-scroll animation to draw attention to the slider
+    let step = 0
+    const interval = setInterval(() => {
+      step += 1
+      setSizeIndex(50 + Math.sin(step * 0.4) * 20)
+      if (step > 15) {
+        clearInterval(interval)
+        setSizeIndex(50)
+        setShowTooltip(true)
+        setTimeout(() => setShowTooltip(false), 5000)
+      }
+    }, 40)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleExport = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -226,7 +243,7 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" />
             </div>
           </div>
-          <div className="flex-[2] w-full px-4">
+          <div className="flex-[2] w-full px-4 relative">
             <div className="flex justify-between items-end mb-2">
               <label className="text-[10px] uppercase tracking-widest text-white/40 font-semibold flex gap-2 items-center">
                 {/* P2 #14 — Removed: 'LIVE DATA SYNC' badge which implies live market connectivity */}
@@ -234,9 +251,19 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
               </label>
               <span className="text-brand-cyan-400 font-mono text-sm font-bold">{m.vol.toLocaleString()} docs/yr</span>
             </div>
-            <input type="range" min="0" max="100" value={sizeIndex} onChange={e => setSizeIndex(parseInt(e.target.value))} 
-              className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-brand-cyan-500" 
-            />
+            
+            <div className="relative">
+              {showTooltip && (
+                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-brand-cyan-500 text-black text-[10px] font-bold px-3 py-1.5 rounded-full shadow-[0_0_15px_rgba(6,182,212,0.5)] whitespace-nowrap animate-in fade-in slide-in-from-bottom-2 duration-300 z-20">
+                  Slide to adjust volume
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-brand-cyan-500 rotate-45"></div>
+                </div>
+              )}
+              <input type="range" min="0" max="100" value={sizeIndex} onChange={e => { setSizeIndex(parseInt(e.target.value)); setShowTooltip(false); }} 
+                className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-brand-cyan-500 relative z-10" 
+              />
+            </div>
+            
             <div className="flex justify-between mt-2 text-[10px] text-white/30 uppercase tracking-wider">
               <span>SMB</span><span>Mid-Market</span><span>Global Enterprise</span>
             </div>

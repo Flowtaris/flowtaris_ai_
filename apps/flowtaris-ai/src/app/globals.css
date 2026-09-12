@@ -29,6 +29,9 @@
     text-rendering: optimizeLegibility;
     /* Prevent white flash during navigation and page load */
     background-color: #0d0b14;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
   }
 
   body {
@@ -39,6 +42,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
   }
 
   /* Selection styles */

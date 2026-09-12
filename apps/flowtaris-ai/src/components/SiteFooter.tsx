@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
@@ -8,6 +8,29 @@ import { ArrowUpRight, Github, Linkedin, Twitter, ArrowRight, Youtube, Instagram
 
 export default function SiteFooter({ config }: { config?: any } = {}) {
   const pathname = usePathname()
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email) return
+    setStatus('loading')
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+      if (!res.ok) throw new Error('Failed to subscribe')
+      setStatus('success')
+      setEmail('')
+      setTimeout(() => setStatus('idle'), 5000)
+    } catch (err) {
+      console.error(err)
+      setStatus('error')
+      setTimeout(() => setStatus('idle'), 3000)
+    }
+  }
 
   // Hide footer on all admin pages
   if (pathname?.startsWith('/admin')) {
@@ -77,16 +100,25 @@ export default function SiteFooter({ config }: { config?: any } = {}) {
                 {newsletterDescription}
               </p>
             </div>
-            <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3">
+            <form onSubmit={handleSubscribe} className="w-full md:w-auto flex flex-col sm:flex-row gap-3 relative">
               <input 
                 type="email" 
                 placeholder="Enter your work email" 
-                className="w-full sm:w-72 bg-black/50 border border-white/10 rounded-full px-6 py-3.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#D4A847]/50 focus:ring-1 focus:ring-[#D4A847]/50 transition-all"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                disabled={status === 'loading' || status === 'success'}
+                className="w-full sm:w-72 bg-black/50 border border-white/10 rounded-full px-6 py-3.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#D4A847]/50 focus:ring-1 focus:ring-[#D4A847]/50 transition-all disabled:opacity-50"
               />
-              <button className="whitespace-nowrap bg-white text-black font-semibold rounded-full px-8 py-3.5 text-sm hover:bg-[#f0c97a] hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                {newsletterButtonText}
+              <button 
+                type="submit"
+                disabled={status === 'loading' || status === 'success'}
+                className="whitespace-nowrap bg-white text-black font-semibold rounded-full px-8 py-3.5 text-sm hover:bg-[#f0c97a] hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] disabled:opacity-50 disabled:hover:scale-100 disabled:hover:bg-white"
+              >
+                {status === 'loading' ? 'Subscribing...' : status === 'success' ? 'Subscribed!' : newsletterButtonText}
               </button>
-            </div>
+              {status === 'error' && <div className="absolute -bottom-6 left-4 text-xs text-red-400">Something went wrong. Try again.</div>}
+            </form>
           </div>
         </div>
 

@@ -25,46 +25,64 @@ export default function PrivacyPage() {
         <Card className="glass-card">
           <CardContent className="p-8 md:p-12 prose prose-invert max-w-none prose-p:text-neutral-300 prose-headings:text-white prose-a:text-[#E8A020]">
 
-            <h2>1. Introduction</h2>
+            <h2>1. Our Commitment to Enterprise Security</h2>
             <p>
-              Flowtaris AI ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or use our enterprise AI automation services.
+              At Flowtaris AI, security and privacy are foundational. This Privacy & Data Protection Policy outlines our strict protocols for handling enterprise data, specifically concerning our AI integrations with ERP systems (NetSuite, SAP, Coupa, Workday). We operate under a <strong>Zero-Trust Architecture</strong> and maintain strict adherence to global privacy frameworks.
             </p>
 
-            <h2>2. Information We Collect</h2>
+            <h2>2. Enterprise Data & AI Model Training (Zero Retention)</h2>
             <p>
-              We may collect information about you in a variety of ways, including:
-            </p>
-            <ul>
-              <li><strong>Personal Data:</strong> Name, email address, phone number, and company details provided via contact forms or assessment wizards.</li>
-              <li><strong>Usage Data:</strong> Information automatically collected when accessing the site, such as IP addresses, browser types, and interaction metrics.</li>
-            </ul>
-
-            <h2>3. How We Use Your Information</h2>
-            <p>
-              Having accurate information about you permits us to provide you with a smooth, efficient, and customized experience. Specifically, we may use information collected about you via the Site to:
+              Your data remains your data. Flowtaris AI guarantees that <strong>customer data is never used to train foundational AI models</strong>. We employ a strict Zero-Data-Retention policy for all GenAI interactions:
             </p>
             <ul>
-              <li>Respond to your inquiries and offer customer support.</li>
-              <li>Deliver our enterprise AI automation solutions and platform updates.</li>
-              <li>Improve website performance and user experience.</li>
+              <li><strong>No Cross-Tenant Contamination:</strong> Your proprietary financial data is isolated within single-tenant, dedicated vector databases.</li>
+              <li><strong>Ephemeral Processing:</strong> Prompts and completions processed through our LLM gateways are never logged, stored, or reviewed by humans.</li>
+              <li><strong>Private Instances:</strong> We utilize private, isolated instances of AI models via secure APIs (Azure OpenAI, AWS Bedrock) governed by strict BAA and DPA agreements preventing data retention.</li>
             </ul>
 
-            <h2>4. Disclosure of Your Information</h2>
+            <h2>3. Information We Process</h2>
             <p>
-              We do not sell, trade, or rent your Personal Data to third parties. We may share information with trusted third-party service providers (Processors) who assist us in operating our website and conducting our business, so long as those parties agree to keep this information confidential and secure.
+              As a Data Processor, Flowtaris AI only processes information strictly necessary to execute the autonomous workflows authorized by your organization:
+            </p>
+            <ul>
+              <li><strong>Transactional Data:</strong> Invoices, purchase orders, and receipts processed via our OCR and document intelligence engine.</li>
+              <li><strong>System Telemetry:</strong> Anonymized integration health metrics and API latency logs to ensure SLA compliance.</li>
+              <li><strong>Administrative Data:</strong> RBAC (Role-Based Access Control) credentials, SSO tokens, and audit logs of user actions within the Flowtaris portal.</li>
+            </ul>
+
+            <h2>4. Encryption & Infrastructure Security</h2>
+            <p>
+              All customer data is secured using military-grade encryption standards:
+            </p>
+            <ul>
+              <li><strong>Data at Rest:</strong> Encrypted using AES-256 block-level encryption.</li>
+              <li><strong>Data in Transit:</strong> Secured via TLS 1.3 across all internal and external network boundaries.</li>
+              <li><strong>Data Residency:</strong> Customers may elect to have their data hosted exclusively in US, EU (Frankfurt), or UK data centers to comply with local data sovereignty laws (e.g., GDPR).</li>
+            </ul>
+
+            <h2>5. Compliance & Audits</h2>
+            <p>
+              Flowtaris AI maintains continuous compliance with the following frameworks. Audit reports (Type II) are available to customers under NDA:
+            </p>
+            <ul>
+              <li><strong>SOC 2 Type II:</strong> Audited annually by independent third-party assessors.</li>
+              <li><strong>ISO 27001:</strong> Certified Information Security Management System (ISMS).</li>
+              <li><strong>GDPR & CCPA:</strong> Fully compliant data processing agreements and subject rights workflows.</li>
+              <li><strong>HIPAA:</strong> BAA available for healthcare clients processing PHI.</li>
+            </ul>
+
+            <h2>6. Data Subject Rights & Incident Response</h2>
+            <p>
+              We maintain a 24/7/365 Security Operations Center (SOC). In the highly unlikely event of a data anomaly, our incident response protocol guarantees customer notification within 24 hours. Enterprise administrators have full self-service capabilities to fulfill Data Subject Access Requests (DSARs) directly through the Flowtaris admin console.
             </p>
 
-            <h2>5. Security of Your Information</h2>
+            <h2>7. Contact Our Data Protection Officer (DPO)</h2>
             <p>
-              We use administrative, technical, and physical security measures to help protect your personal information. While we have taken reasonable steps to secure the personal information you provide to us, please be aware that despite our efforts, no security measures are perfect or impenetrable.
-            </p>
-
-            <h2>6. Contact Us</h2>
-            <p>
-              If you have questions or comments about this Privacy Policy, please contact us at:
+              For security assessments, DPA inquiries, or privacy concerns, please contact our dedicated compliance team:
               <br /><br />
-              <strong>Flowtaris AI Legal Department</strong><br />
-              Email: privacy@flowtaris.com
+              <strong>Flowtaris AI Office of the CISO</strong><br />
+              Email: security@flowtaris.com<br />
+              Email: dpo@flowtaris.com
             </p>
           </CardContent>
         </Card>

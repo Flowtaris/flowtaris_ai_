@@ -373,16 +373,16 @@ function StepIntro({ config, onStart }: { config: AssessmentConfigData['intro'];
 // ─── EXACT BRAND LOGOS (PULLED FROM OFFICIAL SOURCES) ─────────────────────
 const ERP_LOGOS: Record<string, React.ReactNode> = {
   'NetSuite': (
-    <img src="https://logo.clearbit.com/netsuite.com" alt="Oracle NetSuite" className="w-full h-full object-contain" />
+    <img src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://netsuite.com&size=128" alt="Oracle NetSuite" className="w-full h-full object-contain rounded-md" />
   ),
   'SAP': (
-    <img src="https://logo.clearbit.com/sap.com" alt="SAP S/4HANA" className="w-full h-full object-contain" />
+    <img src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://sap.com&size=128" alt="SAP S/4HANA" className="w-full h-full object-contain rounded-md" />
   ),
   'Coupa': (
-    <img src="https://logo.clearbit.com/coupa.com" alt="Coupa" className="w-full h-full object-contain" />
+    <img src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://coupa.com&size=128" alt="Coupa" className="w-full h-full object-contain rounded-md" />
   ),
   'Workday': (
-    <img src="https://logo.clearbit.com/workday.com" alt="Workday" className="w-full h-full object-contain" />
+    <img src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://workday.com&size=128" alt="Workday" className="w-full h-full object-contain rounded-md" />
   )
 }
 

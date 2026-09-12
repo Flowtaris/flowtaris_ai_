@@ -147,6 +147,7 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
   const [emailError, setEmailError] = useState('')
   const [showPressEnter, setShowPressEnter] = useState(false)
   const [showErrorPopup, setShowErrorPopup] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('Please enter valid email')
   const [sent, setSent] = useState(false)
   const [isSimulating, setIsSimulating] = useState(false)
 
@@ -192,6 +193,7 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]{2,}\.[a-zA-Z]{2,}$/
     if (!emailRegex.test(email)) {
       setShowPressEnter(false)
+      setErrorMessage('Please enter valid email')
       setShowErrorPopup(true)
       // Auto-hide error popup after 3 seconds
       setTimeout(() => setShowErrorPopup(false), 3000)
@@ -227,6 +229,7 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
         })
       })
       if (!resp.ok) {
+        setErrorMessage('Failed to connect to server')
         setShowErrorPopup(true)
         setTimeout(() => setShowErrorPopup(false), 3000)
         throw new Error('Failed to send')
@@ -385,7 +388,7 @@ export default function ROICalculatorClient({ initialConfig }: { initialConfig: 
                     {/* Red "please enter valid email" popup — below the input */}
                     {showErrorPopup && (
                       <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-lg shadow-red-500/30 whitespace-nowrap pointer-events-none z-10">
-                        Please enter valid email
+                        {errorMessage}
                       </div>
                     )}
                   </div>

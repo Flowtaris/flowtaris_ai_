@@ -19,22 +19,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
     }
 
-    // 1. Insert into Supabase
-    const supabase = createServerClient()
-    const { data: lead, error: supabaseError } = await supabase
-      .from('roi_calculations')
-      .insert({
-        inputs,
-        outputs,
-        email,
-        assessment_id: assessment_id || null,
-      })
-      .select()
-      .single()
+    // 1. Insert into Supabase (optional logging, do not fail if DB is unavailable)
+    let lead = null
+    try {
+      const supabase = createServerClient()
+      const { data, error: supabaseError } = await supabase
+        .from('roi_calculations')
+        .insert({
+          inputs,
+          outputs,
+          email,
+          assessment_id: assessment_id || null,
+        })
+        .select()
+        .single()
 
-    if (supabaseError) {
-      console.error('Supabase error:', supabaseError)
-      return NextResponse.json({ error: 'Failed to save ROI calculation' }, { status: 500 })
+      if (supabaseError) {
+        console.error('Supabase error (bypassing to send email):', supabaseError)
+      } else {
+        lead = data
+      }
+    } catch (dbErr) {
+      console.error('Supabase connection error:', dbErr)
     }
 
     // 2. Send Email via Resend
@@ -177,7 +183,7 @@ export async function POST(request: NextRequest) {
        console.log('RESEND_API_KEY not found. Skipping email send.')
     }
 
-    return NextResponse.json({ success: true, calcId: lead.id })
+    return NextResponse.json({ success: true, calcId: lead?.id || 'bypass' })
 
   } catch (error) {
     console.error('ROI backend error:', error)

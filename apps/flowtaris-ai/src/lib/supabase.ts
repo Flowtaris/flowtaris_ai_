@@ -26,13 +26,13 @@ function createMockClient(): SupabaseClient {
 
 // Client for public operations (read-only for now)
 export const supabase: SupabaseClient = (supabaseUrl && supabaseAnonKey)
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey, { global: { fetch: (url, options) => fetch(url, { ...options, cache: 'no-store' }) } })
   : createMockClient()
 
 // Server-side client with service role (for admin operations)
 export function createAdminClient() {
   if (!supabaseUrl || !supabaseServiceRoleKey) return createMockClient()
-  return createClient(supabaseUrl, supabaseServiceRoleKey, {
+  return createClient(supabaseUrl, supabaseServiceRoleKey, { global: { fetch: (url, options) => fetch(url, { ...options, cache: 'no-store' }) },
     auth: {
       autoRefreshToken: false,
       persistSession: false,

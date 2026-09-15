@@ -23,7 +23,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://flowtaris.ai'
 async function fetchHeaderConfig() {
   try {
     const res = await fetch(`${BASE_URL}/api/site-config`, {
-      next: { revalidate: 5, tags: ['site-config'] },
+      cache: 'no-store',
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return await res.json()
@@ -366,3 +366,4 @@ export default async function RootLayout({
     </html>
   );
 }
+

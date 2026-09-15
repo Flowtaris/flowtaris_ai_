@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Flowtaris AI Terms of Service. Information about your rights and responsibilities when using our services.',
 }
 
-export const revalidate = 5;
+export const dynamic = 'force-dynamic';
 
 export default async function TermsPage() {
   let siteConfig = null
@@ -104,3 +104,4 @@ export default async function TermsPage() {
     </div>
   )
 }
+

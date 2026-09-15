@@ -117,7 +117,7 @@ export const metadata: Metadata = {
   },
 }
 
-export const revalidate = 5;
+export const dynamic = 'force-dynamic';
 
 export default async function CapabilitiesPage() {
   let siteConfig = null;
@@ -238,3 +238,4 @@ export default async function CapabilitiesPage() {
     </div>
   )
 }
+

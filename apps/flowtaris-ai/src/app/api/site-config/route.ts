@@ -40,7 +40,17 @@ export async function GET() {
       capabilitiesSectionConfig: (data as any)?.capabilities_section_config ?? null,
       costSectionConfig: (data as any)?.cost_section_config ?? null,
       newsletterConfig: (data as any)?.newsletter_config ?? null,
-      socialLinks: (data as any)?.social_links ?? null,
+      socialLinks: (function() {
+        const configArr = (data as any)?.social_links_config;
+        if (Array.isArray(configArr) && configArr.length > 0) {
+          const map: any = {};
+          configArr.forEach((item: any) => {
+            if (item.platform && item.url) map[item.platform] = item.url;
+          });
+          return map;
+        }
+        return (data as any)?.social_links ?? null;
+      })(),
       privacyPolicyUrl: (data as any)?.privacy_policy_url ?? null,
       termsOfServiceUrl: (data as any)?.terms_of_service_url ?? null,
       insightsHeroConfig: (data as any)?.insights_hero_config ?? null,
@@ -182,3 +192,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: err.message ?? 'Unknown error' }, { status: 500 })
   }
 }
+

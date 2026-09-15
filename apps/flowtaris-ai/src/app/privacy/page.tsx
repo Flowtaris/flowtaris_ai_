@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 5;
 
 export default async function PrivacyPolicyPage() {
   let siteConfig = null
@@ -33,12 +33,11 @@ export default async function PrivacyPolicyPage() {
 
     // Pre-render HTML on the server before passing to Client Component
     const { marked } = await import('marked')
-    const DOMPurify = (await import('isomorphic-dompurify')).default
     
     const sections = await Promise.all(
       rawSections.map(async (section: any) => ({
         ...section,
-        html: DOMPurify.sanitize(await marked(section.content || '', { gfm: true, breaks: true }) as string)
+        html: await marked(section.content || '', { gfm: true, breaks: true })
       }))
     )
 

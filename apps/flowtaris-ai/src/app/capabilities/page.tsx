@@ -1,3 +1,4 @@
+import { getSiteConfig } from '@/lib/supabase'
 import { Metadata } from 'next'
 import { CapabilityCardList, CtaButtonGroup } from './CapabilityInteractives'
 
@@ -116,7 +117,20 @@ export const metadata: Metadata = {
   },
 }
 
-export default function CapabilitiesPage() {
+export const revalidate = 5;
+
+export default async function CapabilitiesPage() {
+  let siteConfig = null;
+  try {
+    siteConfig = await getSiteConfig();
+  } catch (err) {
+    console.error("Failed to fetch site config:", err);
+  }
+  
+  let dynamicCapabilities = CAPABILITIES;
+  if (siteConfig?.capabilities_config?.capabilities) {
+    dynamicCapabilities = siteConfig.capabilities_config.capabilities;
+  }
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans">
       {/* Subtle grid */}
@@ -150,7 +164,7 @@ export default function CapabilitiesPage() {
           <h2 id="capabilities-heading" className="sr-only">All 6 AI Capabilities</h2>
 
           <div className="space-y-6">
-            <CapabilityCardList capabilities={CAPABILITIES} />
+            <CapabilityCardList capabilities={dynamicCapabilities} />
           </div>
         </div>
       </section>
@@ -172,7 +186,7 @@ export default function CapabilitiesPage() {
               <thead>
                 <tr className="border-b border-white/10 bg-white/[0.02]">
                   <th className="text-left px-6 py-5 text-xs font-bold uppercase tracking-widest text-gray-500 w-[28%]">Capability</th>
-                  {CAPABILITIES.map((cap) => (
+                  {dynamicCapabilities.map((cap) => (
                     <th key={cap.slug} className="px-4 py-5 text-center">
                       <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: cap.accent }}>
                         {cap.title.split(' ').slice(0, 2).join(' ')}
@@ -188,7 +202,7 @@ export default function CapabilitiesPage() {
                     {row.caps.map((has, i) => (
                       <td key={i} className="px-4 py-5 text-center">
                         {has
-                          ? <span className="inline-block w-5 h-5 rounded-full" style={{ backgroundColor: CAPABILITIES[i].accentMuted, border: `1.5px solid ${CAPABILITIES[i].accent}`, color: CAPABILITIES[i].accent }}>
+                          ? <span className="inline-block w-5 h-5 rounded-full" style={{ backgroundColor: dynamicCapabilities[i].accentMuted, border: `1.5px solid ${dynamicCapabilities[i].accent}`, color: dynamicCapabilities[i].accent }}>
                               <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 p-[3px]"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                             </span>
                           : <span className="text-gray-700">—</span>

@@ -128,8 +128,8 @@ export default async function CapabilitiesPage() {
   }
   
   let dynamicCapabilities = CAPABILITIES;
-  if (siteConfig?.capabilities_config?.capabilities) {
-    dynamicCapabilities = siteConfig.capabilities_config.capabilities;
+  if (siteConfig?.capabilities_section_config?.capabilities) {
+    dynamicCapabilities = siteConfig.capabilities_section_config.capabilities;
   }
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans">
@@ -238,4 +238,5 @@ export default async function CapabilitiesPage() {
     </div>
   )
 }
+
 

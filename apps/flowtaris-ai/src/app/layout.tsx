@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
@@ -366,4 +367,5 @@ export default async function RootLayout({
     </html>
   );
 }
+
 

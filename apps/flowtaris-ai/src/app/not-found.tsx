@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   const links = [
-    { label: 'Capabilities', href: '/capabilities', desc: 'Explore our AI automation modules' },
     { label: 'Assessment', href: '/assessment', desc: 'Get your AI readiness score' },
     { label: 'Case Studies', href: '/case-studies', desc: 'See customer outcomes' },
     { label: 'Contact', href: '/contact', desc: 'Talk to our team' },

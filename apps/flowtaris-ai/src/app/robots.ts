@@ -15,8 +15,8 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         disallow: [
-          '/admin/',
-          '/admin',
+          
+          
           '/api/',
           '/_next/',
           '/preview/',
@@ -31,63 +31,63 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: 'Googlebot',
         allow: '/',
-        disallow: ['/admin/', '/api/', '/_next/'],
+        disallow: ['/api/', '/_next/'],
       },
 
       // ── Bingbot: Full access ──────────────────────────────────────────────
       {
         userAgent: 'Bingbot',
         allow: '/',
-        disallow: ['/admin/', '/api/', '/_next/'],
+        disallow: ['/api/', '/_next/'],
       },
 
       // ── OpenAI GPTBot: Welcome — flowtaris.ai wants to appear in ChatGPT ─
       {
         userAgent: 'GPTBot',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: ['/api/'],
       },
 
       // ── OpenAI ChatGPT-User: For ChatGPT browsing plugin ─────────────────
       {
         userAgent: 'ChatGPT-User',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: ['/api/'],
       },
 
       // ── Perplexity AI ─────────────────────────────────────────────────────
       {
         userAgent: 'PerplexityBot',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: ['/api/'],
       },
 
       // ── Anthropic Claude ──────────────────────────────────────────────────
       {
         userAgent: 'ClaudeBot',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: ['/api/'],
       },
 
       // ── Google Gemini / Bard ──────────────────────────────────────────────
       {
         userAgent: 'Google-Extended',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: ['/api/'],
       },
 
       // ── Meta AI ───────────────────────────────────────────────────────────
       {
         userAgent: 'meta-externalagent',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: ['/api/'],
       },
 
       // ── Cohere AI ─────────────────────────────────────────────────────────
       {
         userAgent: 'cohere-ai',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: ['/api/'],
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
